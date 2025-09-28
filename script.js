@@ -82,6 +82,42 @@ document.addEventListener('DOMContentLoaded', async function() {
   updateBarsAndKW();
   setInterval(updateBarsAndKW, 1000);
 
+  // ================= Daily Bill =================
+ const dailyBillEl = document.getElementById('DailyBill');
+const unitEl = document.querySelector('.unit');
+const endpoint = 'px_pm3250';   // <-- เปลี่ยนเป็น sensor ที่คุณใช้จริง
+const pricePerUnit = 4.4;       // บาท/หน่วย
+
+async function fetchDailyBill() {
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    const url = `https://api-kx4r63rdjq-an.a.run.app/daily-bill/sensor${endpoint}/${today}`;
+    const res = await fetch(url);
+    const json = await res.json();
+
+    const bill = json.electricity_bill ?? 0;  // ค่าไฟฟ้าเป็นเงิน
+    const units = bill / pricePerUnit;        // แปลงเป็นหน่วย
+
+    if (dailyBillEl) {
+      dailyBillEl.textContent = bill.toFixed(2) + ' THB';
+    }
+    if (unitEl) {
+      unitEl.textContent = units.toFixed(2) + ' Unit';
+    }
+
+  } catch (err) {
+    console.error('Error fetching daily bill:', err);
+    if (dailyBillEl) dailyBillEl.textContent = 'Error';
+    if (unitEl) unitEl.textContent = '';
+  }
+}
+
+// เรียกครั้งแรก
+fetchDailyBill();
+
+// อัปเดตทุก 30 นาที
+setInterval(fetchDailyBill, 1800000);
+
   // ================= Chart.js =================
   const canvas = document.getElementById('EnergyChart');
   if (canvas){
@@ -204,19 +240,21 @@ document.addEventListener('DOMContentLoaded', async function() {
 
   // ================= Calendar =================
   const calendarEl = document.getElementById('calendar');
-  const calendar = new FullCalendar.Calendar(calendarEl, {
-    initialView: 'dayGridMonth',
-    locale: 'th', // ใช้ภาษาไทย
-    headerToolbar: {
-      left: 'prev,next today',
-      center: 'title',
-      right: ''
-    },
-    events: [
-      { title: 'Event 1', start: '2025-09-28' },
-      { title: 'Event 2', start: '2025-09-30' }
-    ],
-    height: 600
-  });
-  calendar.render();
+  if (calendarEl) {
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: 'dayGridMonth',
+      locale: 'th',
+      headerToolbar: {
+        left: 'prev,next today',
+        center: 'title',
+        right: ''
+      },
+      events: [
+        { title: 'Event 1', start: '2025-09-28' },
+        { title: 'Event 2', start: '2025-09-30' }
+      ],
+      height: 600
+    });
+    calendar.render();
+  }
 });
