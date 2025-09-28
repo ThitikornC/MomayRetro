@@ -202,23 +202,21 @@ document.addEventListener('DOMContentLoaded', async function() {
     nextBtn.addEventListener('click', ()=>changeDay(1));
   }
 
-  // ================= FullCalendar =================
-  var calendarEl = document.getElementById('calendar');
-  calendarEl.style.height='600px';
-
-  async function fetchEnergyData() {
-    const res = await fetch('https://api-kx4r63rdjq-an.a.run.app/daily-energy/px_pm3250');
-    const json = await res.json();
-    return json.data.map(item=>({title:item.power.toFixed(2)+' kW', start:item.timestamp.split('T')[0], allDay:true}));
-  }
-
-  const events = await fetchEnergyData();
-  var calendar = new FullCalendar.Calendar(calendarEl,{
-    initialView:'dayGridMonth',
-    locale:'th',
-    events:events,
-    eventDidMount:function(info){ info.el.title='พลังงาน: '+info.event.title; }
+  // ================= Calendar =================
+  const calendarEl = document.getElementById('calendar');
+  const calendar = new FullCalendar.Calendar(calendarEl, {
+    initialView: 'dayGridMonth',
+    locale: 'th', // ใช้ภาษาไทย
+    headerToolbar: {
+      left: 'prev,next today',
+      center: 'title',
+      right: ''
+    },
+    events: [
+      { title: 'Event 1', start: '2025-09-28' },
+      { title: 'Event 2', start: '2025-09-30' }
+    ],
+    height: 600
   });
-
   calendar.render();
 });
