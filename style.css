@@ -1,0 +1,387 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
+
+/* ================= Body ================= */
+body {
+  font-family: 'Cinzel', serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  padding: 20px 15px;
+
+  /* Background image */
+  background-image: url('./images/BG.png');
+  background-size: cover;       /* ปรับขนาดให้เต็มหน้าจอ */
+  background-position: center;  /* กึ่งกลางรูป */
+  background-repeat: no-repeat; /* ไม่ทำซ้ำรูป */
+}
+
+/* ================= Top Container ================= */
+.Top_Container {
+  display: flex;
+  flex-direction: row;     /* จัดแนวนอน */
+  justify-content: center; /* กึ่งกลางแนวนอน */
+  gap: 20px;               /* ระยะห่างระหว่างกล่อง */
+  width: 100%;
+  max-width: 400px;
+}
+
+/* ================= กล่อง Client และ Electrical ================= */
+.ClientName_Container,
+.ElectricalBill_Container {
+  width: 180px;
+  height: 85px;
+  font-size: 12px;
+  font-weight: bold;
+  text-align: center;
+  box-sizing: border-box;
+  color: #fff;
+  border-radius: 10px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  /* PNG background */
+  background-image: url('./images/noise.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  /* เงา */
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+}
+
+/* ================= Main Container ================= */
+.Main_Container {
+  width: 365px;
+  height: 289px;
+  font-size: 12px;
+  font-weight: bold;
+  text-align: center;
+  box-sizing: border-box;
+  color: #fff;
+  border-radius: 10px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 30px;
+   position: relative;
+    overflow: visible;
+
+  /* PNG background */
+  background-image: url('./images/mainBG.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  /* เงา */
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+}
+
+/* ================= Realtime Container ================= */
+.Realtime_Container {
+  width: 365px;
+  height: 218px;
+  font-size: 12px;
+  font-weight: bold;
+  text-align: center;
+  box-sizing: border-box;
+  color: #fff;
+  border-radius: 10px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 30px;
+
+  /* PNG background */
+  background-image: url('./images/mainBG.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  /* เงา */
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+}
+
+/* ================= Bottom Info ================= */
+.Bottom_info {
+  width: 200px;         /* กำหนดความกว้างของกล่อง */
+  height: auto;         /* ความสูงปรับตามรูป */
+  display: flex;        /* ใช้ flex จัดตำแหน่ง */
+  justify-content: center;  /* กึ่งกลางแนวนอน */
+  align-items: center;      /* กึ่งกลางแนวตั้ง */
+  margin-top: 20px;     /* เว้นระยะจากกล่องบน */
+}
+
+.Bottom_info img {
+  max-width: 100%;      /* ปรับขนาดรูปไม่เกินกล่อง */
+  height: auto;         /* รักษาอัตราส่วน */
+  display: block;
+}
+
+/* ================= Navbar ================= */
+.Navbar {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto 20px auto;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 10px 20px;
+  border-radius: 10px;
+  box-sizing: border-box;
+}
+
+/* วันที่ซ้าย */
+#Date_icon h2 {
+  color: #fff;
+  font-weight: bold;
+  font-size: 14px;
+  margin: 0;
+}
+
+/* กลุ่มไอคอนขวา */
+#Icons_group {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;         /* ระยะห่างระหว่างไอคอน */
+  margin-left: auto; /* ดันไปขวาสุด */
+}
+
+/* ไอคอนทั่วไป */
+.Navbar div img {
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  display: block;
+  object-fit: contain;
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+/* ปรับขนาดเฉพาะไอคอน */
+#Calendar_icon img { width: 50px; height: 50px; }
+#Kwang_icon img    { width: 50px; height: 50px; }
+#Bell_icon img     { width: 50px; height: 50px; }
+
+/* Hover / Active */
+.Navbar div img:hover  { transform: scale(1.1); opacity: 0.9; }
+.Navbar div img:active { transform: scale(0.95); opacity: 0.8; }
+
+/* ================= Main Picinfo ================= */
+#Main_Picinfo {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 10px;
+  padding-right: 140px;
+}
+
+#Main_Picinfo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 10px;
+}
+
+/* Glow แสงหลอดไฟ */
+#Main_Picinfo .glow {
+  position: absolute;
+  top: 25%;
+  left: 40%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  height: 50%;
+  max-width: 150px;
+  max-height: 150px;
+  border-radius: 100%;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255,200,50,0.4) 20%,
+    rgba(255,200,50,0) 90%
+  );
+  filter: blur(30px);
+  z-index: 1;
+  transition: background 0.1s linear,
+              width 0.1s linear,
+              height 0.1s linear;
+}
+
+/* ================= Progress Bars ================= */
+.progress-container {
+  position: relative;     /* จาก absolute -> relative */
+  width: 140px;
+  height: 11px;
+  background-color: rgb(255, 247, 247);
+  box-shadow: inset 0 1px 2px rgba(73, 72, 72, 0.6);
+  border-radius: 6px;
+  overflow: visible;
+  margin: 6px 0;        /* เว้นระยะระหว่าง bar กับ element อื่น */
+}
+
+#floor1,
+#floor2 {
+  bottom: auto;           /* ยกเลิก bottom */
+  margin-left: -70px;
+  transform: none;        /* ยกเลิก translate */
+}
+
+
+.progress-bar {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 1s ease-in-out,
+              background-color 0.5s ease-in-out;
+  box-shadow: inset 0 2px 3px rgba(255,255,255,0.5);
+
+}
+
+#Total_Bar {
+  position: absolute;      /* วางแยกออกจาก flow */
+  right: 100px;             /* ชิดขวาใน Main_Container */
+  top: 40%;                /* กึ่งกลางแนวตั้ง */
+  transform: translateY(-50%); /* กึ่งกลางแนวตั้ง */
+  width: 18px;
+  height: 182px;
+  background-color: rgb(255, 247, 247);
+  box-shadow: inset 0 1px 2px rgba(73, 72, 72, 0.6);
+  border-radius: 6px;
+  overflow: hidden;
+  z-index: 2;              /* อยู่เหนือพื้นหลังแต่ใต้ glow ถ้าต้องการ */
+}
+.floor-wrapper {
+  display: flex;
+  align-items: center;  /* ให้ bar และชื่ออยู่แนวเดียวกัน */
+  gap: 70px;            /* ระยะระหว่างชื่อกับ bar */
+  margin-right: 90px;
+}
+
+.Bar_name {
+  margin: 0;       
+  padding: 0;      
+  width: 60px;
+  font-size: 12px;      
+}
+#Total_Bar .progress-bar {
+  width: 100%;
+  height: 0;            /* เริ่มจาก 0 */
+  position: absolute;
+  bottom: 0;            /* ให้ bar เริ่มจากด้านล่าง */
+  transition: height 0.5s ease, background-color 0.5s ease;
+}
+#Bar_Bg {
+  position: absolute;        /* วางทับหรือแยกจาก flow */
+  right: 65px;              /* ปรับตำแหน่งขวา */
+  top: 40%;                  /* กึ่งกลางแนวตั้ง */
+  transform: translateY(-50%); /* กึ่งกลางแนวตั้ง */
+  width: 86px;               /* ปรับความกว้าง */
+  height: 192px;             /* ปรับความสูง */
+  z-index: 1;                /* อยู่ใต้ Total_Bar */
+}
+
+#Bar_Bg img {
+  width: 100%;               /* ให้รูปเต็ม div */
+  height: 100%;              /* ให้รูปเต็ม div */
+  object-fit: cover;         /* ครอบเต็มพื้นที่ */
+  border-radius: 10px;
+}
+.Marker {
+  position: absolute;
+  width: 18px;   
+  height: 2px;
+  background-color: #100f0f;
+  border-radius: 10px;
+  z-index: 10;
+  display: flex;
+  justify-content: center; 
+  align-items: center;     
+  color: rgb(1, 1, 1); 
+  font-weight: bold;
+  font-size: 8px;
+}
+
+/* Marker1: เว้นตัวเลขบนเส้น */
+#marker1 {
+  top: 40%;
+  right: 100px;
+  flex-direction: column;   /* ตัวเลขบนเส้น */
+}
+
+#marker1::after {
+  content: "";
+  display: block;
+  width: 10px;       
+  height: 2px;       
+  background-color: #100f0f;
+  border-radius: 10px;
+  margin-top: 10px;   /* เว้นระยะตัวเลข */
+}
+
+/* Marker2 และ Marker3: ใช้แบบปกติ ไม่เว้น */
+#marker2 { top: 55%; right: 100px; }
+#marker3 { bottom: 75%; right: 100px; }
+
+
+
+.Realtime_kW {
+  position: absolute;
+  right: 20px;
+  bottom: 10px;   /* ✅ วางห่างจากขอบล่าง 20px */
+  width: 90px;
+  height: 50px;
+  border-radius: 10px;
+  background-image: url(images/KW.png);
+  background-size: auto;
+  background-repeat: no-repeat;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+  color: #100f0f;
+  font-weight: bold;
+}
+/* ================= Chart ================= */
+.Realtime_Container {
+  width: 365px;
+  height: 220px;
+  margin: 20px auto;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  padding: 10px;
+  position: relative; /* เพื่อให้ canvas อยู่ภายใน container */
+}
+
+.Realtime_Container canvas {
+  width: 300px !important;
+  height: 200px !important;
+  margin-top: 40px; /* ขยับลงมา 50px */
+}
+
+#PickDate {
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  text-align: center;
+  position: relative;
+  top: 20px;      /* ขยับลง 20px จากตำแหน่งปกติ */
+  cursor: pointer;
+  user-select: none;
+  color: #fff;
+}
+
+/* ตัว "<" และ ">" แยกออกมาให้ขยับเล็กน้อย */
+#PickDate span {
+  margin: 0 8px;
+}
