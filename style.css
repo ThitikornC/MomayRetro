@@ -5,8 +5,8 @@ body {
   font-family: 'Cinzel', serif;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
+  justify-content: center; /* กึ่งกลางแนวตั้ง */
+  align-items: center;     /* กึ่งกลางแนวนอน */
   min-height: 100vh;
   margin: 0;
   padding: 20px 15px;
@@ -71,8 +71,8 @@ body {
   justify-content: center;
   align-items: center;
   margin-top: 30px;
-   position: relative;
-    overflow: visible;
+  position: relative;
+  overflow: visible;
 
   /* PNG background */
   background-image: url('./images/mainBG.png');
@@ -199,7 +199,7 @@ body {
 #Main_Picinfo .glow {
   position: absolute;
   top: 25%;
-  left: 40%;
+  left: 35%;
   transform: translate(-50%, -50%);
   width: 80%;
   height: 50%;
@@ -238,14 +238,12 @@ body {
   transform: none;        /* ยกเลิก translate */
 }
 
-
 .progress-bar {
   height: 100%;
   border-radius: 6px;
   transition: width 1s ease-in-out,
               background-color 0.5s ease-in-out;
   box-shadow: inset 0 2px 3px rgba(255,255,255,0.5);
-
 }
 
 #Total_Bar {
@@ -333,8 +331,6 @@ body {
 #marker2 { top: 55%; right: 100px; }
 #marker3 { bottom: 75%; right: 100px; }
 
-
-
 .Realtime_kW {
   position: absolute;
   right: 20px;
@@ -353,6 +349,7 @@ body {
   color: #100f0f;
   font-weight: bold;
 }
+
 /* ================= Chart ================= */
 .Realtime_Container {
   width: 365px;
@@ -384,4 +381,322 @@ body {
 /* ตัว "<" และ ">" แยกออกมาให้ขยับเล็กน้อย */
 #PickDate span {
   margin: 0 8px;
+}
+
+/* ================= Media Query มือถือ ================= */
+@media (max-width: 400px) {
+  body {
+    padding: 0 10px; /* ลด padding ข้าง ๆ */
+  }
+
+  /* Top Container */
+  .Top_Container {
+    gap: 10px; /* ลดช่องว่างระหว่างกล่อง */
+    max-width: 100%; /* ให้ไม่เกินหน้าจอมือถือ */
+  }
+
+  /* Floor wrapper */
+  .floor-wrapper {
+    gap: 40px; /* ลดช่องว่างชื่อกับ bar */
+    margin-right: 20px; /* ลด margin ขวา */
+  }
+
+  /* Total Bar และ Background */
+  #Total_Bar {
+    right: 20px; /* ปรับตำแหน่งชิดขวาน้อยลง */
+  }
+
+  #Bar_Bg {
+    right: 10px; /* ปรับขวาเล็กลง */
+  }
+
+  /* รูปและไอคอน */
+  #Calendar_icon img,
+  #Kwang_icon img,
+  #Bell_icon img {
+    width: 40px;
+    height: 40px;
+  }
+
+  /* Main Container & Realtime Container */
+  .Main_Container,
+  .Realtime_Container {
+    margin: 20px 0; /* เว้นระยะบน-ล่างให้พอดี */
+  }
+}
+
+/*calendar*/
+.calendar-container {
+    max-width: 900px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    overflow: hidden;
+    animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.calendar-header {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    padding: 30px;
+    text-align: center;
+    color: white;
+}
+
+.controls-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.date-selectors {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.selector-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.selector-label {
+    font-size: 0.9em;
+    opacity: 0.9;
+    font-weight: 500;
+}
+
+.date-selector {
+    background: rgba(255,255,255,0.2);
+    border: 2px solid rgba(255,255,255,0.3);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    outline: none;
+    min-width: 120px;
+}
+
+.date-selector:hover {
+    background: rgba(255,255,255,0.3);
+    border-color: rgba(255,255,255,0.5);
+}
+
+.date-selector:focus {
+    background: rgba(255,255,255,0.3);
+    border-color: rgba(255,255,255,0.7);
+}
+
+.date-selector option {
+    background: #333;
+    color: white;
+    padding: 5px;
+}
+
+.month-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.nav-btn {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: white;
+    padding: 12px 16px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 18px;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-btn:hover {
+    background: rgba(255,255,255,0.3);
+    transform: scale(1.1);
+}
+
+.current-month {
+    font-size: 2.2em;
+    font-weight: bold;
+    margin: 0 20px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    flex: 1;
+}
+
+.today-info {
+    font-size: 1.2em;
+    opacity: 0.9;
+    margin-top: 10px;
+}
+
+.calendar-grid {
+    padding: 30px;
+}
+
+.weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    margin-bottom: 1px;
+}
+
+.weekday {
+    background: #f8f9ff;
+    padding: 15px 8px;
+    text-align: center;
+    font-weight: bold;
+    color: #666;
+    font-size: 0.9em;
+    border-radius: 8px;
+}
+
+.days-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    background: #f0f0f0;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.day {
+    background: white;
+    padding: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-height: 70px;
+    position: relative;
+    font-weight: 500;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.day:hover {
+    background: #e3f2fd;
+    transform: scale(1.05);
+}
+
+.day.other-month {
+    color: #ccc;
+    background: #fafafa;
+}
+
+.day.today {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+    color: white;
+    font-weight: bold;
+    border: 3px solid #ff6b6b;
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+}
+
+.day.today:hover {
+    transform: scale(1.08);
+}
+
+.day.selected {
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    color: white;
+    border: 3px solid #4facfe;
+    transform: scale(1.02);
+}
+
+.calendar-footer {
+    padding: 20px 30px;
+    background: #f8f9ff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.date-info {
+    color: #666;
+    font-size: 0.9em;
+    flex: 1;
+    min-width: 200px;
+}
+
+.footer-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.today-btn {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.today-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.quick-nav {
+    background: rgba(255,255,255,0.1);
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 15px;
+}
+
+.quick-nav-title {
+    font-size: 1em;
+    margin-bottom: 10px;
+    opacity: 0.9;
+}
+
+.quick-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.quick-btn {
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.85em;
+}
+
+.quick-btn:hover {
+    background: rgba(255,255,255,0.3);
+    border-color: rgba(255,255,255,0.5);
 }

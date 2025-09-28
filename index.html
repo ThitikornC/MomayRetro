@@ -5,40 +5,37 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Momay</title>
   <link rel="stylesheet" href="style.css">
-
-
 </head>
 <body>
 
 <div id="Date_icon">
   <h2 id="Date"></h2>
 </div>
-    <div id="Icons_group">
-        <div id="Calendar_icon">
-            <img src="./images/calendar_icon.png" alt="Calendar">
-        </div>
-        <div id="Kwang_icon">
-            <img src="./images/Kwang_icon.png" alt="Kwang">
-        </div>
-        <div id="Bell_icon">
-            <img src="./images/Bell_icon.png" alt="Bell">
-        </div>
-    </div>
+
+<div id="Icons_group">
+  <div id="Calendar_icon">
+    <img src="./images/calendar_icon.png" alt="Calendar">
+  </div>
+  <div id="Kwang_icon">
+    <img src="./images/Kwang_icon.png" alt="Kwang">
+  </div>
+  <div id="Bell_icon">
+    <img src="./images/Bell_icon.png" alt="Bell">
+  </div>
 </div>
 
-
-    <div class="Top_Container">
-  <div class = "ClientName_Container">
+<div class="Top_Container">
+  <div class="ClientName_Container">
     <h2 class="ClientName"></h2>
     <h2></h2>
   </div>
-   <div class = "ElectricalBill_Container">
+  <div class="ElectricalBill_Container">
     <h2 id="Bill"></h2>
     <h1 class="DailyBill"></h1>
-     <h2 id="Unit"></h2>
+    <h2 id="Unit"></h2>
     <h2 class="DailyUnit"></h2>
   </div>
-  </div>
+</div>
   
 <div class="Main_Container">
   <div id="Main_Picinfo">
@@ -47,35 +44,36 @@
   </div>
   
   <!-- Floor Bars แนวนอน -->
-<div class="floor-wrapper">
-  <h1 class="Bar_name">floor1</h1>
-  <div id="floor1" class="progress-container">
-    <div class="progress-bar" style="width: 40%"></div>
+  <div class="floor-wrapper">
+    <h1 class="Bar_name">floor1</h1>
+    <div id="floor1" class="progress-container">
+      <div class="progress-bar" style="width: 40%"></div>
+    </div>
   </div>
-</div>
 
-<div class="floor-wrapper">
-  <h1 class="Bar_name">floor2</h1>
-  <div id="floor2" class="progress-container">
-    <div class="progress-bar" style="width: 20%"></div>
+  <div class="floor-wrapper">
+    <h1 class="Bar_name">floor2</h1>
+    <div id="floor2" class="progress-container">
+      <div class="progress-bar" style="width: 20%"></div>
+    </div>
   </div>
-</div>
 
-    <!-- Total Bar วางหลัง floor bars -->
-     <div class="Marker" id="marker1">50%</div>
-     <div class="Marker" id="marker2"></div>
-     <div class="Marker" id="marker3"></div>
+  <!-- Total Bar วางหลัง floor bars -->
+  <div class="Marker" id="marker1">50%</div>
+  <div class="Marker" id="marker2"></div>
+  <div class="Marker" id="marker3"></div>
   
-
   <div id="Total_Bar">
     <div class="progress-bar"></div>
   </div>
-    <div id="Bar_Bg">
+
+  <div id="Bar_Bg">
     <img src="./images/Wood_bar.png">
-    </div>
-  <div class = Realtime_kW>
-    </div>
+  </div>
+
+  <div class="Realtime_kW"></div>
 </div>
+
 <div class="Realtime_Container">
   <!-- Vintage Date Picker -->
   <div id="PickDate">
@@ -88,15 +86,82 @@
   <canvas id="EnergyChart"></canvas>
 </div>
 
-
-   <div class="Bottom_info">
-    <img src="./images/kwang_logo.png" alt="Import">
+<div class="Bottom_info">
+  <img src="./images/kwang_logo.png" alt="Import">
 </div>
 
+<div class="calendar-container">
+  <div class="calendar-header">
+    <div class="controls-section">
+      <div class="date-selectors">
+        <div class="selector-group">
+          <div class="selector-label">เดือน</div>
+          <select class="date-selector" id="monthSelector">
+            <option value="0">มกราคม</option>
+            <option value="1">กุมภาพันธ์</option>
+            <option value="2">มีนาคม</option>
+            <option value="3">เมษายน</option>
+            <option value="4">พฤษภาคม</option>
+            <option value="5">มิถุนายน</option>
+            <option value="6">กรกฎาคม</option>
+            <option value="7">สิงหาคม</option>
+            <option value="8">กันยายน</option>
+            <option value="9">ตุลาคม</option>
+            <option value="10">พฤศจิกายน</option>
+            <option value="11">ธันวาคม</option>
+          </select>
+        </div>
+        <div class="selector-group">
+          <div class="selector-label">ปี พ.ศ.</div>
+          <select class="date-selector" id="yearSelector"></select>
+        </div>
+      </div>
+    </div>
+    
+    <div class="month-nav">
+      <button class="nav-btn" id="prevBtn">‹</button>
+      <h1 class="current-month" id="currentMonth"></h1>
+      <button class="nav-btn" id="nextBtn">›</button>
+    </div>
+    
+    <div class="today-info" id="todayInfo"></div>
+    
+    <div class="quick-nav">
+      <div class="quick-nav-title">นำทางด่วน</div>
+      <div class="quick-buttons">
+        <button class="quick-btn" id="prevYearBtn">ปีก่อน</button>
+        <button class="quick-btn" id="prevMonthBtn">เดือนก่อน</button>
+        <button class="quick-btn" id="currentBtn">วันนี้</button>
+        <button class="quick-btn" id="nextMonthBtn">เดือนหน้า</button>
+        <button class="quick-btn" id="nextYearBtn">ปีหน้า</button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="calendar-grid">
+    <div class="weekdays">
+      <div class="weekday">อา</div>
+      <div class="weekday">จ</div>
+      <div class="weekday">อ</div>
+      <div class="weekday">พ</div>
+      <div class="weekday">พฤ</div>
+      <div class="weekday">ศ</div>
+      <div class="weekday">ส</div>
+    </div>
+    <div class="days-grid" id="daysGrid"></div>
+  </div>
+  
+  <div class="calendar-footer">
+    <div class="date-info" id="dateInfo">เลือกวันที่เพื่อดูรายละเอียด</div>
+    <div class="footer-buttons">
+      <button class="today-btn" id="todayBtn">วันนี้</button>
+    </div>
+  </div>
+</div>
 
-  <script src="script.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+<script src="script.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
 
 </body>
 </html>

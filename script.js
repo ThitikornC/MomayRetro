@@ -259,3 +259,275 @@ document.addEventListener('DOMContentLoaded', () => {
   prevBtn.addEventListener('click', ()=>changeDay(-1));
   nextBtn.addEventListener('click', ()=>changeDay(1));
 });
+
+//caledar
+class ThaiCalendar {
+    constructor() {
+        this.currentDate = new Date();
+        this.displayDate = new Date();
+        this.selectedDate = null;
+        
+        this.monthNames = [
+            'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
+            'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
+        ];
+        
+        this.dayNames = [
+            'วันอาทิตย์', 'วันจันทร์', 'วันอังคาร', 'วันพุธ', 'วันพฤหัสบดี', 'วันศุกร์', 'วันเสาร์'
+        ];
+        
+        this.init();
+    }
+    
+    init() {
+        this.setupYearSelector();
+        this.bindEvents();
+        this.render();
+        this.updateTodayInfo();
+    }
+    
+    setupYearSelector() {
+        const yearSelector = document.getElementById('yearSelector');
+        const currentYear = new Date().getFullYear();
+        
+        // สร้างตัวเลือกปี (ย้อนหลัง 10 ปี, อนาคต 5 ปี)
+        for (let year = currentYear - 10; year <= currentYear + 5; year++) {
+            const option = document.createElement('option');
+            option.value = year;
+            option.textContent = year + 543; // แปลงเป็น พ.ศ.
+            if (year === currentYear) option.selected = true;
+            yearSelector.appendChild(option);
+        }
+    }
+    
+    bindEvents() {
+        // Navigation buttons
+        document.getElementById('prevBtn').addEventListener('click', () => {
+            this.displayDate.setMonth(this.displayDate.getMonth() - 1);
+            this.updateSelectors();
+            this.render();
+        });
+        
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            this.displayDate.setMonth(this.displayDate.getMonth() + 1);
+            this.updateSelectors();
+            this.render();
+        });
+        
+        // Date selectors
+        document.getElementById('monthSelector').addEventListener('change', (e) => {
+            this.displayDate.setMonth(parseInt(e.target.value));
+            this.render();
+        });
+        
+        document.getElementById('yearSelector').addEventListener('change', (e) => {
+            this.displayDate.setFullYear(parseInt(e.target.value));
+            this.render();
+        });
+        
+        // Today button
+        document.getElementById('todayBtn').addEventListener('click', () => {
+            this.goToToday();
+        });
+        
+        // Quick navigation buttons
+        document.getElementById('prevYearBtn').addEventListener('click', () => {
+            this.displayDate.setFullYear(this.displayDate.getFullYear() - 1);
+            this.updateSelectors();
+            this.render();
+        });
+        
+        document.getElementById('nextYearBtn').addEventListener('click', () => {
+            this.displayDate.setFullYear(this.displayDate.getFullYear() + 1);
+            this.updateSelectors();
+            this.render();
+        });
+        
+        document.getElementById('prevMonthBtn').addEventListener('click', () => {
+            this.displayDate.setMonth(this.displayDate.getMonth() - 1);
+            this.updateSelectors();
+            this.render();
+        });
+        
+        document.getElementById('nextMonthBtn').addEventListener('click', () => {
+            this.displayDate.setMonth(this.displayDate.getMonth() + 1);
+            this.updateSelectors();
+            this.render();
+        });
+        
+        document.getElementById('currentBtn').addEventListener('click', () => {
+            this.goToToday();
+        });
+    }
+    
+    goToToday() {
+        this.displayDate = new Date();
+        this.selectedDate = new Date();
+        this.updateSelectors();
+        this.render();
+        this.updateDateInfo();
+    }
+    
+    updateSelectors() {
+        document.getElementById('monthSelector').value = this.displayDate.getMonth();
+        document.getElementById('yearSelector').value = this.displayDate.getFullYear();
+    }
+    
+    render() {
+        this.renderHeader();
+        this.renderDays();
+    }
+    
+    renderHeader() {
+        const monthElement = document.getElementById('currentMonth');
+        const month = this.monthNames[this.displayDate.getMonth()];
+        const year = this.displayDate.getFullYear();
+        monthElement.textContent = `${month} ${year + 543}`;
+        
+        // Update selectors to match current display
+        this.updateSelectors();
+    }
+    
+    renderDays() {
+        const daysGrid = document.getElementById('daysGrid');
+        daysGrid.innerHTML = '';
+        
+        const year = this.displayDate.getFullYear();
+        const month = this.displayDate.getMonth();
+        
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const daysInPrevMonth = new Date(year, month, 0).getDate();
+        
+        // Previous month's days
+        for (let i = firstDay - 1; i >= 0; i--) {
+            const dayElement = this.createDayElement(
+                daysInPrevMonth - i,
+                true
+            );
+            daysGrid.appendChild(dayElement);
+        }
+        
+        // Current month's days
+        for (let day = 1; day <= daysInMonth; day++) {
+            const dayElement = this.createDayElement(day, false);
+            daysGrid.appendChild(dayElement);
+        }
+        
+        // Next month's days
+        const totalCells = daysGrid.children.length;
+        const remainingCells = 42 - totalCells;
+        
+        for (let day = 1; day <= remainingCells; day++) {
+            const dayElement = this.createDayElement(day, true);
+            daysGrid.appendChild(dayElement);
+        }
+    }
+    
+    createDayElement(day, isOtherMonth) {
+        const dayElement = document.createElement('div');
+        dayElement.className = 'day';
+        
+        // สร้างตัวเลขวันที่และวางไว้มุมซ้ายบน
+        const dayNumber = document.createElement('span');
+        dayNumber.style.fontSize = '1.1em';
+        dayNumber.style.fontWeight = 'bold';
+        dayNumber.textContent = day;
+        dayElement.appendChild(dayNumber);
+        
+        if (isOtherMonth) {
+            dayElement.classList.add('other-month');
+        } else {
+            // Check if this is today
+            const today = new Date();
+            if (this.displayDate.getFullYear() === today.getFullYear() &&
+                this.displayDate.getMonth() === today.getMonth() &&
+                day === today.getDate()) {
+                dayElement.classList.add('today');
+            }
+            
+            // Check if this is selected date
+            if (this.selectedDate &&
+                this.displayDate.getFullYear() === this.selectedDate.getFullYear() &&
+                this.displayDate.getMonth() === this.selectedDate.getMonth() &&
+                day === this.selectedDate.getDate()) {
+                dayElement.classList.add('selected');
+            }
+        }
+        
+        dayElement.addEventListener('click', () => {
+            if (!isOtherMonth) {
+                this.selectedDate = new Date(
+                    this.displayDate.getFullYear(),
+                    this.displayDate.getMonth(),
+                    day
+                );
+                this.render();
+                this.updateDateInfo();
+            }
+        });
+        
+        return dayElement;
+    }
+    
+    updateTodayInfo() {
+        const todayInfoElement = document.getElementById('todayInfo');
+        const today = new Date();
+        const dayName = this.dayNames[today.getDay()];
+        const date = today.getDate();
+        const month = this.monthNames[today.getMonth()];
+        const year = today.getFullYear() + 543;
+        
+        todayInfoElement.textContent = `${dayName}ที่ ${date} ${month} ${year}`;
+    }
+    
+    updateDateInfo() {
+        const dateInfoElement = document.getElementById('dateInfo');
+        if (this.selectedDate) {
+            const dayName = this.dayNames[this.selectedDate.getDay()];
+            const date = this.selectedDate.getDate();
+            const month = this.monthNames[this.selectedDate.getMonth()];
+            const year = this.selectedDate.getFullYear() + 543;
+            
+            dateInfoElement.textContent = `วันที่เลือก: ${dayName}ที่ ${date} ${month} ${year}`;
+        } else {
+            dateInfoElement.textContent = 'เลือกวันที่เพื่อดูรายละเอียด';
+        }
+    }
+    
+    // ฟังก์ชันสำหรับเพิ่มข้อมูลในแต่ละวัน (สำหรับการพัฒนาต่อ)
+    addDataToDay(dayElement, data) {
+        // สร้าง progress bar หรือข้อมูลอื่นๆ
+        const dataContainer = document.createElement('div');
+        dataContainer.style.position = 'absolute';
+        dataContainer.style.bottom = '5px';
+        dataContainer.style.left = '5px';
+        dataContainer.style.right = '5px';
+        
+        // ตัวอย่าง progress bar
+        if (data && data.power) {
+            const progressBar = document.createElement('div');
+            progressBar.style.height = '4px';
+            progressBar.style.background = '#e0e0e0';
+            progressBar.style.borderRadius = '2px';
+            progressBar.style.overflow = 'hidden';
+            
+            const progress = document.createElement('div');
+            progress.style.height = '100%';
+            progress.style.width = `${Math.min(100, data.power)}%`;
+            progress.style.background = data.power > 80 ? '#f44336' : 
+                                      data.power > 50 ? '#ff9800' : '#4caf50';
+            progress.style.transition = 'width 0.3s ease';
+            
+            progressBar.appendChild(progress);
+            dataContainer.appendChild(progressBar);
+        }
+        
+        dayElement.appendChild(dataContainer);
+    }
+}
+
+// Initialize calendar when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    new ThaiCalendar();
+});
