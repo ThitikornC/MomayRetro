@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Momay</title>
   <link rel="stylesheet" href="style.css">
+  <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css' rel='stylesheet' />
+
 </head>
 <body>
 
@@ -90,78 +92,15 @@
   <img src="./images/kwang_logo.png" alt="Import">
 </div>
 
-<div class="calendar-container">
-  <div class="calendar-header">
-    <div class="controls-section">
-      <div class="date-selectors">
-        <div class="selector-group">
-          <div class="selector-label">เดือน</div>
-          <select class="date-selector" id="monthSelector">
-            <option value="0">มกราคม</option>
-            <option value="1">กุมภาพันธ์</option>
-            <option value="2">มีนาคม</option>
-            <option value="3">เมษายน</option>
-            <option value="4">พฤษภาคม</option>
-            <option value="5">มิถุนายน</option>
-            <option value="6">กรกฎาคม</option>
-            <option value="7">สิงหาคม</option>
-            <option value="8">กันยายน</option>
-            <option value="9">ตุลาคม</option>
-            <option value="10">พฤศจิกายน</option>
-            <option value="11">ธันวาคม</option>
-          </select>
-        </div>
-        <div class="selector-group">
-          <div class="selector-label">ปี พ.ศ.</div>
-          <select class="date-selector" id="yearSelector"></select>
-        </div>
-      </div>
-    </div>
-    
-    <div class="month-nav">
-      <button class="nav-btn" id="prevBtn">‹</button>
-      <h1 class="current-month" id="currentMonth"></h1>
-      <button class="nav-btn" id="nextBtn">›</button>
-    </div>
-    
-    <div class="today-info" id="todayInfo"></div>
-    
-    <div class="quick-nav">
-      <div class="quick-nav-title">นำทางด่วน</div>
-      <div class="quick-buttons">
-        <button class="quick-btn" id="prevYearBtn">ปีก่อน</button>
-        <button class="quick-btn" id="prevMonthBtn">เดือนก่อน</button>
-        <button class="quick-btn" id="currentBtn">วันนี้</button>
-        <button class="quick-btn" id="nextMonthBtn">เดือนหน้า</button>
-        <button class="quick-btn" id="nextYearBtn">ปีหน้า</button>
-      </div>
-    </div>
-  </div>
-  
-  <div class="calendar-grid">
-    <div class="weekdays">
-      <div class="weekday">อา</div>
-      <div class="weekday">จ</div>
-      <div class="weekday">อ</div>
-      <div class="weekday">พ</div>
-      <div class="weekday">พฤ</div>
-      <div class="weekday">ศ</div>
-      <div class="weekday">ส</div>
-    </div>
-    <div class="days-grid" id="daysGrid"></div>
-  </div>
-  
-  <div class="calendar-footer">
-    <div class="date-info" id="dateInfo">เลือกวันที่เพื่อดูรายละเอียด</div>
-    <div class="footer-buttons">
-      <button class="today-btn" id="todayBtn">วันนี้</button>
-    </div>
-  </div>
-</div>
+<div id='calendar' style="max-width: 900px; margin: 40px auto; height: 600px;"></div>
 
-<script src="script.js"></script>
+
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
+<script src="script.js"></script>
+
 
 </body>
 </html>
