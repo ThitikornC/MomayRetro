@@ -112,7 +112,7 @@ const pricePerUnit = 4.4;       // บาท/หน่วย
 async function fetchDailyBill() {
   try {
     const today = new Date().toISOString().split('T')[0];
-    const url = `https://api-kx4r63rdjq-an.a.run.app/daily-bill/sensor${endpoint}/${today}`;
+     const url = `https://momaybackend02-production.up.railway.app/daily-bill/${today}`;
     const res = await fetch(url);
     const json = await res.json();
 
