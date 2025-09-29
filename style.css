@@ -386,56 +386,26 @@ body {
 }
 
 /* ================= Media Query มือถือ ================= */
-@media (max-width: 400px) {
-  body {
-    padding: 0 10px; /* ลด padding ข้าง ๆ */
-  }
 
-  /* Top Container */
-  .Top_Container {
-    gap: 10px; /* ลดช่องว่างระหว่างกล่อง */
-    max-width: 100%; /* ให้ไม่เกินหน้าจอมือถือ */
-  }
-
-  /* Floor wrapper */
-  .floor-wrapper {
-    gap: 40px; /* ลดช่องว่างชื่อกับ bar */
-    margin-right: 20px; /* ลด margin ขวา */
-  }
-
-  /* Total Bar และ Background */
-  #Total_Bar {
-    right: 20px; /* ปรับตำแหน่งชิดขวาน้อยลง */
-  }
-
-  #Bar_Bg {
-    right: 10px; /* ปรับขวาเล็กลง */
-  }
-
-  /* รูปและไอคอน */
-  #Calendar_icon img,
-  #Kwang_icon img,
-  #Bell_icon img {
-    width: 40px;
-    height: 40px;
-  }
-
-  /* Main Container & Realtime Container */
-  .Main_Container,
-  .Realtime_Container {
-    margin: 20px 0; /* เว้นระยะบน-ล่างให้พอดี */
-  }
-}
 
 /*calendar*/
 #calendar {
-  display: none;
-  max-width: 900px;
-  margin: 40px auto;
-  background-color: #fff;
-  border-radius: 10px;
-  padding: 10px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  background-image: url('layer1.jpg');  /* ใส่ path รูป */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+}
+
+/* Layer 2: พื้นวัน/ช่อง (โปร่งให้เห็น layer1) */
+.fc-daygrid-day {
+  background-color: rgba(255,255,255,0.3); /* ปรับโปร่งตามต้องการ */
+}
+
+/* Layer 3: Event (อยู่บนสุด) */
+.fc-event {
+  background-color: rgba(255,100,100,0.8); /* โปร่งเล็กน้อยเพื่อเห็น layer1 */
+  border: 1px solid #cc0000;
 }
 
 #DailyBill {
@@ -444,6 +414,7 @@ body {
   left: 30%;                 /* กึ่งกลางแนวนอน */  text-align: center;
   font-size: 24px;
   font-weight: bold;
+    text-shadow: 1px 2px 4px rgba(0,0,0,0.6); /* เพิ่มเงา */
 }
 
 .unit {
@@ -451,4 +422,16 @@ body {
   font-weight: bold;
   top: 50%;                  /* กึ่งกลางแนวตั้ง */
   left: 50%; 
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.6); /* เพิ่มเงา */
+}
+#currentDay {
+  color: #000; /* สีดำ */
+  font-weight: bold; /* ถ้าต้องการหนา */
+}
+#prevDay, #nextDay {
+  color: #000;       /* สีตัวอักษร / ลูกศร */
+  background: none;  /* ถ้าไม่อยากให้มีพื้นหลัง */
+  border: none;      /* ถ้าไม่อยากให้มีกรอบ */
+  font-size: 20px;   /* ปรับขนาดลูกศร */
+  cursor: pointer;   /* เมาส์เป็น pointer */
 }

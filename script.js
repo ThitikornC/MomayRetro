@@ -29,9 +29,9 @@ document.addEventListener('DOMContentLoaded', async function() {
 
   const V = 400;
   const root3 = Math.sqrt(3);
-  const floor1_maxA = 20;
+  const floor1_maxA = 100;
   const floor1_maxKW = root3 * V * floor1_maxA / 1000;
-  const total_maxA = 20;
+  const total_maxA = 250;
   const total_maxKW = root3 * V * total_maxA / 1000;
 
   async function updateBarsAndKW() {
@@ -102,7 +102,7 @@ async function fetchDailyBill() {
       dailyBillEl.textContent = bill.toFixed(2) + ' THB';
     }
     if (unitEl) {
-      unitEl.textContent = units.toFixed(2) + ' Unit';
+      unitEl.textContent = units.toFixed(2) + ' kWh';
     }
 
   } catch (err) {
@@ -159,8 +159,8 @@ setInterval(fetchDailyBill, 1800000);
           tooltip:{
             enabled:true,
             backgroundColor:'rgba(0,0,0,0.8)',
-            titleColor:'#fff',
-            bodyColor:'#fff',
+            titleColor: '#000', // สีดำ
+            bodyColor: '#000',
             cornerRadius:8,
             displayColors:false,
             callbacks:{
@@ -176,8 +176,8 @@ setInterval(fetchDailyBill, 1800000);
           }
         },
         scales:{
-          x:{type:'category',grid:{display:false},ticks:{autoSkip:false,color:'#fff',maxRotation:0,minRotation:0,callback:function(v){const l=this.getLabelForValue(v); if(!l) return ''; const [h,m]=l.split(':'); return m==='00'&&parseInt(h)%3===0?l:'';}}},
-          y:{grid:{display:false},beginAtZero:true,min:0,ticks:{color:'#fff'}}
+          x:{type:'category',grid:{display:false},ticks:{autoSkip:false,color:'#000',maxRotation:0,minRotation:0,callback:function(v){const l=this.getLabelForValue(v); if(!l) return ''; const [h,m]=l.split(':'); return m==='00'&&parseInt(h)%3===0?l:'';}}},
+          y:{grid:{display:false},beginAtZero:true,min:0,ticks:{color:'#000'}}
         }
       }
     };
@@ -191,11 +191,16 @@ setInterval(fetchDailyBill, 1800000);
     let currentDate = new Date();
     function formatDate(date){
       const d=String(date.getDate()).padStart(2,'0');
+      const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
       const m=String(date.getMonth()+1).padStart(2,'0');
       const y=date.getFullYear();
       return `${d} - ${m} - ${y}`;
     }
     currentDayEl.textContent = formatDate(currentDate);
+    function changeDay(delta){
+    currentDate.setDate(currentDate.getDate() + delta);
+    currentDayEl.textContent = formatDate(currentDate);
+  }
 
     async function fetchDailyData(date){
       const dateStr = date.toISOString().split('T')[0];
