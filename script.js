@@ -27,6 +27,8 @@ updateDate();
   const totalBar = document.querySelector('#Total_Bar .progress-bar');
   const glow = document.querySelector('.glow');
   const realtimeKWEl = document.querySelector('.Realtime_kW');
+  const containerglow = document.getElementById('Containerglow'); 
+
 
   const V = 400;
   const root3 = Math.sqrt(3);
@@ -37,7 +39,7 @@ updateDate();
 
   async function updateBarsAndKW() {
     try {
-      const res = await fetch('https://api-kx4r63rdjq-an.a.run.app/daily-energy/px_pm3250?date=' + new Date().toISOString().split('T')[0]);
+      const res = await fetch('https://api-kx4r63rdjq-an.a.run.app/daily-energy/px_dh?date=' + new Date().toISOString().split('T')[0]);
       const json = await res.json();
       const data = json.data;
       const latest = data.length ? data[data.length - 1].power : 0;
@@ -56,6 +58,9 @@ updateDate();
         totalBar.style.backgroundColor = totalPercent <= 50 ? '#3a6b35' : '#b82500';
       }
 
+    
+
+
       // Update Marker
       updateMarker(totalPercent);
 
@@ -69,6 +74,21 @@ updateDate();
         glow.style.width = `${glowSize}%`;
         glow.style.height = `${glowSize}%`;
       }
+
+         if(containerglow){
+      const intensity = totalPercent / 100;
+      const glowAlpha = 0.3 + intensity * 0.7;
+      const glowSize = 120 + intensity * 30;
+
+      const glowColor = totalPercent <= 50 
+        ? `rgba(58,107,53,${glowAlpha})`   // เขียว
+        : `rgba(184,37,0,${glowAlpha})`;   // แดง
+
+      containerglow.style.transition = 'all 0.5s ease';
+      containerglow.style.width = `${glowSize}%`;
+      containerglow.style.height = `${glowSize}%`;
+      containerglow.style.background = `radial-gradient(circle, ${glowColor} 0%, rgba(0,0,0,0) 70%)`;
+    }
 
       // Realtime kW
       if(realtimeKWEl){
@@ -86,7 +106,7 @@ updateDate();
   // ================= Daily Bill =================
  const dailyBillEl = document.getElementById('DailyBill');
 const unitEl = document.querySelector('.unit');
-const endpoint = 'px_pm3250';   // <-- เปลี่ยนเป็น sensor ที่คุณใช้จริง
+const endpoint = 'px_dh';   // <-- เปลี่ยนเป็น sensor ที่คุณใช้จริง
 const pricePerUnit = 4.4;       // บาท/หน่วย
 
 async function fetchDailyBill() {
@@ -206,7 +226,7 @@ setInterval(fetchDailyBill, 1800000);
     async function fetchDailyData(date){
       const dateStr = date.toISOString().split('T')[0];
       try{
-        const res = await fetch(`https://api-kx4r63rdjq-an.a.run.app/daily-energy/px_pm3250?date=${dateStr}`);
+        const res = await fetch(`https://api-kx4r63rdjq-an.a.run.app/daily-energy/px_dh?date=${dateStr}`);
         const json = await res.json();
         return json.data;
       }catch(err){console.error(err); return [];}

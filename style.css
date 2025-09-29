@@ -211,6 +211,19 @@ body {
   display: block;
   border-radius: 10px;
 }
+#Containerglow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 120%;
+  height: 120%;
+  border-radius: 10px;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(255,200,50,0.4) 0%, rgba(255,200,50,0) 70%);
+  filter: blur(40px);
+  z-index: 0;
+  transition: all 0.5s ease;
+}
 
 /* Glow แสงหลอดไฟ */
 #Main_Picinfo .glow {
