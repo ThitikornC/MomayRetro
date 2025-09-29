@@ -1,14 +1,15 @@
 document.addEventListener('DOMContentLoaded', async function() {
   // ================= Date =================
-  function updateDate() {
-    const dateElement = document.getElementById('Date');
-    const today = new Date();
-    const day = String(today.getDate()).padStart(2, '0');
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const year = today.getFullYear();
-    dateElement.textContent = `${day}/${month}/${year}`;
-  }
-  updateDate();
+ function updateDate() {
+  const dateElement = document.getElementById('Date');
+  const today = new Date();
+  const day = String(today.getDate()).padStart(2, '0');
+  const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const month = monthNames[today.getMonth()]; // เดือนเต็ม
+  const year = today.getFullYear();
+  dateElement.textContent = `${day} ${month} ${year}`;
+}
+updateDate();
 
   // ================= Total Marker =================
   const totalBarContainer = document.getElementById('Total_Bar'); 
@@ -159,8 +160,8 @@ setInterval(fetchDailyBill, 1800000);
           tooltip:{
             enabled:true,
             backgroundColor:'rgba(0,0,0,0.8)',
-            titleColor: '#000', // สีดำ
-            bodyColor: '#000',
+            titleColor: '#fff', // สีดำ
+            bodyColor: '#fff',
             cornerRadius:8,
             displayColors:false,
             callbacks:{
@@ -191,9 +192,9 @@ setInterval(fetchDailyBill, 1800000);
     let currentDate = new Date();
     function formatDate(date){
       const d=String(date.getDate()).padStart(2,'0');
-      const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-      const m=String(date.getMonth()+1).padStart(2,'0');
-      const y=date.getFullYear();
+  const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+ const m = monthNames[date.getMonth()];     
+ const y=date.getFullYear();
       return `${d} - ${m} - ${y}`;
     }
     currentDayEl.textContent = formatDate(currentDate);
@@ -229,8 +230,9 @@ setInterval(fetchDailyBill, 1800000);
 
       chart.data.datasets=[
         {label:'Power', data:chartData, borderColor:'#8B4513', backgroundColor:gradient, fill:true, borderWidth:0.5, tension:0.3, pointRadius:0.1},
-        {label:'Max', data:new Array(1440).fill(null).map((_,i)=>i===maxIdx?maxVal:null), borderColor:'red', pointRadius:5, pointBackgroundColor:'red', fill:false, showLine:false},
-        {label:'Average', data:new Array(1440).fill(avgVal), borderColor:'#FFD700', borderDash:[5,5], fill:false, pointRadius:0}
+        {label:'Max', data:new Array(1440).fill(null).map((_,i)=>i===maxIdx?maxVal:null), borderColor:'#8555', pointRadius:5, pointBackgroundColor:'#8555', fill:false, showLine:false},
+        {label:'Average', data:new Array(1440).fill(avgVal), borderColor:'#000', borderDash:[5,5], fill:false, pointRadius:0,  borderWidth: 1   // <-- กำหนดความหนาเส้น (ค่าเล็ก = บาง)
+}
       ];
 
       chart.update();

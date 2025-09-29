@@ -141,13 +141,30 @@ body {
 }
 
 /* วันที่ซ้าย */
-#Date_icon h2 {
-  color: #fff;
-  font-weight: bold;
-  font-size: 14px;
-  margin: 0;
+#Date_icon {
+  position: relative; /* ต้องมีเพื่อให้ h2 ใช้ absolute ภายใน */
+  width: 100px;       /* ปรับตามต้องการ */
+  height: 40px;       /* ปรับตามต้องการ */
 }
 
+#Date_icon h2 {
+  position: absolute;
+  top: 156%;
+  left: -50%;
+  transform: translate(-50%, -50%); /* กึ่งกลางแนวตั้งและแนวนอน */
+  color: #fff;
+  font-weight: bold;
+  font-size: 18px;
+  margin: 0;
+  font-family: 'Cinzel', serif; /* ใช้ฟอนต์ Cinzel */
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5); /* เพิ่มเงา */
+
+}
+
+#Date {
+  display: inline-block; /* หรือ inline */
+  white-space: nowrap;   /* ป้องกันการขึ้นบรรทัดใหม่ */
+}
 /* กลุ่มไอคอนขวา */
 #Icons_group {
   display: flex;
@@ -390,24 +407,30 @@ body {
 
 /*calendar*/
 #calendar {
-  background-image: url('layer1.jpg');  /* ใส่ path รูป */
+  background-image: url('layer1.jpg'); /* รูปพื้นหลังล่างสุด */
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   position: relative;
 }
 
-/* Layer 2: พื้นวัน/ช่อง (โปร่งให้เห็น layer1) */
+/* Layer 2: Background ของแต่ละวัน (day cell) */
 .fc-daygrid-day {
-  background-color: rgba(255,255,255,0.3); /* ปรับโปร่งตามต้องการ */
+  background-image: url('layer2.png'); /* รูปของแต่ละวัน */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
-/* Layer 3: Event (อยู่บนสุด) */
+/* Layer 3: Background ของ event */
 .fc-event {
-  background-color: rgba(255,100,100,0.8); /* โปร่งเล็กน้อยเพื่อเห็น layer1 */
-  border: 1px solid #cc0000;
+  background-image: url('layer3.png'); /* รูปของ event */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: white;  /* ตัวอักษร event */
+  border: none;
 }
-
 #DailyBill {
        /* ลอยอิสระไม่ขึ้นกับกล่องแม่ */
   top: 50%;                  /* กึ่งกลางแนวตั้ง */
@@ -415,6 +438,26 @@ body {
   font-size: 24px;
   font-weight: bold;
     text-shadow: 1px 2px 4px rgba(0,0,0,0.6); /* เพิ่มเงา */
+}
+.ClientName {
+  position: absolute;
+  font-size: 12px;
+  font-weight: bold;
+   top: 22%;            /* ปรับตำแหน่งแนวตั้ง */
+  right: 40% ;
+  transform: translateX(-50%); /* กึ่งกลางแนวนอน */
+  white-space: nowrap; 
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.6); 
+}
+
+.ClientNo {
+  position: absolute;
+  font-size: 12px;
+  font-weight: bold;
+  top: 27%;            /* ปรับตำแหน่งแนวตั้ง */
+  right: 73% ;
+  transform: translateX(-50%); /* กึ่งกลางแนวนอน */
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.6); 
 }
 
 .unit {
