@@ -407,7 +407,8 @@ body {
 
 /*calendar*/
 #calendar {
-  background-image: url('layer1.jpg'); /* รูปพื้นหลังล่างสุด */
+  display: none;
+  background-image: url('./images/images/calendar_BG.png'); /* รูปพื้นหลังล่างสุด */
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -416,7 +417,7 @@ body {
 
 /* Layer 2: Background ของแต่ละวัน (day cell) */
 .fc-daygrid-day {
-  background-image: url('layer2.png'); /* รูปของแต่ละวัน */
+  background-image: url('./images/mainBG.png');/* รูปของแต่ละวัน */
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -443,8 +444,8 @@ body {
   position: absolute;
   font-size: 12px;
   font-weight: bold;
-   top: 22%;            /* ปรับตำแหน่งแนวตั้ง */
-  right: 40% ;
+  top: 20%;            /* ปรับตำแหน่งแนวตั้ง */
+  right: 33% ;
   transform: translateX(-50%); /* กึ่งกลางแนวนอน */
   white-space: nowrap; 
   text-shadow: 2px 2px 4px rgba(0,0,0,0.6); 
@@ -454,8 +455,8 @@ body {
   position: absolute;
   font-size: 12px;
   font-weight: bold;
-  top: 27%;            /* ปรับตำแหน่งแนวตั้ง */
-  right: 73% ;
+  top: 23%;            /* ปรับตำแหน่งแนวตั้ง */
+  right: 80% ;
   transform: translateX(-50%); /* กึ่งกลางแนวนอน */
   text-shadow: 2px 2px 4px rgba(0,0,0,0.6); 
 }
