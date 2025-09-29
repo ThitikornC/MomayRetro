@@ -103,7 +103,7 @@ async function fetchDailyBill() {
       dailyBillEl.textContent = bill.toFixed(2) + ' THB';
     }
     if (unitEl) {
-      unitEl.textContent = units.toFixed(2) + ' kWh';
+      unitEl.textContent = units.toFixed(2) + ' Unit';
     }
 
   } catch (err) {
