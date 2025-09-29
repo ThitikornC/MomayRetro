@@ -95,6 +95,7 @@ body {
   justify-content: center;
   align-items: center;
   margin-top: 30px;
+  padding-bottom: 5px;
   position: relative;
   overflow: visible;
 
@@ -107,6 +108,36 @@ body {
   /* เงา */
   box-shadow: 0 4px 10px rgba(0,0,0,0.4);
 }
+
+
+.Floor_Container{
+  width: 365px;
+  height: 100px;
+  font-size: 12px;
+  font-weight: bold;
+  text-align: center;
+  box-sizing: border-box;
+  color: #fff;
+  border-radius: 10px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+  position: relative;
+  overflow: visible;
+
+  /* PNG background */
+  background-image: url('./images/mainBG.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  /* เงา */
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+}
+
 
 /* ================= Realtime Container ================= */
 .Realtime_Container {
@@ -164,30 +195,31 @@ body {
   box-sizing: border-box;
 }
 
+.Todayinfo{
+  font-size: 16px;
+  margin-left: 10px;
+   text-shadow: 1px 2px 4px rgba(0,0,0,0.6);
+}
+
 /* วันที่ซ้าย */
 #Date_icon {
-  position: relative; /* ต้องมีเพื่อให้ h2 ใช้ absolute ภายใน */
-  width: 100px;       /* ปรับตามต้องการ */
-  height: 40px;       /* ปรับตามต้องการ */
+  position: relative;
+  width: 180px;
+  height: 40px;
+  background-color: #fffefe;
+  top: 50px;
+  right: 100px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  border-radius: 8pX;
+  background-image: url('./images/noise.png');
 }
 
-#Date_icon h2 {
-  position: absolute;
-  top: 156%;
-  left: -50%;
-  transform: translate(-50%, -50%); /* กึ่งกลางแนวตั้งและแนวนอน */
-  color: #fff;
-  font-weight: bold;
-  font-size: 18px;
-  margin: 0;
-  font-family: 'Cinzel', serif; /* ใช้ฟอนต์ Cinzel */
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.5); /* เพิ่มเงา */
-
-}
 
 #Date {
-  display: inline-block; /* หรือ inline */
-  white-space: nowrap;   /* ป้องกันการขึ้นบรรทัดใหม่ */
+  /* ป้องกันการขึ้นบรรทัดใหม่ */
+  display: none;
 }
 /* กลุ่มไอคอนขวา */
 #Icons_group {
@@ -237,16 +269,20 @@ body {
 }
 #Containerglow {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 120%;
+  top: 50%;
+  left: 50%;
+  width: 120%;          /* กว้างกว่ากล่อง */
   height: 120%;
-  border-radius: 10px;
-  pointer-events: none;
-  background: radial-gradient(circle, rgba(255,200,50,0.4) 0%, rgba(255,200,50,0) 70%);
-  filter: blur(40px);
-  z-index: 0;
-  transition: all 0.5s ease;
+  transform: translate(-50%, -50%);
+  border-radius: 15px;  /* ทำให้โค้งเหมือนกล่อง */
+  background: radial-gradient(
+    circle,
+    rgba(0,255,0,0.6) 0%,   /* เขียว */
+    rgba(0,255,0,0) 80%
+  );
+  filter: blur(40px);       /* ทำให้กระจาย */
+  z-index: -1;              /* อยู่หลังกล่อง */
+  pointer-events: none;     /* ไม่รบกวนการคลิก */
 }
 
 /* Glow แสงหลอดไฟ */
@@ -309,10 +345,13 @@ body {
   width: 18px;
   height: 182px;
   background-color: rgb(255, 247, 247);
-  box-shadow: inset 0 1px 2px rgba(73, 72, 72, 0.6);
+  box-shadow: inset 2px 5px 1px rgba(73, 72, 72, 0.6);
+
+
   border-radius: 6px;
   overflow: hidden;
   z-index: 2;              /* อยู่เหนือพื้นหลังแต่ใต้ glow ถ้าต้องการ */
+  
 }
 .floor-wrapper {
   display: flex;
@@ -390,7 +429,7 @@ body {
 .Realtime_kW {
   position: absolute;
   right: 20px;
-  bottom: 10px;   /* ✅ วางห่างจากขอบล่าง 20px */
+  bottom: 25px;   /* ✅ วางห่างจากขอบล่าง 20px */
   width: 90px;
   height: 50px;
   border-radius: 10px;
@@ -401,7 +440,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 14px;
+  font-size: 20px;
   color: #100f0f;
   font-weight: bold;
 }
@@ -478,7 +517,7 @@ body {
     text-shadow: 1px 2px 4px rgba(0,0,0,0.6); /* เพิ่มเงา */
 }
 .ClientName {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: bold;
   top: 20%;            /* ปรับตำแหน่งแนวตั้ง */
   right: 50% ;
@@ -486,14 +525,14 @@ body {
   text-shadow: 2px 2px 4px rgba(0,0,0,0.6); 
 }
 .Date_install{
-  font-size: 12px;
+  font-size: 11px;
   font-weight: bold;
   top: 23%;            /* ปรับตำแหน่งแนวตั้ง */
   right: 80% ;
   text-shadow: 2px 2px 4px rgba(0,0,0,0.6); 
 }
 .ClientNo {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: bold;
   top: 23%;            /* ปรับตำแหน่งแนวตั้ง */
   right: 50% ;

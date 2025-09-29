@@ -75,7 +75,21 @@ updateDate();
         glow.style.height = `${glowSize}%`;
       }
 
-         if(containerglow){
+     if(containerglow){
+  const intensity = totalPercent / 100;
+  const glowAlpha = 0.2 + intensity * 0.5; // ค่อยๆ เพิ่มความเข้ม
+  const glowSize = 200 + intensity * 50;    // ขยาย halo ออกไป
+
+  const glowColor = totalPercent <= 50 
+    ? `rgba(58,107,53,${glowAlpha})`   // เขียว
+    : `rgba(184,37,0,${glowAlpha})`;   // แดง
+
+  containerglow.style.width = `${glowSize}%`;
+  containerglow.style.height = `${glowSize}%`;
+  containerglow.style.background = `radial-gradient(circle, ${glowColor} 0%, rgba(0,0,0,0) 70%)`;
+}
+         // ✅ Containerglow (ใหม่)
+    if(containerglow){
       const intensity = totalPercent / 100;
       const glowAlpha = 0.3 + intensity * 0.7;
       const glowSize = 120 + intensity * 30;
@@ -89,7 +103,6 @@ updateDate();
       containerglow.style.height = `${glowSize}%`;
       containerglow.style.background = `radial-gradient(circle, ${glowColor} 0%, rgba(0,0,0,0) 70%)`;
     }
-
       // Realtime kW
       if(realtimeKWEl){
         realtimeKWEl.textContent = latest.toFixed(2) + ' kW';
@@ -250,7 +263,7 @@ setInterval(fetchDailyBill, 1800000);
 
       chart.data.datasets=[
         {label:'Power', data:chartData, borderColor:'#8B4513', backgroundColor:gradient, fill:true, borderWidth:0.5, tension:0.3, pointRadius:0.1},
-        {label:'Max', data:new Array(1440).fill(null).map((_,i)=>i===maxIdx?maxVal:null), borderColor:'#8555', pointRadius:5, pointBackgroundColor:'#8555', fill:false, showLine:false},
+        {label:'Max', data:new Array(1440).fill(null).map((_,i)=>i===maxIdx?maxVal:null), borderColor:'#ff9999', pointRadius:5, pointBackgroundColor:'#ff9999', fill:false, showLine:false},
         {label:'Average', data:new Array(1440).fill(avgVal), borderColor:'#000', borderDash:[5,5], fill:false, pointRadius:0,  borderWidth: 1   // <-- กำหนดความหนาเส้น (ค่าเล็ก = บาง)
 }
       ];
