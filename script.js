@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', async function() {
+
   // ================= Date =================
  function updateDate() {
   const dateElement = document.getElementById('Date');
@@ -14,8 +15,6 @@ updateDate();
   // ================= Total Marker =================
   const totalBarContainer = document.getElementById('Total_Bar'); 
   let marker = document.createElement('div');
-  marker.className = 'total-marker';
-  totalBarContainer.appendChild(marker);
 
   function updateMarker(totalPercent) {
     const markerPosition = 182 * (totalPercent / 100);
@@ -27,7 +26,7 @@ updateDate();
   const totalBar = document.querySelector('#Total_Bar .progress-bar');
   const glow = document.querySelector('.glow');
   const realtimeKWEl = document.querySelector('.Realtime_kW');
-  const containerglow = document.getElementById('Containerglow'); 
+  const mainContainer = document.querySelector('.Main_Container');
 
 
   const V = 400;
@@ -49,16 +48,28 @@ updateDate();
       if(floor1Bar){
         floor1Bar.style.width = `${floor1Percent}%`;
         floor1Bar.style.backgroundColor = floor1Percent <= 50 ? '#3a6b35' : '#b82500';
+        floor1Bar.innerText = `${Math.round(floor1Percent)}%`;
+
       }
 
       // Total Bar
       const totalPercent = Math.min((latest / total_maxKW) * 100, 100);
       if(totalBar){
-        totalBar.style.height = `${totalPercent / 100 * 182}px`;
+        totalBar.style.height = `${totalPercent / 100 * 200}px`;
         totalBar.style.backgroundColor = totalPercent <= 50 ? '#3a6b35' : '#b82500';
+        totalBar.innerText = `${Math.round(totalPercent)}%`;
       }
-
-    
+if (mainContainer) {
+  if (totalPercent <= 50) {
+    // สีเขียว
+    mainContainer.style.boxShadow = 
+      "0 0 10px 2px #28c128, inset 0 0 40px 2px #39cd39";
+  } else {
+    // สีแดง (เลือกโทนใกล้เคียง)
+    mainContainer.style.boxShadow = 
+      "0 0 10px 2px #b82500, inset 0 0 40px 2px #e63939";
+  }
+} 
 
 
       // Update Marker
@@ -75,34 +86,7 @@ updateDate();
         glow.style.height = `${glowSize}%`;
       }
 
-     if(containerglow){
-  const intensity = totalPercent / 100;
-  const glowAlpha = 0.2 + intensity * 0.5; // ค่อยๆ เพิ่มความเข้ม
-  const glowSize = 200 + intensity * 50;    // ขยาย halo ออกไป
-
-  const glowColor = totalPercent <= 50 
-    ? `rgba(58,107,53,${glowAlpha})`   // เขียว
-    : `rgba(184,37,0,${glowAlpha})`;   // แดง
-
-  containerglow.style.width = `${glowSize}%`;
-  containerglow.style.height = `${glowSize}%`;
-  containerglow.style.background = `radial-gradient(circle, ${glowColor} 0%, rgba(0,0,0,0) 70%)`;
-}
-         // ✅ Containerglow (ใหม่)
-    if(containerglow){
-      const intensity = totalPercent / 100;
-      const glowAlpha = 0.3 + intensity * 0.7;
-      const glowSize = 120 + intensity * 30;
-
-      const glowColor = totalPercent <= 50 
-        ? `rgba(58,107,53,${glowAlpha})`   // เขียว
-        : `rgba(184,37,0,${glowAlpha})`;   // แดง
-
-      containerglow.style.transition = 'all 0.5s ease';
-      containerglow.style.width = `${glowSize}%`;
-      containerglow.style.height = `${glowSize}%`;
-      containerglow.style.background = `radial-gradient(circle, ${glowColor} 0%, rgba(0,0,0,0) 70%)`;
-    }
+    
       // Realtime kW
       if(realtimeKWEl){
         realtimeKWEl.textContent = latest.toFixed(2) + ' kW';
@@ -297,4 +281,56 @@ setInterval(fetchDailyBill, 1800000);
     });
     calendar.render();
   }
+
+
+  // ================= Weather Sukhothai =================
+async function fetchCurrentWeatherSukhothai() {
+  try {
+    const lat = 17.0080;
+    const lon = 99.8238;
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=Asia/Bangkok`;
+
+    const res = await fetch(url);
+    const data = await res.json();
+
+    const weatherCode = data.current_weather.weathercode;
+    const temp = data.current_weather.temperature;
+
+    // ฟังก์ชันแปลงรหัสสภาพอากาศเป็น icon
+    function weatherCodeToEmoji(code) {
+      if (code === 0) return "☀️";
+      if ([1,2,3].includes(code)) return "⛅";
+      if ([45,48].includes(code)) return "🌫️";
+      if ([51,53,55].includes(code)) return "🌦️";
+      if ([56,57].includes(code)) return "🌧️";
+      if ([61,63,65].includes(code)) return "🌧️";
+      if ([66,67].includes(code)) return "🌧️❄️";
+      if ([71,73,75].includes(code)) return "❄️";
+      if (code === 77) return "❄️";
+      if ([80,81,82].includes(code)) return "🌧️";
+      if ([85,86].includes(code)) return "❄️";
+      if (code === 95) return "⛈️";
+      if ([96,99].includes(code)) return "⛈️❄️";
+      return "🌡️";
+    }
+
+    document.getElementById('weather-city').innerText = "Sukhothai";
+    document.getElementById('weather-icon').innerText = weatherCodeToEmoji(weatherCode);
+    document.getElementById('weather-temp').innerText = temp.toFixed(1) + "°C";
+
+  } catch (e) {
+    console.error("Error fetching current weather:", e);
+    document.getElementById('weather-city').innerText = "Sukhothai";
+    document.getElementById('weather-icon').innerText = "❓";
+    document.getElementById('weather-temp').innerText = "-°C";
+  }
+}
+
+// เรียกครั้งแรก
+fetchCurrentWeatherSukhothai();
+
+// อัปเดตทุก 30 นาที
+setInterval(fetchCurrentWeatherSukhothai, 1800000);
+
 });
+

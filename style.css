@@ -90,7 +90,7 @@ body {
   color: #fff;
   border-radius: 10px;
   padding: 15px 15px 5px 15px;
-  position: relative;  /* อ้างอิงสำหรับ absolute child */
+  position: relative;
   overflow: visible;
 
   display: flex;
@@ -104,9 +104,12 @@ body {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-
-  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+  /*
+  box-shadow: 
+    0 0 10px 2px #28c128,   /* เงาฟุ้งรอบนอก 
+    inset 0 0 50px 2px #39cd39; /* เงาฟุ้งด้านใน */
 }
+
 
 
 .Floor_Container{
@@ -194,10 +197,14 @@ body {
   box-sizing: border-box;
 }
 
-.Todayinfo{
-  font-size: 16px;
-  margin-left: 10px;
-   text-shadow: 1px 2px 4px rgba(0,0,0,0.6);
+.Todayinfo {
+  font-size: 14px;
+  margin: 10px 0 0 0; 
+  text-shadow: 1px 2px 4px rgba(0,0,0,0.6);
+  white-space: nowrap;    /* บังคับไม่ตัดบรรทัด */
+  
+
+
 }
 
 /* วันที่ซ้าย */
@@ -207,14 +214,24 @@ body {
   height: 40px;
   background-color: #fffefe;
   top: 50px;
-  right: 100px;
-  display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
+  right: 95px;
+    flex-direction: row;      /* เรียงแนวนอน */
+  align-items: center;      /* จัดกึ่งกลางแนวตั้ง */
+  justify-content: flex-start; /* ชิดซ้าย */
+  gap: 0px;                /* เว้นระยะระหว่าง Date, Today, Weather */
+  flex-wrap: nowrap;         /* ไม่ให้ wrap */
+   padding-left: 20px;
   border-radius: 8pX;
+    padding-top: 4px;        /* ระยะด้านบนของ container */
+
   background-image: url('./images/noise.png');
 }
-
+#Date_icon h2, 
+#Date_icon h1,
+#weather {
+ margin: -1px 0 0 0;
+  padding: 0;
+}
 
 #Date {
   /* ป้องกันการขึ้นบรรทัดใหม่ */
@@ -279,8 +296,18 @@ body {
 #Meter_Pic img {
   max-width: 120px;    /* ปรับสเกลให้พอดีกับ container */
   height: auto;
+  border-radius: 7px;
+  align-items: center;
 }
 
+.Meterunit{
+   position: absolute;
+   top: 126px;
+   right: 68px;
+   width: 50px;
+   background-color: #000000;
+      z-index: 100;      
+}
 #Containerglow {
   position: absolute;
   top: 50%;
@@ -340,8 +367,12 @@ body {
   bottom: auto;           /* ยกเลิก bottom */
   margin-left: -60px;
   transform: none;   
+  font-size: 10px;  /* ปรับขนาดตัวเลขตามต้องการ */
+  font-weight: bold; /* หนาขึ้นถ้าต้องการ */
+  color: #0e0e0e
      /* ยกเลิก translate */
 }
+
 
 .progress-bar {
   height: 100%;
@@ -364,7 +395,7 @@ body {
 
   border-radius: 6px;
   overflow: hidden;
-  z-index: 2;              /* อยู่เหนือพื้นหลังแต่ใต้ glow ถ้าต้องการ */
+  z-index: 1;              /* อยู่เหนือพื้นหลังแต่ใต้ glow ถ้าต้องการ */
   
 }
 .floor-wrapper {
@@ -383,10 +414,18 @@ body {
 }
 #Total_Bar .progress-bar {
   width: 100%;
-  height: 0;            /* เริ่มจาก 0 */
+  height: 0;                 /* เริ่มจาก 0 */
   position: absolute;
-  bottom: 0;            /* ให้ bar เริ่มจากด้านล่าง */
+  bottom: 0;                 /* ให้ bar เริ่มจากด้านล่าง */
   transition: height 0.5s ease, background-color 0.5s ease;
+  
+  display: flex;             /* ให้ข้อความอยู่ใน bar */
+  justify-content: center;   /* กึ่งกลางแนวนอน */
+  align-items: center;       /* กึ่งกลางแนวตั้ง */
+  color: #000000;               /* สีตัวเลข */
+  font-size: 9px;
+  font-weight: bold;
+  z-index: 10; 
 }
 #Bar_Bg {
   position: absolute;        /* วางทับหรือแยกจาก flow */
@@ -410,7 +449,7 @@ body {
   height: 2px;
   background-color: #100f0f;
   border-radius: 10px;
-  z-index: 10;
+  z-index: 5;
   display: flex;
   justify-content: center; 
   align-items: center;     
@@ -541,7 +580,7 @@ body {
   text-shadow: 2px 2px 4px rgba(0,0,0,0.6); 
 }
 .Date_install{
-  font-size: 11px;
+  font-size: 10px;
   font-weight: bold;
   top: 23%;            /* ปรับตำแหน่งแนวตั้ง */
   right: 80% ;
@@ -573,4 +612,29 @@ body {
   border: none;      /* ถ้าไม่อยากให้มีกรอบ */
   font-size: 20px;   /* ปรับขนาดลูกศร */
   cursor: pointer;   /* เมาส์เป็น pointer */
+}
+
+
+
+#weather {
+  display: flex;
+  align-items: center;    /* จังหวัด | icon | temp อยู่บรรทัดเดียว */
+  gap: 8px;               /* เว้นระยะระหว่าง city, icon, temp */
+  font-size: 18px;
+  font-weight: bold;
+  margin-top: -4px;
+}
+
+#weather-city {
+  font-size: 10px;
+  color: #000000;
+}
+
+#weather-icon {
+  font-size: 15px;
+}
+
+#weather-temp {
+  font-size: 10px;
+  color: #000;
 }
