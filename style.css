@@ -29,7 +29,31 @@ body {
 }
 
 /* ================= กล่อง Client และ Electrical ================= */
-.ClientName_Container,
+.ClientName_Container{
+    width: 180px;
+  height: 85px;
+  font-size: 12px;
+  font-weight: bold;
+  text-align: center;
+  box-sizing: border-box;
+  color: #000000;
+  border-radius: 10px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+
+  /* PNG background */
+  background-image: url('./images/noise.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  /* เงา */
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+
+}
 .ElectricalBill_Container {
   width: 180px;
   height: 85px;
@@ -454,25 +478,28 @@ body {
     text-shadow: 1px 2px 4px rgba(0,0,0,0.6); /* เพิ่มเงา */
 }
 .ClientName {
-  position: absolute;
-  font-size: 12px;
+  font-size: 20px;
   font-weight: bold;
   top: 20%;            /* ปรับตำแหน่งแนวตั้ง */
-  right: 33% ;
-  transform: translateX(-50%); /* กึ่งกลางแนวนอน */
+  right: 50% ;
   white-space: nowrap; 
   text-shadow: 2px 2px 4px rgba(0,0,0,0.6); 
 }
-
-.ClientNo {
-  position: absolute;
+.Date_install{
   font-size: 12px;
   font-weight: bold;
   top: 23%;            /* ปรับตำแหน่งแนวตั้ง */
   right: 80% ;
-  transform: translateX(-50%); /* กึ่งกลางแนวนอน */
   text-shadow: 2px 2px 4px rgba(0,0,0,0.6); 
 }
+.ClientNo {
+  font-size: 12px;
+  font-weight: bold;
+  top: 23%;            /* ปรับตำแหน่งแนวตั้ง */
+  right: 50% ;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.6); 
+}
+
 
 .unit {
   font-size: 14px;
