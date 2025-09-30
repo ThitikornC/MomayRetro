@@ -112,7 +112,7 @@ const pricePerUnit = 4.4;       // บาท/หน่วย
 async function fetchDailyBill() {
   try {
     const today = new Date().toISOString().split('T')[0];
-     const url = `https://momaybackend02-production.up.railway.app/daily-bill/${today}`;
+     const url = `https://momaybackend02-production.up.railway.app/daily-bill?date=${today}`;
     const res = await fetch(url);
     const json = await res.json();
 
@@ -269,11 +269,11 @@ const calendarEl = document.getElementById('calendar');
 if (calendarEl) {
   const calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: 'dayGridMonth',
-    locale: 'th',
+    locale: 'en',
     headerToolbar: {
-      left: 'prev,next today',
+      left: 'prev',
       center: 'title',
-      right: ''
+      right: 'next'
     },
     height: 600,
     events: async function(fetchInfo, successCallback, failureCallback) {
