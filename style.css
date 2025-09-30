@@ -244,7 +244,7 @@ body {
   height: 40px;
   background-color: #fffefe;
   top: 0px;
-  right: 100px;
+  right: 95px;
   flex-direction: row;      /* เรียงแนวนอน */
   align-items: center;      /* จัดกึ่งกลางแนวตั้ง */
   justify-content: flex-start; /* ชิดซ้าย */

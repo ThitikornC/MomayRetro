@@ -49,7 +49,8 @@ updateDate();
       const floor1Percent = Math.min((latest / floor1_maxKW) * 100, 100);
       if(floor1Bar){
         floor1Bar.style.width = `${floor1Percent}%`;
-        floor1Bar.style.backgroundColor = floor1Percent <= 50 ? '#3a6b35' : '#b82500';
+        floor1Bar.style.backgroundColor = floor1Percent <= 50 ? '#EE760C' : '#b82500';
+
       }
       if(floor1Text){
       floor1Text.textContent = `${Math.round(floor1Percent)}%`;
@@ -60,7 +61,7 @@ updateDate();
 
 if(totalBar){
   totalBar.style.height = `${totalPercent / 100 * 200}px`; 
-  totalBar.style.backgroundColor = totalPercent <= 50 ? '#3a6b35' : '#b82500';
+  totalBar.style.backgroundColor = totalPercent <= 50 ? '#EE760C' : '#b82500';
 }
 
 if(totalBarText){
