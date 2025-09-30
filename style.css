@@ -8,8 +8,8 @@ body {
   justify-content: center; /* กึ่งกลางแนวตั้ง */
   align-items: center;     /* กึ่งกลางแนวนอน */
   min-height: 100vh;
-  margin: 0;
-  padding: 20px 15px;
+  margin: 5px;
+  padding: 0px;
 
   /* Background image */
   background-image: url('./images/BG.png');
@@ -26,6 +26,7 @@ body {
   gap: 20px;               /* ระยะห่างระหว่างกล่อง */
   width: 100%;
   max-width: 400px;
+  margin-bottom: 10px;
 }
 
 /* ================= กล่อง Client และ Electrical ================= */
@@ -82,7 +83,7 @@ body {
 
 /* ================= Main Container ================= */
 .Main_Container {
-  width: 365px;
+   width: 375px;
   height: 289px;
   font-size: 12px;
   font-weight: bold;
@@ -99,7 +100,7 @@ body {
   justify-content: center;
   align-items: center;
 
-  margin-top: 30px;
+  margin-bottom: 10px;
 
   background-image: url('./images/mainBG.png');
   background-size: cover;
@@ -150,15 +151,15 @@ body {
   box-sizing: border-box;
   color: #fff;
   border-radius: 10px;
-  padding: 15px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin-top: 10px;
+  margin-bottom: 10px;
   position: relative;
   overflow: visible;
-  margin-top: 15px;
+   margin-bottom: 10px;
+
 
   /* PNG background */
   background-image: url('./images/mainBG.png');
@@ -173,7 +174,7 @@ body {
 
 /* ================= Realtime Container ================= */
 .Realtime_Container {
-  width: 365px;
+  width: 375px;
   height: 218px;
   font-size: 12px;
   font-weight: bold;
@@ -181,12 +182,11 @@ body {
   box-sizing: border-box;
   color: #fff;
   border-radius: 10px;
-  padding: 15px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin-top: 30px;
+  margin-bottom: 0px;
 
   /* PNG background */
   background-image: url('./images/mainBG.png');
@@ -205,7 +205,6 @@ body {
   display: flex;        /* ใช้ flex จัดตำแหน่ง */
   justify-content: center;  /* กึ่งกลางแนวนอน */
   align-items: center;      /* กึ่งกลางแนวตั้ง */
-  margin-top: 20px;     /* เว้นระยะจากกล่องบน */
 }
 
 .Bottom_info img {
@@ -229,39 +228,37 @@ body {
 
 .Todayinfo {
   font-size: 14px;
-  margin: 1px 0 0 0; 
   text-shadow: 1px 2px 4px rgba(0,0,0,0.6);
-  white-space: nowrap;    /* บังคับไม่ตัดบรรทัด */
-  
-
-
+  white-space: nowrap;
+  margin-left: 10px;
+  position: relative;
+  left: 10px;  /* เลื่อนซ้าย 40px (ปรับค่าตามต้องการ) */
 }
 
 /* วันที่ซ้าย */
 #Date_icon {
-  position: relative;
-  width: 155px;
+  
+    position: relative; 
+  width: 172px;
   height: 40px;
   background-color: #fffefe;
   top: 0px;
-  right: 95px;
   flex-direction: row;      /* เรียงแนวนอน */
   align-items: flex-start;      /* จัดกึ่งกลางแนวตั้ง */
   justify-content: flex-start; /* ชิดซ้าย */
   gap: 0px;                /* เว้นระยะระหว่าง Date, Today, Weather */
   flex-wrap: nowrap;         /* ไม่ให้ wrap */
-  padding-left: 14px;
-  padding-right: 2px;
   border-radius: 8pX;
-  padding-top: 4px;        /* ระยะด้านบนของ container */
-  margin-left: 2Px;
+  padding-top: 12px;        /* ระยะด้านบนของ container */
+  margin-right: 200px;
+  padding-left: 5px;
   background-image: url('./images/noise.png');
-  margin-bottom: 5px;
+  margin-bottom: 10px;
 }
 #Date_icon h2, 
 #Date_icon h1,
 #weather {
- margin: -1px 0 0 0;
+ margin:0;
   padding: 0;
 }
 .Meter{
@@ -603,7 +600,6 @@ color: #000000;
 .Realtime_Container {
   width: 365px;
   height: 220px;
-  margin: 20px auto;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0,0,0,0.2);
   padding: 10px;
@@ -671,10 +667,12 @@ color: #000000;
 .ClientName {
   font-size: 24px;
   font-weight: bold;
-  top: 20%;            /* ปรับตำแหน่งแนวตั้ง */
-  right: 50% ;
   white-space: nowrap; 
   text-shadow: 2px 2px 4px rgba(0,0,0,0.6); 
+  margin-left: 0;       /* เลื่อนไปซ้าย */
+  margin-right: auto;   /* กึ่งกลางหรือขยับขวาได้ */
+  position: relative;   /* หรือ absolute ถ้าต้องการวางทับ */
+  top: 0;               /* ลบ top ที่ไม่จำเป็น */
 }
 .Date_install{
   font-size: 10px;
@@ -715,25 +713,30 @@ color: #000000;
 
 #weather {
   display: flex;
-  align-items: center;    /* จังหวัด | icon | temp อยู่บรรทัดเดียว */
-  gap: 8px;               /* เว้นระยะระหว่าง city, icon, temp */
+  align-items: center;
+  gap: 8px;
   font-size: 18px;
   font-weight: bold;
-  margin-top: -4px;
+  margin-top: -5px;
+  position: relative;      /* ⬅️ เพิ่มบรรทัดนี้ */
+  left: 10px;            /* ⬅️ เพิ่มบรรทัดนี้ (ปรับค่าตามต้องการ) */
 }
 
 #weather-city {
   font-size: 10px;
   color: #000000;
+    margin-top: 0px;
 }
 
 #weather-icon {
   font-size: 15px;
+    margin-top: 0px;
 }
 
 #weather-temp {
   font-size: 10px;
   color: #000;
+    margin-top: 0px;
 }
 #EnergyChart {
   position: relative;
