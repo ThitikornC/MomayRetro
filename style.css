@@ -484,7 +484,7 @@ font-size: 14px;
 
 #Total_Bar {
   position: absolute;      
-  left: 130px;             
+  left: 150px;             
   top: 50%;                
   transform: translateY(-50%);
   width: 19px;
@@ -667,6 +667,50 @@ font-size: 14px;
   border-radius: 8px;
 }
 
+/* CSS popup */
+/* ตัว popup ครอบ */
+#DatePopup {
+  display: none;          
+  position: fixed;        
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5); /* พื้นหลังโปร่งแสง */
+  display: flex;
+  justify-content: center; 
+  align-items: center;     
+  z-index: 1000;           
+}
+
+/* กล่องเนื้อหา popup */
+#popupContent {
+  background: #fff;         /* พื้นสีขาว */
+  padding: 20px 30px;       /* ระยะขอบ */
+  border-radius: 10px;      /* ขอบมน */
+  max-width: 400px;         /* กว้างสูงสุด */
+  width: 80%;               /* ปรับตามหน้าจอ */
+  max-height: 80%;          /* สูงสุด */
+  overflow-y: auto;         /* เลื่อนถ้าเนื้อหายาว */
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3); /* เงา */
+}
+
+.popup-content {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  position: relative;
+}
+
+.close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 24px;
+  cursor: pointer;
+}
+
 #DailyBill {
        /* ลอยอิสระไม่ขึ้นกับกล่องแม่ */
   top: 50%;                  /* กึ่งกลางแนวตั้ง */
@@ -833,6 +877,21 @@ font-size: 14px;
 .fc-theme-standard th {
   border: 1px solid #e5e7eb;
 }
+.fc-event {
+  background-color: transparent !important;
+  border-color: transparent !important;
+  color: black !important;
+  display: flex !important;
+  justify-content: center !important; /* กึ่งกลางแนวนอน */
+  align-items: flex-start !important; /* ชิดบน */
+  padding: 0 !important;
+}
+.fc-event .fc-event-title {
+  font-size: 14px;       /* ขนาดตัวอักษร */
+  line-height: 1.2;
+  margin-top: 2px;       /* ปรับให้ขยับลงเล็กน้อยจากบน */
+  text-align: center;    /* กึ่งกลางแนวนอน */
+}
 
 /* ===== วันปัจจุบัน ===== */
 .fc .fc-day-today {
@@ -963,6 +1022,75 @@ font-size: 14px;
   margin-top: 2px; 
 }
 }
+/* ================= Responsive สำหรับมือถือ ================= */
+@media screen and (max-width: 600px) {
+  
+  /* Container ปฏิทิน */
+  #calendar {
+    width: 100%;      /* เต็มความกว้างหน้าจอ */
+    max-width: 320px; /* จำกัดสูงสุด */
+    height: 70%;
+     max-height: 500px;
+    padding: 9px;
+  
+  }
+
+  /* Toolbar (Title + Buttons) */
+  .fc .fc-toolbar-title {
+    font-size: 1rem !important;
+    width: auto !important;
+    height: auto !important;
+    padding: 2px 4px !important;
+    margin: 2px !important;
+  }
+  .fc .fc-toolbar-prev,
+  .fc .fc-toolbar-next,
+  .fc .fc-button {
+    font-size: 0.8rem !important;
+    padding: 2px 6px !important;
+  }
+  .fc .fc-button-primary {
+    font-size: 0.8rem !important;
+    padding: 2px 6px !important;
+  }
+
+  /* ตารางวัน */
+  .fc-daygrid-day {
+    min-height: 20px !important;
+    max-height: 20px !important;
+    width: auto !important;
+    padding: 2px !important;
+  }
+
+  /* ตัวเลขวัน */
+  .fc-daygrid-day-number {
+    font-size: 0.5rem !important;
+    margin-right: 0 !important;
+    margin-bottom: 2px !important;
+  }
+
+  /* Event */
+  .fc-event {
+    font-size: 0.65rem !important;
+    padding: 1px 2px !important;
+  }
+  .fc-event .fc-event-title {
+     font-size: 9px !important;
+    line-height: 1.1 !important;
+  }
+
+  /* Header column (Sun, Mon, ...) */
+  .fc .fc-col-header-cell-cushion {
+    font-size: 0.7rem !important;
+    padding: 2px !important;
+  }
+
+  /* Day today highlight */
+  .fc .fc-day-today {
+    background: #fef3c7 !important;
+  }
+}
+
 
 @media screen and (max-width: 375px) {
   body {
