@@ -279,7 +279,7 @@ if (calendarEl) {
     events: async function(fetchInfo, successCallback, failureCallback) {
       try {
         // ดึงข้อมูลทั้งหมดจาก backend
-        const res = await fetch(`http://momaybackend02-production.up.railway.app/calendar`);
+        const res = await fetch(`https://momaybackend02-production.up.railway.app/calendar`);
         const data = await res.json();
 
         // filter ตามช่วงวันที่ที่ FullCalendar ต้องการ (รวมเดือนก่อน/หลังที่ติดมา)
