@@ -122,14 +122,14 @@ body {
   transform: translate(-50%, -50%);
   border-radius: 50%;
   pointer-events: none;
-  box-shadow: 0 0 50px 20px rgba(40, 193, 40, 0.4); /* เริ่มเขียว */
+  box-shadow: 0 0 50px 20px rgba(245, 169, 5, 0.999); /* เริ่มเขียว */
   animation: pulseGreen 2s infinite alternate ease-in-out;
 }
 
 @keyframes pulseGreen {
-  0% { box-shadow: 0 0 40px 10px rgba(40, 193, 40, 0.4); }
-  50% { box-shadow: 0 0 70px 25px rgba(40, 193, 40, 0.6); }
-  100% { box-shadow: 0 0 40px 10px rgba(40, 193, 40, 0.4); }
+  0% { box-shadow: 0 0 40px 10px rgba(188, 193, 40, 0.4); }
+  50% { box-shadow: 0 0 70px 25px rgba(183, 193, 40, 0.6); }
+  100% { box-shadow: 0 0 40px 10px rgba(193, 170, 40, 0.4); }
 }
 
 @keyframes pulseRed {
@@ -384,9 +384,10 @@ color: #000000;
   border-radius: 15px;  /* ทำให้โค้งเหมือนกล่อง */
   background: radial-gradient(
     circle,
-    rgba(0,255,0,0.6) 0%,   /* เขียว */
+    rgba(245, 173, 4, 0.881) 0%,   /* เขียว */
     rgba(0,255,0,0) 80%
   );
+   
   filter: blur(40px);       /* ทำให้กระจาย */
   z-index: -1;              /* อยู่หลังกล่อง */
   pointer-events: none;     /* ไม่รบกวนการคลิก */
@@ -584,7 +585,7 @@ color: #000000;
   width: 70px;
   height: 50px;
   border-radius: 10px;
-  background-image: url(images/KW.png);
+  background-image: url(./images/KW.png);
   background-size: auto;
   background-repeat: no-repeat;
   

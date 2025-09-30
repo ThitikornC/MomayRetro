@@ -68,8 +68,8 @@ if(totalBarText){
 }
 if(mainContainer && glowEl){
   if(totalPercent <= 50){
-    mainContainer.style.boxShadow = "0 0 10px 2px #28c128, inset 0 0 40px 2px #39cd39";
-    glowEl.style.boxShadow = "0 0 50px 20px rgba(56, 201, 56, 0.4)";
+    mainContainer.style.boxShadow = "0 0 10px 2px #FBBF32, inset 0 0 40px 2px #F9B30F";
+    glowEl.style.boxShadow = "0 0 50px 20px #FBBF32";
   } else {
     mainContainer.style.boxShadow = "0 0 10px 2px #b82500, inset 0 0 40px 2px #e63939";
     glowEl.style.boxShadow = "0 0 50px 20px rgba(230, 57, 57, 0.4)";
