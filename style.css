@@ -104,14 +104,42 @@ body {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  /*
-  box-shadow: 
-    0 0 10px 2px #28c128,   /* เงาฟุ้งรอบนอก 
-    inset 0 0 50px 2px #39cd39; /* เงาฟุ้งด้านใน */
+
+  /* ลบ animation ออก */
+  /* animation: glow 2s infinite alternate ease-in-out; */
+
+  /* เพิ่ม transition ให้ smooth */
+  transition: all 0.5s ease;
 }
 
+.glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200%;
+  height: 200%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  pointer-events: none;
+  box-shadow: 0 0 50px 20px rgba(40, 193, 40, 0.4); /* เริ่มเขียว */
+  animation: pulseGreen 2s infinite alternate ease-in-out;
+}
 
+@keyframes pulseGreen {
+  0% { box-shadow: 0 0 40px 10px rgba(40, 193, 40, 0.4); }
+  50% { box-shadow: 0 0 70px 25px rgba(40, 193, 40, 0.6); }
+  100% { box-shadow: 0 0 40px 10px rgba(40, 193, 40, 0.4); }
+}
 
+@keyframes pulseRed {
+  0% { box-shadow: 0 0 40px 10px rgba(184, 37, 0, 0.4); }
+  50% { box-shadow: 0 0 70px 25px rgba(230, 57, 57, 0.6); }
+  100% { box-shadow: 0 0 40px 10px rgba(184, 37, 0, 0.4); }
+}
+
+.Main_Container, .glow {
+  transition: all 0.5s ease;
+}
 .Floor_Container{
   width: 365px;
   height: 100px;
@@ -210,11 +238,11 @@ body {
 /* วันที่ซ้าย */
 #Date_icon {
   position: relative;
-  width: 170px;
+  width: 160px;
   height: 40px;
   background-color: #fffefe;
   top: 50px;
-  right: 95px;
+  right: 100px;
     flex-direction: row;      /* เรียงแนวนอน */
   align-items: center;      /* จัดกึ่งกลางแนวตั้ง */
   justify-content: flex-start; /* ชิดซ้าย */
@@ -330,7 +358,7 @@ body {
 #Main_Picinfo .glow {
   position: absolute;
   top: 25%;
-  left: 30%;
+  left: 40%;
   transform: translate(-50%, -50%);
   width: 80%;
   height: 50%;

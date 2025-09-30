@@ -27,7 +27,7 @@ updateDate();
   const glow = document.querySelector('.glow');
   const realtimeKWEl = document.querySelector('.Realtime_kW');
   const mainContainer = document.querySelector('.Main_Container');
-
+const glowEl = document.querySelector('.glow');
 
   const V = 400;
   const root3 = Math.sqrt(3);
@@ -59,18 +59,22 @@ updateDate();
         totalBar.style.backgroundColor = totalPercent <= 50 ? '#3a6b35' : '#b82500';
         totalBar.innerText = `${Math.round(totalPercent)}%`;
       }
-if (mainContainer) {
-  if (totalPercent <= 50) {
-    // สีเขียว
-    mainContainer.style.boxShadow = 
-      "0 0 10px 2px #28c128, inset 0 0 40px 2px #39cd39";
+if(mainContainer && glowEl){
+  if(totalPercent <= 50){
+    mainContainer.style.boxShadow = "0 0 10px 2px #28c128, inset 0 0 40px 2px #39cd39";
+    glowEl.style.boxShadow = "0 0 50px 20px rgba(56, 201, 56, 0.4)";
   } else {
-    // สีแดง (เลือกโทนใกล้เคียง)
-    mainContainer.style.boxShadow = 
-      "0 0 10px 2px #b82500, inset 0 0 40px 2px #e63939";
+    mainContainer.style.boxShadow = "0 0 10px 2px #b82500, inset 0 0 40px 2px #e63939";
+    glowEl.style.boxShadow = "0 0 50px 20px rgba(230, 57, 57, 0.4)";
   }
-} 
-
+}
+if(glowEl){
+  if(totalPercent <= 50){
+    glowEl.style.animation = 'pulseGreen 2s infinite alternate ease-in-out';
+  } else {
+    glowEl.style.animation = 'pulseRed 2s infinite alternate ease-in-out';
+  }
+}
 
       // Update Marker
       updateMarker(totalPercent);
