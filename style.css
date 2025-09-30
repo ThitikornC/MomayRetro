@@ -240,7 +240,7 @@ body {
 /* วันที่ซ้าย */
 #Date_icon {
   position: relative;
-  max-width: 399px;
+  max-width: 180px;
   height: 40px;
   background-color: #fffefe;
   top: 0px;
