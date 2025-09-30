@@ -813,8 +813,8 @@ font-size: 14px;
 
 @media screen and (max-width: 375px) {
   body {
-    padding-left: 15px;
-    padding-right: 0px;
+    padding-left: 18px;
+    padding-right: -1px;
   }
 
 
