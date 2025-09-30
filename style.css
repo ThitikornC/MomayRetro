@@ -227,7 +227,7 @@ body {
 
 .Todayinfo {
   font-size: 14px;
-  margin: 10px 0 0 0; 
+  margin: 1px 0 0 0; 
   text-shadow: 1px 2px 4px rgba(0,0,0,0.6);
   white-space: nowrap;    /* บังคับไม่ตัดบรรทัด */
   
@@ -243,14 +243,14 @@ body {
   background-color: #fffefe;
   top: 50px;
   right: 100px;
-    flex-direction: row;      /* เรียงแนวนอน */
+  flex-direction: row;      /* เรียงแนวนอน */
   align-items: center;      /* จัดกึ่งกลางแนวตั้ง */
   justify-content: flex-start; /* ชิดซ้าย */
   gap: 0px;                /* เว้นระยะระหว่าง Date, Today, Weather */
   flex-wrap: nowrap;         /* ไม่ให้ wrap */
    padding-left: 20px;
   border-radius: 8pX;
-    padding-top: 4px;        /* ระยะด้านบนของ container */
+  padding-top: 4px;        /* ระยะด้านบนของ container */
 
   background-image: url('./images/noise.png');
 }
