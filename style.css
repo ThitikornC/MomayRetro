@@ -25,8 +25,8 @@ body {
   flex-direction: row;     /* จัดแนวนอน */
   justify-content: center; /* กึ่งกลางแนวนอน */
   gap: 20px;               /* ระยะห่างระหว่างกล่อง */
-  width: 100%;
-  max-width: 400px;
+  min-width: 400px;  /* ป้องกัน container ย่อ */
+  max-width: 300px;
   margin-bottom: 10px;
 }
 
@@ -757,27 +757,19 @@ font-size: 14px;
   width: 90%;
   height: 300px;
 }
-@media screen and (max-width: 399px) {
+@media screen and (max-width: 1024px) {
 
 #Date_icon {
-  width: 158px;
+  width: 160px;
   height: 20px;
-  background-color: #fffefe;
   top: 0px;
-  flex-direction: row;      /* เรียงแนวนอน */
-  align-items: flex-start;      /* จัดกึ่งกลางแนวตั้ง */
-  justify-content: flex-start; /* ชิดซ้าย */
-  gap: 0px;                /* เว้นระยะระหว่าง Date, Today, Weather */
-  flex-wrap: nowrap;         /* ไม่ให้ wrap */
-  border-radius: 8pX;
   padding-top: 10px;        /* ระยะด้านบนของ container */
-  margin-left: -187px;
-  padding-left: 5px;
-  background-image: url('./images/noise.png');
-  margin-bottom: 10px;
+  margin-left: -199px;
+  padding-right: 10px;
+
 }
 .Main_Container{
-  width: 350px;
+  width: 370px;
   height: 289px;
 }
 #Main_Picinfo {
@@ -807,10 +799,9 @@ font-size: 14px;
 #DailyBill {
                 /* กึ่งกลางแนวนอน */  text-align: center;
   font-size: 23px;
-  
+  }
 .ClientName {
   font-size: 23px;
 }
 
-}
 }
