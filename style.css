@@ -490,7 +490,7 @@ font-size: 14px;
   width: 19px;
   height: 200px;
   background-color: rgb(255, 247, 247); /* พื้นขาว */
-  box-shadow: inset 2px 5px 1px rgba(73, 72, 72, 0.6);
+  /*box-shadow: inset 2px 5px 1px rgba(73, 72, 72, 0.6);*/
   border-radius: 6px;
   overflow: hidden;
   z-index: 1;
@@ -767,7 +767,7 @@ font-size: 14px;
 
 #Date_icon {
   width: 160px;
-  height: 20px;
+  height: 18px;
   top: 0px;
   padding-top: 10px;        /* ระยะด้านบนของ container */
   margin-left: -199px;
@@ -811,26 +811,64 @@ font-size: 14px;
 }
 }
 
-@media screen and (max-width: 450px) {
+@media screen and (max-width: 375px) {
   body {
-    padding-left: 8px;
-    padding-right: 8px;
+    padding-left: 15px;
+    padding-right: 0px;
   }
 
-  .Main_Container,
-  .Top_Container {
-    width: 100%;
-  }
+
   .Top_Container,
 .Main_Container {
   width: 100%;
   max-width: 400px;   /* ปรับตาม layout */
   box-sizing: border-box;
-  padding-left: 5px;
-  padding-right: 5px;
+  padding-left: 0px;
+  padding-right: 0px;
 }
 #Date_icon {
-    margin-left: 0;       /* หรือเล็กๆ เช่น 5px */
-    padding-left: 5px;    /* เว้นด้านซ้ายแทน */
+    margin-right: -20pX;       /* หรือเล็กๆ เช่น 5px */
+    padding-left: 2px;    /* เว้นด้านซ้ายแทน */
+    width: 145px;
+}
+
+.ClientName_Container{
+    width: 160px;
+  height: 85px;
+  font-size: 12px;
+  margin-left: 2px;
+}
+
+.ElectricalBill_Container {
+      width: 160px;
+  height: 85px;
+  font-size: 12px;
+  margin-left: 2px;
+}
+.Realtime_Container {
+  width: 340px;
+  height: 218px;
+  font-size: 12px;
+}
+#EnergyChart {
+  position: relative;
+  left: -4px;           /* ขยับจากซ้าย */
+  width: 90%;
+  height: 300px;
+}
+#Main_Picinfo {
+  position: absolute;
+  top: 40px;           /* ปรับตำแหน่งบน */
+  left: 20px;          /* ปรับตำแหน่งซ้าย */
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  z-index: 10;
+}
+#Calendar_icon{
+  margin-top: 2px; 
+}
+#weather {
+  left: 2px;  
 }
 }
