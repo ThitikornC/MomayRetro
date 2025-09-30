@@ -440,7 +440,7 @@ color: #000000;
 
 #floor1_Text {
   position: absolute;
-  top: -2px;                 /* อยู่บนพื้นขาว */
+  top: -3px;                 /* อยู่บนพื้นขาว */
   left: 93%;              /* กึ่งกลางแนวนอน */
   transform: translateX(-50%);
   font-weight: bold;
