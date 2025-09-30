@@ -268,10 +268,12 @@ margin-left: 2Px;
 }
 /* กลุ่มไอคอนขวา */
 #Icons_group {
+  position: absolute;
   display: flex;
   flex-direction: row;
-  gap: 10px;         /* ระยะห่างระหว่างไอคอน */
-  margin-left: 200px; /* ลดค่าจาก 60px → 20px เพื่อดันซ้าย */
+  gap: 2px;         /* ระยะห่างระหว่างไอคอน */
+  margin-left: 190px; /* ลดค่าจาก 60px → 20px เพื่อดันซ้าย */
+  margin-bottom: 200px; 
 }
 
 
@@ -286,9 +288,9 @@ margin-left: 2Px;
 }
 
 /* ปรับขนาดเฉพาะไอคอน */
-#Calendar_icon img { width: 50px; height: 50px; }
-#Kwang_icon img    { width: 50px; height: 50px; }
-#Bell_icon img     { width: 50px; height: 50px; }
+#Calendar_icon img { width: 40px; height: 30px; }
+#Kwang_icon img    { width: 40px; height: 50px; }
+#Bell_icon img     { width: 40px; height: 50px; }
 
 /* Hover / Active */
 .Navbar div img:hover  { transform: scale(1.1); opacity: 0.9; }
