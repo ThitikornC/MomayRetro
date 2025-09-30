@@ -757,6 +757,18 @@ font-size: 14px;
   width: 90%;
   height: 300px;
 }
+.fc-event-title {
+  white-space: pre-line; /* ใช้ \n ให้ขึ้นบรรทัดใหม่ */
+  font-size: 12px;       /* ปรับขนาดตัวอักษรตามต้องการ */
+  line-height: 1.2;
+}
+
+
+
+
+
+
+
 @media screen and (max-width: 1024px) {
 
 #Date_icon {
@@ -802,6 +814,11 @@ font-size: 14px;
   }
 .ClientName {
   font-size: 23px;
+}
+body {
+  min-height: 100vh;
+  margin: 20px;
+
 }
 
 }
