@@ -252,7 +252,7 @@ body {
   padding-right: 10px;
   border-radius: 8pX;
   padding-top: 4px;        /* ระยะด้านบนของ container */
-
+margin-left: 2Px;
   background-image: url('./images/noise.png');
 }
 #Date_icon h2, 
