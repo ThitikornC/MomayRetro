@@ -242,7 +242,7 @@ body {
   width: 148px;
   height: 40px;
   background-color: #fffefe;
-  top: 50px;
+  top: 0px;
   right: 100px;
   flex-direction: row;      /* เรียงแนวนอน */
   align-items: center;      /* จัดกึ่งกลางแนวตั้ง */
@@ -253,8 +253,9 @@ body {
   padding-right: 10px;
   border-radius: 8pX;
   padding-top: 4px;        /* ระยะด้านบนของ container */
-margin-left: 2Px;
+  margin-left: 2Px;
   background-image: url('./images/noise.png');
+  margin-bottom: 5px;
 }
 #Date_icon h2, 
 #Date_icon h1,
