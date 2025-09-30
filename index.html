@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Momay</title>
   <link rel="stylesheet" href="style.css">
-  <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css' rel='stylesheet' />
 
 </head>
 <body>
@@ -53,8 +52,7 @@
 </div>
   </div>
   <div class="Meter">
-   <h1>METER</h1>
-   <h1> 100 Amp</h1>
+   <h1> 30/100 Amp</h1>
   </div>
   <!--
   <div id="Meter_Pic">
@@ -73,6 +71,7 @@
   <div class="Marker" id="marker3"></div>
  -->
   <div id="Total_Bar">
+    <div id="Total_Bar_Text"></div>
     <div class="progress-bar"></div>
   </div>
 <!--
@@ -85,17 +84,20 @@
   <div class="floor-wrapper">
     <h1 class="Bar_name">floor1</h1>
     <div id="floor1" class="progress-container">
+      <div id="floor1_Text" class="progress-text"></div> <!-- ตัวเลขเปอร์เซ็นต์ -->
       <div class="progress-bar" style="width: 40%"></div>
     </div>
-</div>
+  </div>
+
   <div class="floor-wrapper">
     <h1 class="Bar_name">floor2</h1>
     <div id="floor2" class="progress-container">
+      <div id="floor2_Text" class="progress-text"></div> <!-- ตัวเลขเปอร์เซ็นต์ -->
       <div class="progress-bar" style="width: 20%"></div>
     </div>
   </div>
-        <div class="Realtime_kW"></div>
 
+  <div class="Realtime_kW"></div>
 </div>
 
 
@@ -115,7 +117,9 @@
   <img src="./images/kwang_logo.png" alt="Import">
 </div>
 
- <div id="calendar"></div>
+<div id="calendarPopup">
+  <div id="calendar"></div>
+</div>
 
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

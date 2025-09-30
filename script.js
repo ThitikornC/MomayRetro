@@ -27,7 +27,9 @@ updateDate();
   const glow = document.querySelector('.glow');
   const realtimeKWEl = document.querySelector('.Realtime_kW');
   const mainContainer = document.querySelector('.Main_Container');
-const glowEl = document.querySelector('.glow');
+  const glowEl = document.querySelector('.glow');
+  const totalBarText = document.getElementById('Total_Bar_Text'); // ตัวเลขแยก
+  const floor1Text = document.getElementById('floor1_Text');
 
   const V = 400;
   const root3 = Math.sqrt(3);
@@ -48,17 +50,22 @@ const glowEl = document.querySelector('.glow');
       if(floor1Bar){
         floor1Bar.style.width = `${floor1Percent}%`;
         floor1Bar.style.backgroundColor = floor1Percent <= 50 ? '#3a6b35' : '#b82500';
-        floor1Bar.innerText = `${Math.round(floor1Percent)}%`;
-
+      }
+      if(floor1Text){
+      floor1Text.textContent = `${Math.round(floor1Percent)}%`;
       }
 
       // Total Bar
-      const totalPercent = Math.min((latest / total_maxKW) * 100, 100);
-      if(totalBar){
-        totalBar.style.height = `${totalPercent / 100 * 200}px`;
-        totalBar.style.backgroundColor = totalPercent <= 50 ? '#3a6b35' : '#b82500';
-        totalBar.innerText = `${Math.round(totalPercent)}%`;
-      }
+   const totalPercent = Math.min((latest / total_maxKW) * 100, 100);
+
+if(totalBar){
+  totalBar.style.height = `${totalPercent / 100 * 200}px`; 
+  totalBar.style.backgroundColor = totalPercent <= 50 ? '#3a6b35' : '#b82500';
+}
+
+if(totalBarText){
+  totalBarText.textContent = `${Math.round(totalPercent)}%`;
+}
 if(mainContainer && glowEl){
   if(totalPercent <= 50){
     mainContainer.style.boxShadow = "0 0 10px 2px #28c128, inset 0 0 40px 2px #39cd39";
@@ -328,6 +335,24 @@ fetchCurrentWeatherSukhothai();
 
 // อัปเดตทุก 30 นาที
 setInterval(fetchCurrentWeatherSukhothai, 1800000);
+
+//calenderpopup
+// เลือกไอคอน Calendar
+const calendarIcon = document.querySelector("#Calendar_icon img");
+const popup = document.getElementById("calendarPopup");
+
+// กด Calendar icon → เปิด popup
+calendarIcon.addEventListener("click", function() {
+  popup.classList.add("active");
+});
+
+// กดพื้นหลังดำ → ปิด popup
+popup.addEventListener("click", function(e) {
+  if (e.target === popup) {
+    popup.classList.remove("active");
+  }
+});
+
 
 });
 

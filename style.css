@@ -43,6 +43,7 @@ body {
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
+  margin-left: 2px;
 
   /* PNG background */
   background-image: url('./images/noise.png');
@@ -265,22 +266,21 @@ body {
 }
 .Meter{
 position :absolute;
-right: 45px;
-top: 55px;
-width: auto;
+right: 15px;
+top: 60px;
+width: 90px;
 height: auto;
 padding: 10px;
 border-radius: 4px;
 align-items: center;
-/*background-color: #000;
-background-image: url("./images/BG.png");*/
+background-image: url("./images/KW.png");
 
 }
 .Meter h1 {
 font-size: 10px;
 margin: 0;
 text-shadow: 1px 2px 4px rgba(0,0,0,0.6);
-color: #ffffff;
+color: #000000;
 }
 #Date {
   /* ป้องกันการขึ้นบรรทัดใหม่ */
@@ -292,15 +292,14 @@ color: #ffffff;
   display: flex;
   flex-direction: row;
   gap: 2px;         /* ระยะห่างระหว่างไอคอน */
-  margin-left: 195px; /* ลดค่าจาก 60px → 20px เพื่อดันซ้าย */
-  margin-bottom: 230px; 
+  margin-left: 200px; /* ลดค่าจาก 60px → 20px เพื่อดันซ้าย */
+  margin-bottom: 210px; 
 }
 
 
 /* ไอคอนทั่วไป */
 .Navbar div img {
-  width: 40px;
-  height: 40px;
+
   cursor: pointer;
   display: block;
   object-fit: contain;
@@ -308,10 +307,25 @@ color: #ffffff;
 }
 
 /* ปรับขนาดเฉพาะไอคอน */
-#Calendar_icon img { width: 40px; height: 30px; }
-#Kwang_icon img    { width: 40px; height: 50px; }
-#Bell_icon img     { width: 40px; height: 50px; }
+#Calendar_icon img { 
+  width: 30px; 
+  height: 30px; 
+  /* ปรับตำแหน่งเฉพาะ */
+  margin-top: 0px;  /* บวก/ลบเพื่อเลื่อนขึ้นลง */
+}
 
+#Kwang_icon img { 
+  width: 50px; 
+  height: 50px; 
+  margin-top: -5px; /* ตัวอย่างเลื่อนขึ้น 5px */
+}
+
+#Bell_icon img { 
+  width: 40px; 
+  height: 40px; 
+  margin-top: -4px; /* ตัวอย่างเลื่อนลง 5px */
+  margin-left: -5px;
+}
 /* Hover / Active */
 .Navbar div img:hover  { transform: scale(1.1); opacity: 0.9; }
 .Navbar div img:active { transform: scale(0.95); opacity: 0.8; }
@@ -413,6 +427,31 @@ color: #ffffff;
   overflow: visible;
   margin: 6px 0;        /* เว้นระยะระหว่าง bar กับ element อื่น */
 }
+.progress-text {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 12px;
+  font-weight: bold;
+  color: #000;
+}
+
+#floor1_Text {
+  position: absolute;
+  top: -2px;                 /* อยู่บนพื้นขาว */
+  left: 93%;              /* กึ่งกลางแนวนอน */
+  transform: translateX(-50%);
+  font-weight: bold;
+  color: #000;            /* สีตัวอักษร */
+  line-height: 20px;      /* ให้ตัวเลขอยู่กึ่งกลางสูง bar */
+  pointer-events: none;   /* คลิกไม่ไปโดน text */
+  z-index: 2;             /* อยู่เหนือ bar */
+  font-size: 8px;   /* ปรับเป็นขนาดที่ต้องการ */
+  color: #000;       /* สีตัวอักษร */
+
+
+}
 
 #floor1,
 #floor2 {
@@ -435,21 +474,25 @@ color: #ffffff;
 }
 
 #Total_Bar {
-  position: absolute;      /* วางแยกออกจาก flow */
-  left: 130px;             /* ชิดขวาใน Main_Container */
-  top: 50%;                /* กึ่งกลางแนวตั้ง */
-  transform: translateY(-50%); /* กึ่งกลางแนวตั้ง */
+  position: absolute;      
+  left: 130px;             
+  top: 50%;                
+  transform: translateY(-50%);
   width: 19px;
   height: 200px;
-  background-color: rgb(255, 247, 247);
+  background-color: rgb(255, 247, 247); /* พื้นขาว */
   box-shadow: inset 2px 5px 1px rgba(73, 72, 72, 0.6);
-
-
   border-radius: 6px;
   overflow: hidden;
-  z-index: 1;              /* อยู่เหนือพื้นหลังแต่ใต้ glow ถ้าต้องการ */
-  
+  z-index: 1;
+  display: flex;
+  justify-content: center; /* กึ่งกลางแนวนอน */
+  align-items: flex-start; /* ตัวเลขอยู่บน */
+  font-size: 12px;
+  font-weight: bold;
+  color: #000;
 }
+
 .floor-wrapper {
   display: flex;
   align-items: center;  /* ให้ bar และชื่ออยู่แนวเดียวกัน */
@@ -466,18 +509,19 @@ color: #ffffff;
 }
 #Total_Bar .progress-bar {
   width: 100%;
-  height: 0;                 /* เริ่มจาก 0 */
+  background-color: #3a6b35; 
   position: absolute;
-  bottom: 0;                 /* ให้ bar เริ่มจากด้านล่าง */
-  transition: height 0.5s ease, background-color 0.5s ease;
-  
-  display: flex;             /* ให้ข้อความอยู่ใน bar */
-  justify-content: center;   /* กึ่งกลางแนวนอน */
-  align-items: center;       /* กึ่งกลางแนวตั้ง */
-  color: #000000;               /* สีตัวเลข */
-  font-size: 9px;
-  font-weight: bold;
-  z-index: 10; 
+  bottom: 0;                
+  border-radius: 6px 6px 0 0;
+}
+#Total_Bar_Text {
+  font-size: 8px;   /* ปรับเป็นขนาดที่ต้องการ */
+  font-weight: bold; /* ตัวหนา */
+  color: #000;       /* สีตัวอักษร */
+  text-align: center;/* กึ่งกลางแนวนอน */
+  margin-top: 2px;
+  margin-left: 2px;
+  z-index: 1; 
 }
 #Bar_Bg {
   position: absolute;        /* วางทับหรือแยกจาก flow */
@@ -589,32 +633,30 @@ color: #ffffff;
 
 
 /*calendar*/
+#calendarPopup {
+  display: none; /* ซ่อนก่อน */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+}
+
+#calendarPopup.active {
+  display: flex; /* โชว์ popup */
+}
+
 #calendar {
-  display: none;
-  background-image: url('./images/images/calendar_BG.png'); /* รูปพื้นหลังล่างสุด */
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  position: relative;
+  max-width: 900px;
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
 }
 
-/* Layer 2: Background ของแต่ละวัน (day cell) */
-.fc-daygrid-day {
-  background-image: url('./images/mainBG.png');/* รูปของแต่ละวัน */
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-
-/* Layer 3: Background ของ event */
-.fc-event {
-  background-image: url('layer3.png'); /* รูปของ event */
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  color: white;  /* ตัวอักษร event */
-  border: none;
-}
 #DailyBill {
        /* ลอยอิสระไม่ขึ้นกับกล่องแม่ */
   top: 50%;                  /* กึ่งกลางแนวตั้ง */
