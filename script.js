@@ -264,11 +264,9 @@ setInterval(fetchDailyBill, 1800000);
     prevBtn.addEventListener('click', ()=>changeDay(-1));
     nextBtn.addEventListener('click', ()=>changeDay(1));
   }
-
- // ================= Calendar =================
+// ================= Calendar =================
 const calendarEl = document.getElementById('calendar');
 if (calendarEl) {
-  const yearMonth = new Date().toISOString().slice(0,7); // เช่น 2025-09
   const calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: 'dayGridMonth',
     locale: 'th',
@@ -280,34 +278,22 @@ if (calendarEl) {
     height: 600,
     events: async function(fetchInfo, successCallback, failureCallback) {
       try {
-        const res = await fetch(`http://localhost:3000/monthly-calendar/${yearMonth}`);
+        // ดึงข้อมูลทั้งหมดจาก backend
+        const res = await fetch(`http://localhost:3000/calendar`);
         const data = await res.json();
 
-        const events = [];
+        // filter ตามช่วงวันที่ที่ FullCalendar ต้องการ (รวมเดือนก่อน/หลังที่ติดมา)
+        const start = new Date(fetchInfo.startStr);
+        const end = new Date(fetchInfo.endStr);
 
-        data.forEach(item => {
-          // Event 1: ค่าไฟ
-          events.push({
-            title: `฿${item.extendedProps.electricity_bill}`,
-            start: item.start,
-            backgroundColor: '#facc15', // สีเหลือง
-            borderColor: '#fbbf24',
-            display: 'block' // ทำให้ไม่ overlap กัน
-          });
-
-          // Event 2: หน่วยไฟฟ้า
-          events.push({
-            title: `${item.extendedProps.energy_kwh} kWh`,
-            start: item.start,
-            backgroundColor: '#10b981', // สีเขียว
-            borderColor: '#059669',
-            display: 'block'
-          });
+        const filtered = data.filter(item => {
+          const d = new Date(item.start);
+          return d >= start && d < end;
         });
 
-        successCallback(events);
+        successCallback(filtered);
       } catch (err) {
-        console.error("Error fetching monthly calendar:", err);
+        console.error("Error fetching calendar:", err);
         failureCallback(err);
       }
     }
@@ -315,6 +301,8 @@ if (calendarEl) {
 
   calendar.render();
 }
+
+
 
 
   // ================= Weather Sukhothai =================

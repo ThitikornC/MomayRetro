@@ -809,6 +809,21 @@ font-size: 14px;
 .ClientName {
   font-size: 23px;
 }
+#weather {
+  left: 2px;  
+}
+#Main_Picinfo {
+  position: absolute;
+  top: 40px;           /* ปรับตำแหน่งบน */
+  left: 50px;          /* ปรับตำแหน่งซ้าย */
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  z-index: 10;
+}
+#Calendar_icon{
+  margin-top: 2px; 
+}
 }
 
 @media screen and (max-width: 375px) {
