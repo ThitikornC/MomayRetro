@@ -240,7 +240,7 @@ body {
 /* วันที่ซ้าย */
 #Date_icon {
   position: relative;
-  max-width: 180px;
+  max-width: 400px;
   height: 40px;
   background-color: #fffefe;
   top: 0px;
@@ -250,8 +250,8 @@ body {
   justify-content: flex-start; /* ชิดซ้าย */
   gap: 0px;                /* เว้นระยะระหว่าง Date, Today, Weather */
   flex-wrap: nowrap;         /* ไม่ให้ wrap */
-  padding-left: 15px;
-  padding-right: 10px;
+  padding-left: 18px;
+  padding-right: 5px;
   border-radius: 8pX;
   padding-top: 4px;        /* ระยะด้านบนของ container */
   margin-left: 2Px;
