@@ -1,17 +1,15 @@
 document.addEventListener('DOMContentLoaded', async function() {
 
   // ================= Date =================
- function updateDate() {
+function updateDate() {
   const dateElement = document.getElementById('Date');
   const today = new Date();
   const day = String(today.getDate()).padStart(2, '0');
-  const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-  const month = monthNames[today.getMonth()]; // เดือนเต็ม
+  const month = String(today.getMonth() + 1).padStart(2, '0'); // +1 เพราะ JS นับเดือนจาก 0
   const year = today.getFullYear();
-  dateElement.textContent = `${day} ${month} ${year}`;
+  dateElement.textContent = `${day}/${month}/${year}`;
 }
 updateDate();
-
   // ================= Total Marker =================
   const totalBarContainer = document.getElementById('Total_Bar'); 
   let marker = document.createElement('div');
@@ -69,8 +67,8 @@ if(totalBarText){
 }
 if(mainContainer && glowEl){
   if(totalPercent <= 50){
-    mainContainer.style.boxShadow = "0 0 10px 2px #FBBF32, inset 0 0 40px 2px #F9B30F";
-    glowEl.style.boxShadow = "0 0 50px 20px #FBBF32";
+    mainContainer.style.boxShadow = "0 0 5px 2px #FBBF32, inset 0 0 20px 2px #F9B30F";
+    glowEl.style.boxShadow = "0 0 6px 5px #FBBF32";
   } else {
     mainContainer.style.boxShadow = "0 0 10px 2px #b82500, inset 0 0 40px 2px #e63939";
     glowEl.style.boxShadow = "0 0 50px 20px rgba(230, 57, 57, 0.4)";
