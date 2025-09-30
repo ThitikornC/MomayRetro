@@ -240,13 +240,13 @@ body {
 /* วันที่ซ้าย */
 #Date_icon {
   position: relative;
-  max-width: 400px;
+  width: 155px;
   height: 40px;
   background-color: #fffefe;
   top: 0px;
   right: 100px;
   flex-direction: row;      /* เรียงแนวนอน */
-  align-items: center;      /* จัดกึ่งกลางแนวตั้ง */
+  align-items: flex-start;      /* จัดกึ่งกลางแนวตั้ง */
   justify-content: flex-start; /* ชิดซ้าย */
   gap: 0px;                /* เว้นระยะระหว่าง Date, Today, Weather */
   flex-wrap: nowrap;         /* ไม่ให้ wrap */
