@@ -782,7 +782,19 @@ font-size: 14px;
 .fc .fc-toolbar-title {
   font-size: 1.5rem;
   font-weight: bold;
-  color: #ffffff;
+  color: #000000;
+  width: 250px;
+  height: 50px;
+  border-radius: 6px;
+  background-image: url("./images/noise.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  display: flex;               /* เพิ่ม flex */
+  justify-content: center;     /* กึ่งกลางแนวนอน */
+  align-items: center; 
+  margin: 5px;
 }
 
 .fc .fc-toolbar-prev {
@@ -808,7 +820,8 @@ font-size: 14px;
 
 /* ปุ่ม Today */
 .fc .fc-button-primary {
-  background: #644f0b;
+  background: #c3b279;
+  color: #000;
 }
 
 .fc .fc-button-primary:hover {
@@ -867,6 +880,7 @@ font-size: 14px;
   font-size: 1rem;
   font-weight: bold;
   margin-bottom: 4px;
+  margin-right: 70px;
   color: #090a0a;
 }
 
