@@ -248,7 +248,8 @@ body {
   justify-content: flex-start; /* ชิดซ้าย */
   gap: 0px;                /* เว้นระยะระหว่าง Date, Today, Weather */
   flex-wrap: nowrap;         /* ไม่ให้ wrap */
-   padding-left: 20px;
+  padding-left: 10px;
+  padding-right: 10px;
   border-radius: 8pX;
   padding-top: 4px;        /* ระยะด้านบนของ container */
 
