@@ -68,13 +68,6 @@ if(mainContainer && glowEl){
     glowEl.style.boxShadow = "0 0 50px 20px rgba(230, 57, 57, 0.4)";
   }
 }
-if(glowEl){
-  if(totalPercent <= 50){
-    glowEl.style.animation = 'pulseGreen 2s infinite alternate ease-in-out';
-  } else {
-    glowEl.style.animation = 'pulseRed 2s infinite alternate ease-in-out';
-  }
-}
 
       // Update Marker
       updateMarker(totalPercent);
