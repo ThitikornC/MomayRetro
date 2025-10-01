@@ -200,53 +200,59 @@ document.addEventListener('DOMContentLoaded', async function() {
   }
 
   // ================= FullCalendar =================
-  const calendarEl = document.getElementById('calendar');
-  if (calendarEl) {
-    const calendar = new FullCalendar.Calendar(calendarEl, {
-      initialView: 'dayGridMonth',
-      locale: 'en',
-      headerToolbar: { left: 'prev', center: 'title', right: 'next' },
-      height: 600,
-      dateClick: async function(info) {
-        const datePopup = document.getElementById('DatePopup');
-        const popupDateEl = datePopup.querySelector('.popup-date');
-        const popupBillEl = document.getElementById('popup-bill');
-        const popupUnitEl = document.getElementById('popup-unit');
-        datePopup.style.display = 'flex';
-        datePopup.classList.add('active');
-        if (popupDateEl) popupDateEl.textContent = info.dateStr;
-        try {
-          const pricePerUnit = 4.4;
-          const url = `https://momaybackend02-production.up.railway.app/daily-bill?date=${info.dateStr}`;
-          const res = await fetch(url);
-          const json = await res.json();
-          const bill = json.electricity_bill ?? 0;
-          const units = bill / pricePerUnit;
-          if (popupBillEl) popupBillEl.textContent = bill.toFixed(2) + ' THB';
-          if (popupUnitEl) popupUnitEl.textContent = units.toFixed(2) + ' Unit';
-        } catch (err) {
-          console.error('Error fetching daily bill:', err);
-          if (popupBillEl) popupBillEl.textContent = 'Error';
-          if (popupUnitEl) popupUnitEl.textContent = '';
-        }
-      },
-      events: async function(fetchInfo, successCallback, failureCallback) {
-        try {
-          const res = await fetch(`https://momaybackend02-production.up.railway.app/calendar`);
-          const data = await res.json();
-          const start = new Date(fetchInfo.startStr);
-          const end = new Date(fetchInfo.endStr);
-          const filtered = data.filter(item => {
-            const d = new Date(item.start);
-            return d >= start && d < end;
-          });
-          const styled = filtered.map(event => ({ ...event, textColor: 'black', backgroundColor: 'transparent', borderColor: 'transparent' }));
-          successCallback(styled);
-        } catch (err) { console.error("Error fetching calendar:", err); failureCallback(err); }
+const calendarEl = document.getElementById('calendar');
+let calendar;
+if (calendarEl) {
+  calendar = new FullCalendar.Calendar(calendarEl, {
+    initialView: 'dayGridMonth',
+    locale: 'en',
+    headerToolbar: { left: 'prev', center: 'title', right: 'next' },
+    height: 600,
+    dateClick: async function(info) {
+      const datePopup = document.getElementById('DatePopup');
+      const popupDateEl = datePopup.querySelector('.popup-date');
+      const popupBillEl = document.getElementById('popup-bill');
+      const popupUnitEl = document.getElementById('popup-unit');
+      datePopup.style.display = 'flex';
+      datePopup.classList.add('active');
+      if (popupDateEl) popupDateEl.textContent = info.dateStr;
+      try {
+        const pricePerUnit = 4.4;
+        const url = `https://momaybackend02-production.up.railway.app/daily-bill?date=${info.dateStr}`;
+        const res = await fetch(url);
+        const json = await res.json();
+        const bill = json.electricity_bill ?? 0;
+        const units = bill / pricePerUnit;
+        if (popupBillEl) popupBillEl.textContent = bill.toFixed(2) + ' THB';
+        if (popupUnitEl) popupUnitEl.textContent = units.toFixed(2) + ' Unit';
+      } catch (err) {
+        console.error('Error fetching daily bill:', err);
+        if (popupBillEl) popupBillEl.textContent = 'Error';
+        if (popupUnitEl) popupUnitEl.textContent = '';
       }
-    });
-    calendar.render();
-  }
+    },
+    events: async function(fetchInfo, successCallback, failureCallback) {
+      try {
+        const res = await fetch(`https://momaybackend02-production.up.railway.app/calendar`);
+        const data = await res.json();
+        const start = new Date(fetchInfo.startStr);
+        const end = new Date(fetchInfo.endStr);
+        const filtered = data.filter(item => {
+          const d = new Date(item.start);
+          return d >= start && d < end;
+        });
+        const styled = filtered.map(event => ({ ...event, textColor: 'black', backgroundColor: 'transparent', borderColor: 'transparent' }));
+        successCallback(styled);
+      } catch (err) { console.error("Error fetching calendar:", err); failureCallback(err); }
+    }
+  });
+  calendar.render();
+
+  // ------------------- บังคับรีเฟรชขนาด -------------------
+  setTimeout(() => {
+    calendar.updateSize();  // รีเฟสขนาดปฏิทิน
+  }, 100);  // หน่วงเล็กน้อยให้ DOM พร้อม
+}
 
   // ================= ปิด popup =================
   const datePopup = document.getElementById('DatePopup');
@@ -321,6 +327,11 @@ document.addEventListener('DOMContentLoaded', async function() {
   // ================= Calendar Popup =================
   const calendarIcon = document.querySelector("#Calendar_icon img");
   const popup = document.getElementById("calendarPopup");
-  calendarIcon.addEventListener("click", function() { popup.classList.add("active"); });
-  popup.addEventListener("click", function(e) { if (e.target === popup) popup.classList.remove("active"); });
+  calendarIcon.addEventListener("click", function() { 
+    popup.classList.add("active"); 
+    calendar.updateSize(); // รีเฟรชขนาดตอนเปิด popup
+  });
+  popup.addEventListener("click", function(e) { 
+    if (e.target === popup) popup.classList.remove("active"); 
+  });
 });
