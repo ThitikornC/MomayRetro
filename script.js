@@ -174,7 +174,7 @@ const res = await fetch('https://api-kx4r63rdjq-an.a.run.app/daily-energy/px_dh?
     currentDayEl.textContent = formatDate(currentDate);
 
     async function fetchDailyData(date){
-      const dateStr = date.toISOString().split('T')[0];
+    const dateStr = date.toLocaleDateString('en-CA'); // YYYY-MM-DD local
       try{
         const res = await fetch(`https://api-kx4r63rdjq-an.a.run.app/daily-energy/px_dh?date=${dateStr}`);
         const json = await res.json();
@@ -214,10 +214,15 @@ const res = await fetch('https://api-kx4r63rdjq-an.a.run.app/daily-energy/px_dh?
   const calendarEl = document.getElementById('calendar');
   let calendar;
 
-  function isToday(dateStr) {
-    const today = new Date().toISOString().split('T')[0];
-    return dateStr === today;
-  }
+function isToday(dateStr) {
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const dd = String(now.getDate()).padStart(2, '0');
+  const today = `${yyyy}-${mm}-${dd}`;
+  return dateStr === today;
+}
+
 
   if (calendarEl) {
     calendar = new FullCalendar.Calendar(calendarEl, {
