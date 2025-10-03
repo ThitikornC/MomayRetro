@@ -29,6 +29,11 @@ document.addEventListener('DOMContentLoaded', async function() {
   const glowEl = document.querySelector('.glow');
   const totalBarText = document.getElementById('Total_Bar_Text');
   const floor1Text = document.getElementById('floor1_Text');
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
+  const localDate = `${yyyy}-${mm}-${dd}`;
 
   const V = 400;
   const root3 = Math.sqrt(3);
@@ -39,7 +44,13 @@ document.addEventListener('DOMContentLoaded', async function() {
 
   async function updateBarsAndKW() {
     try {
-      const res = await fetch('https://api-kx4r63rdjq-an.a.run.app/daily-energy/px_dh?date=' + new Date().toISOString().split('T')[0]);
+const today = new Date();
+const yyyy = today.getFullYear();
+const mm = String(today.getMonth() + 1).padStart(2, '0');
+const dd = String(today.getDate()).padStart(2, '0');
+const localDate = `${yyyy}-${mm}-${dd}`;
+
+const res = await fetch('https://api-kx4r63rdjq-an.a.run.app/daily-energy/px_dh?date=' + localDate);
       const json = await res.json();
       const data = json.data;
       const latest = data.length ? data[data.length - 1].power : 0;
@@ -199,79 +210,70 @@ document.addEventListener('DOMContentLoaded', async function() {
     updateChart(currentDate);
   }
 
-// ================= FullCalendar =================
-const calendarEl = document.getElementById('calendar');
-let calendar;
+  // ================= FullCalendar =================
+  const calendarEl = document.getElementById('calendar');
+  let calendar;
 
-// ฟังก์ชันตรวจสอบวันปัจจุบัน
-function isToday(dateStr) {
-  const today = new Date().toISOString().split('T')[0];
-  return dateStr === today;
-}
+  function isToday(dateStr) {
+    const today = new Date().toISOString().split('T')[0];
+    return dateStr === today;
+  }
 
-if (calendarEl) {
-  calendar = new FullCalendar.Calendar(calendarEl, {
-    initialView: 'dayGridMonth',
-    locale: 'en',
-    headerToolbar: { left: 'prev', center: 'title', right: 'next' },
-    height: 600,
-    dateClick: async function(info) {
-      const datePopup = document.getElementById('DatePopup');
-      const popupDateEl = datePopup.querySelector('.popup-date');
-      const popupBillEl = document.getElementById('popup-bill');
-      const popupUnitEl = document.getElementById('popup-unit');
+  if (calendarEl) {
+    calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: 'dayGridMonth',
+      locale: 'en',
+      headerToolbar: { left: 'prev', center: 'title', right: 'next' },
+      height: 600,
+      dateClick: async function(info) {
+        const datePopup = document.getElementById('DatePopup');
+        const popupDateEl = datePopup.querySelector('.popup-date');
+        const popupBillEl = document.getElementById('popup-bill');
+        const popupUnitEl = document.getElementById('popup-unit');
 
-      // แสดง popup
-      datePopup.style.display = 'flex';
-      datePopup.classList.add('active');
-      if (popupDateEl) popupDateEl.textContent = info.dateStr;
+        datePopup.style.display = 'flex';
+        datePopup.classList.add('active');
+        if (popupDateEl) popupDateEl.textContent = info.dateStr;
 
-      try {
-        const pricePerUnit = 4.4;
-        const url = `https://momaybackend02-production.up.railway.app/daily-bill?date=${info.dateStr}`;
-        const res = await fetch(url);
-        const json = await res.json();
-        const bill = json.electricity_bill ?? 0;
-        const units = bill / pricePerUnit;
+        try {
+          const pricePerUnit = 4.4;
+          const url = `https://momaybackend02-production.up.railway.app/daily-bill?date=${info.dateStr}`;
+          const res = await fetch(url);
+          const json = await res.json();
+          const bill = json.electricity_bill ?? 0;
+          const units = bill / pricePerUnit;
 
-        // ตั้งค่า Bill และ Unit
-        if (popupBillEl) popupBillEl.textContent = bill.toFixed(2) + ' THB';
-        if (popupUnitEl) popupUnitEl.textContent = units.toFixed(2) + ' Unit';
+          if (popupBillEl) popupBillEl.textContent = bill.toFixed(2) + ' THB';
+          if (popupUnitEl) popupUnitEl.textContent = units.toFixed(2) + ' Unit';
 
-        // ถ้าวันนี้ ให้เอา Bill ขึ้นก่อน Unit
-        if (isToday(info.dateStr)) {
-          popupBillEl.parentNode.insertBefore(popupBillEl, popupUnitEl);
+          if (isToday(info.dateStr)) {
+            popupBillEl.parentNode.insertBefore(popupBillEl, popupUnitEl);
+          }
+
+        } catch (err) {
+          console.error('Error fetching daily bill:', err);
+          if (popupBillEl) popupBillEl.textContent = 'Error';
+          if (popupUnitEl) popupUnitEl.textContent = '';
         }
-
-      } catch (err) {
-        console.error('Error fetching daily bill:', err);
-        if (popupBillEl) popupBillEl.textContent = 'Error';
-        if (popupUnitEl) popupUnitEl.textContent = '';
+      },
+      events: async function(fetchInfo, successCallback, failureCallback) {
+        try {
+          const res = await fetch(`https://momaybackend02-production.up.railway.app/calendar`);
+          const data = await res.json();
+          const start = new Date(fetchInfo.startStr);
+          const end = new Date(fetchInfo.endStr);
+          const filtered = data.filter(item => {
+            const d = new Date(item.start);
+            return d >= start && d < end;
+          });
+          const styled = filtered.map(event => ({ ...event, textColor: 'black', backgroundColor: 'transparent', borderColor: 'transparent' }));
+          successCallback(styled);
+        } catch (err) { console.error("Error fetching calendar:", err); failureCallback(err); }
       }
-    },
-    events: async function(fetchInfo, successCallback, failureCallback) {
-      try {
-        const res = await fetch(`https://momaybackend02-production.up.railway.app/calendar`);
-        const data = await res.json();
-        const start = new Date(fetchInfo.startStr);
-        const end = new Date(fetchInfo.endStr);
-        const filtered = data.filter(item => {
-          const d = new Date(item.start);
-          return d >= start && d < end;
-        });
-        const styled = filtered.map(event => ({ ...event, textColor: 'black', backgroundColor: 'transparent', borderColor: 'transparent' }));
-        successCallback(styled);
-      } catch (err) { console.error("Error fetching calendar:", err); failureCallback(err); }
-    }
-  });
-  calendar.render();
-
-  // รีเฟรชขนาดปฏิทินเล็กน้อย
-  setTimeout(() => {
-    calendar.updateSize();
-  }, 100);
-}
-
+    });
+    calendar.render();
+    setTimeout(() => { calendar.updateSize(); }, 100);
+  }
 
   // ================= ปิด popup =================
   const datePopup = document.getElementById('DatePopup');
@@ -348,9 +350,86 @@ if (calendarEl) {
   const popup = document.getElementById("calendarPopup");
   calendarIcon.addEventListener("click", function() { 
     popup.classList.add("active"); 
-    calendar.updateSize(); // รีเฟรชขนาดตอนเปิด popup
+    calendar.updateSize();
   });
   popup.addEventListener("click", function(e) { 
     if (e.target === popup) popup.classList.remove("active"); 
   });
+
+  // ================= Kwang Solar Popup =================
+  const kwangIcon = document.getElementById("Kwang_icon");
+  const kwangPopup = document.getElementById("kwangPopup");
+  const closeKwangPopup = document.getElementById("closeKwangPopup");
+  const kwangDatepicker = document.getElementById("kwangDatepicker");
+  const kwangPowerEl = document.getElementById("kwangPower");
+  const kwangBillEl = document.getElementById("kwangBill");
+
+  if (kwangIcon && kwangPopup) {
+    // เปิด popup
+    kwangIcon.addEventListener("click", () => {
+      kwangPopup.classList.add("active");
+      kwangPopup.style.display = "flex";
+      const today = new Date().toISOString().split('T')[0];
+      kwangDatepicker.value = today;
+      fetchKwangData(today);
+    });
+
+    // ปิด popup
+    closeKwangPopup.addEventListener("click", () => {
+      kwangPopup.classList.remove("active");
+      kwangPopup.style.display = "none";
+    });
+
+    kwangPopup.addEventListener("click", (e) => {
+      if (e.target === kwangPopup) {
+        kwangPopup.classList.remove("active");
+        kwangPopup.style.display = "none";
+      }
+    });
+
+    // เลือกวันใหม่
+    kwangDatepicker.addEventListener("change", (e) => {
+      const date = e.target.value;
+      fetchKwangData(date);
+    });
+
+    // ฟังก์ชันดึงข้อมูล Solar
+    async function fetchKwangData(date) {
+      try {
+        const res = await fetch(`https://api-kx4r63rdjq-an.a.run.app/daily-energy/px_dh?date=${date}`);
+        const json = await res.json();
+        const data = json.data;
+
+        // รวมเป็นชั่วโมง
+        const hourly = new Array(24).fill(0);
+        const counts = new Array(24).fill(0);
+
+        data.forEach(item => {
+          const d = new Date(item.timestamp);
+          const h = d.getUTCHours();
+          if (item.power != null) {
+            hourly[h] += item.power;
+            counts[h]++;
+          }
+        });
+
+        const hourlyAvg = hourly.map((sum, i) => counts[i] ? sum / counts[i] : 0);
+        const totalPower = hourlyAvg.reduce((a, b) => a + b, 0);
+
+        // แสดงผลใน popup
+        kwangPowerEl.textContent = totalPower.toFixed(2) + " kWh";
+
+        // คำนวณค่าไฟ (สมมติ 4.4 THB/unit)
+        const pricePerUnit = 4.4;
+        kwangBillEl.textContent = (totalPower * pricePerUnit).toFixed(2) + " THB";
+
+      } catch (err) {
+        console.error("Error fetching Kwang solar data:", err);
+        kwangPowerEl.textContent = "- kWh";
+        kwangBillEl.textContent = "- THB";
+      }
+    }
+  }
+
 });
+
