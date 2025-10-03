@@ -199,9 +199,16 @@ document.addEventListener('DOMContentLoaded', async function() {
     updateChart(currentDate);
   }
 
-  // ================= FullCalendar =================
+// ================= FullCalendar =================
 const calendarEl = document.getElementById('calendar');
 let calendar;
+
+// ฟังก์ชันตรวจสอบวันปัจจุบัน
+function isToday(dateStr) {
+  const today = new Date().toISOString().split('T')[0];
+  return dateStr === today;
+}
+
 if (calendarEl) {
   calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: 'dayGridMonth',
@@ -213,9 +220,12 @@ if (calendarEl) {
       const popupDateEl = datePopup.querySelector('.popup-date');
       const popupBillEl = document.getElementById('popup-bill');
       const popupUnitEl = document.getElementById('popup-unit');
+
+      // แสดง popup
       datePopup.style.display = 'flex';
       datePopup.classList.add('active');
       if (popupDateEl) popupDateEl.textContent = info.dateStr;
+
       try {
         const pricePerUnit = 4.4;
         const url = `https://momaybackend02-production.up.railway.app/daily-bill?date=${info.dateStr}`;
@@ -223,8 +233,16 @@ if (calendarEl) {
         const json = await res.json();
         const bill = json.electricity_bill ?? 0;
         const units = bill / pricePerUnit;
+
+        // ตั้งค่า Bill และ Unit
         if (popupBillEl) popupBillEl.textContent = bill.toFixed(2) + ' THB';
         if (popupUnitEl) popupUnitEl.textContent = units.toFixed(2) + ' Unit';
+
+        // ถ้าวันนี้ ให้เอา Bill ขึ้นก่อน Unit
+        if (isToday(info.dateStr)) {
+          popupBillEl.parentNode.insertBefore(popupBillEl, popupUnitEl);
+        }
+
       } catch (err) {
         console.error('Error fetching daily bill:', err);
         if (popupBillEl) popupBillEl.textContent = 'Error';
@@ -243,16 +261,20 @@ if (calendarEl) {
         });
         const styled = filtered.map(event => ({ ...event, textColor: 'black', backgroundColor: 'transparent', borderColor: 'transparent' }));
         successCallback(styled);
-      } catch (err) { console.error("Error fetching calendar:", err); failureCallback(err); }
+      } catch (err) { 
+        console.error("Error fetching calendar:", err); 
+        failureCallback(err); 
+      }
     }
   });
   calendar.render();
 
-  // ------------------- บังคับรีเฟรชขนาด -------------------
+  // รีเฟรชขนาดปฏิทินเล็กน้อย
   setTimeout(() => {
-    calendar.updateSize();  // รีเฟสขนาดปฏิทิน
-  }, 100);  // หน่วงเล็กน้อยให้ DOM พร้อม
+    calendar.updateSize();
+  }, 100);
 }
+
 
   // ================= ปิด popup =================
   const datePopup = document.getElementById('DatePopup');
