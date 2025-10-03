@@ -261,10 +261,7 @@ if (calendarEl) {
         });
         const styled = filtered.map(event => ({ ...event, textColor: 'black', backgroundColor: 'transparent', borderColor: 'transparent' }));
         successCallback(styled);
-      } catch (err) { 
-        console.error("Error fetching calendar:", err); 
-        failureCallback(err); 
-      }
+      } catch (err) { console.error("Error fetching calendar:", err); failureCallback(err); }
     }
   });
   calendar.render();
