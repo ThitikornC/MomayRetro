@@ -1102,8 +1102,7 @@ font-size: 14px;
   
   font-family: "Prompt", sans-serif;
   z-index: 1001;
-  
-  overflow: auto;      /* ถ้าเนื้อหายาว จะมี scroll */
+       /* ถ้าเนื้อหายาว จะมี scroll */
 }
 
 
@@ -1270,7 +1269,7 @@ font-size: 14px;
   font-family: "Prompt", sans-serif;
   z-index: 1001;
   
-  overflow: auto;      /* ถ้าเนื้อหายาว จะมี scroll *//
+      /* ถ้าเนื้อหายาว จะมี scroll *//
 }
 
 
