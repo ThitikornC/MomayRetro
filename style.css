@@ -532,6 +532,61 @@ font-size: 14px;
   margin-left: 2px;
   z-index: 1; 
 }
+/* ================= Total Gauge CSS ================= */
+#totalGaugeFace {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: #f3f3f3;
+  border: 2px solid #ccc;
+  overflow: visible;
+}
+
+/* เข็มเกจ */
+#totalNeedle {
+  position: absolute;
+  width: 2px;
+  height: 70px;          /* ปรับความยาวให้พอดีกับ 150px วงกลม */
+  background: red;
+  top: 50%;
+  left: 50%;
+  transform-origin: bottom center; /* หมุนรอบฐานเข็ม */
+  transform: rotate(-135deg);      /* มุมเริ่มต้น */
+  transition: transform 0.8s ease-in-out;
+}
+
+/* Marks และตัวเลข */
+.gauge-mark {
+  position: absolute;
+  width: 2px;
+  height: 6px;
+  background: #333;
+  top: 0;
+  left: 50%;
+  transform-origin: bottom center;
+}
+.gauge-mark.major {
+  height: 10px;
+  background: #000;
+}
+
+.gauge-number {
+  position: absolute;
+  font-size: 10px;
+  font-weight: bold;
+  transform: translate(-50%, -50%);
+}
+
+#Total_Bar_Text {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  bottom: 5px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
 #Bar_Bg {
   position: absolute;        /* วางทับหรือแยกจาก flow */
   right: 65px;              /* ปรับตำแหน่งขวา */
@@ -639,8 +694,17 @@ font-size: 14px;
   margin: 0 8px;
 }
 
-/* ================= Media Query มือถือ ================= */
-
+.popup-stats > div {
+  font-size: 18px;
+  font-weight: bold;
+  color: #2c1810;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  padding: 8px 14px;
+  box-shadow: inset 0 0 5px rgba(0,0,0,0.15);
+  margin-top: 15px; /* ระยะห่างจากวงกลม */
+  text-align: center;
+}
 
 /*calendar*/
 #calendarPopup {
@@ -752,17 +816,31 @@ font-size: 14px;
   left: 50%; 
     text-shadow: 2px 2px 4px rgba(0,0,0,0.6); /* เพิ่มเงา */
 }
+#kwangCurrentDay {
+  color: #000;
+  font-weight: bold;
+}
+#kwangPrevDay, #kwangNextDay {
+  color: #000 !important;
+  background: none !important;
+  border: none !important;
+  font-size: 20px;
+  cursor: pointer;
+}
 #currentDay {
   color: #000; /* สีดำ */
   font-weight: bold; /* ถ้าต้องการหนา */
 }
 #prevDay, #nextDay {
-  color: #000;       /* สีตัวอักษร / ลูกศร */
+  color: #000 !important;       /* สีตัวอักษร / ลูกศร */
   background: none;  /* ถ้าไม่อยากให้มีพื้นหลัง */
   border: none;      /* ถ้าไม่อยากให้มีกรอบ */
   font-size: 20px;   /* ปรับขนาดลูกศร */
   cursor: pointer;   /* เมาส์เป็น pointer */
+  background: none !important;  /* เอาพื้นหลังเขียว */
+  border: none !important;      /* เอากรอบ */
 }
+
 
 
 
@@ -958,7 +1036,305 @@ font-size: 14px;
   background-repeat: no-repeat;  /* ไม่ทำซ้ำ */
   background-image: url("./images/noise.png");
 }
+/* =================diff================= */
+   #overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: none; /* เริ่มต้นซ่อน */
+    z-index: 1000;
+  }
 
+/* popup กลางจอ */
+
+.kwangcircle-container {
+  width: 140px;
+  height: 140px;
+  background: radial-gradient(circle at 30% 30%, #d4a352, #8b5a2b 80%);
+  border: 3px solid #5e3d11;
+  border-radius: 50%;
+  box-shadow: inset 0 0 10px rgba(255,255,255,0.4), 0 5px 10px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #fff7da;
+  font-weight: bold;
+  text-align: center;
+  font-size: 14px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+/* ================= Daily Popup ================= */
+#dailyPopup.show {
+  display: flex; /* แสดง popup */
+}
+#dailyPopup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-image: url("./images/noise.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: #f7e3b0; /* สีพื้นทองอ่อน */
+  border: 3px solid #5a3b0a; /* ขอบทองเข้ม */
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.25); /* ลดความซับซ้อน */
+  padding: 30px 35px; 
+  max-width: 420px;
+  width: 90%;
+  text-align: center;
+  display: none; /* ซ่อนตอนเริ่มต้น */
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  font-family: "Prompt", sans-serif;
+  z-index: 1001;
+  overflow: visible; /* ให้ element ภายในไม่ถูกตัด */
+}
+
+
+/* หัวข้อ */
+#dailyPopup h3 {
+  margin: 10px 0 10px 0; /* top 10px, bottom 20px */
+  font-size: 20px;
+  font-weight: 700;
+  color: #4a2b07;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.6);
+}
+
+/* container วงกลม */
+.circle-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px; /* ระยะห่างระหว่าง Day Before กับ Yesterday */
+}
+
+/* วงกลมแบบเหรียญ */
+#dailyDayBefore, #dailyYesterday {
+  width: 140px;
+  height: 140px;
+  background: radial-gradient(circle at 30% 30%, #d4a352, #8b5a2b 80%);
+  border: 3px solid #5e3d11;
+  border-radius: 50%;
+  box-shadow: inset 0 0 10px rgba(255,255,255,0.4), 0 5px 10px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #fff7da;
+  font-weight: bold;
+  text-align: center;
+  font-size: 14px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#dailyDayBefore:hover, #dailyYesterday:hover {
+  transform: scale(1.05);
+  box-shadow: inset 0 0 15px rgba(255,255,255,0.5), 0 8px 15px rgba(0,0,0,0.3);
+}
+
+/* ค่าผลต่าง */
+#dailyDiffValue {
+  font-size: 18px;
+  font-weight: bold;
+  color: #2c1810;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  padding: 8px 14px;
+  box-shadow: inset 0 0 5px rgba(0,0,0,0.15);
+  margin-top: 15px; /* เพิ่มระยะห่างจากวงกลม */
+}
+
+.popupValue1 {
+  font-size: 18px;
+  font-weight: bold;
+  color: #2c1810;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  padding: 8px 14px;
+  box-shadow: inset 0 0 5px rgba(0,0,0,0.15);
+  margin-top: 15px; /* เพิ่มระยะห่างจากวงกลม */
+}
+.popupValue2 {
+  font-size: 18px;
+  font-weight: bold;
+  color: #2c1810;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  padding: 8px 14px;
+  box-shadow: inset 0 0 5px rgba(0,0,0,0.15);
+}
+
+/* ปุ่ม */
+#dailyPopup .popup-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px; /* ระยะห่างระหว่างปุ่ม */
+  margin-top: 20px; /* เพิ่มระยะห่างจาก Diff */
+}
+
+#dailyPopup button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+#downloadBtn {
+  background-color: #e74c3c; /* แดง */
+}
+#downloadBtn:hover {
+  background-color: #c0392b;
+  transform: translateY(-2px);
+}
+
+#shareBtn {
+  background-color: #2ecc71; /* เขียว */
+}
+#shareBtn:hover {
+  background-color: #27ae60;
+  transform: translateY(-2px);
+}
+.Kwang_baner {
+  position: absolute;
+  top: -2px;
+  right: -16px;
+}
+.daily-dates-arc {
+  display: flex;           /* จัดเรียงเป็นบรรทัดเดียว */
+  justify-content: center; /* จัดตรงกลางแนวนอน */
+  align-items: center;     /* จัดกลางแนวตั้ง */
+  gap: 75px;               /* ระยะห่างระหว่างสองวันที่ */
+  margin-top: 10px;        /* ขยับลงจากด้านบน */
+  margin-bottom: 10px; 
+}
+
+.daily-date-arc {
+  font-weight: bold;
+  font-size: 14px;
+  text-align: center;
+}
+
+
+
+/* ================= Kwang Popup ================= */
+#kwangPopup {
+
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-image: url("./images/noise.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: #f7e3b0; /* สีพื้นทองอ่อน */
+  border: 3px solid #5a3b0a; /* ขอบทองเข้ม */
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.25); /* ลดความซับซ้อน */
+  padding: 30px 35px; 
+  max-width: 420px;
+  width: 90%;
+  text-align: center;
+  display: none; /* ซ่อนตอนเริ่มต้น */
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  font-family: "Prompt", sans-serif;
+  z-index: 1001;
+  overflow: visible; /* ให้ element ภายในไม่ถูกตัด */
+}
+.kwangcircle-wrapper {
+  display: flex;           /* เรียงลูกในแนวนอน */
+  gap: 20px;               /* ระยะห่างระหว่างวงกลม */
+  justify-content: center; /* จัดกลางแนวนอน */
+  align-items: center;     /* จัดกลางแนวตั้ง */
+  width: 100%;             /* ครอบเต็ม popup */
+}
+
+
+
+#popupContent {
+
+  padding: 25px 30px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+      background-image: url('./images/noise.png');
+  background-size: cover;       /* ปรับขนาดให้เต็มหน้าจอ */
+  background-position: center;  /* กึ่งกลางรูป */
+  background-repeat: no-repeat; /* ไม่ทำซ้ำรูป */
+
+}
+
+#popupContent h3 {
+  font-size: 22px;
+  margin-bottom: 15px;
+  color: hsl(0, 0%, 0%);
+}
+
+#popupContent label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+#popupContent input[type="date"] {
+  padding: 8px 10px;
+  font-size: 14px;
+  margin-bottom: 15px;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+#popupContent p {
+  margin: 8px 0;
+  font-size: 15px;
+  color: #555;
+}
+
+#popupContent button {
+  margin-top: 15px;
+  padding: 8px 20px;
+  background-color: #10b981; /* สีเขียว */
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+#popupContent button:hover {
+  background-color: #059669; /* สีเข้มเมื่อ hover */
+}
+
+.circle {
+  width: 100px;
+  height: 100px;
+  background-color: skyblue;
+  border-radius: 50%;
+  display: flex;                 /* เปิดใช้งาน flex */
+  justify-content: center;       /* จัดแนวนอนให้อยู่ตรงกลาง */
+  align-items: center;           /* จัดแนวตั้งให้อยู่ตรงกลาง */
+  font-size: 18px;               /* ขนาดตัวอักษร */
+  color: white;                  /* สีตัวอักษร */
+  font-weight: bold;             /* ตัวหนา (เลือกได้) */
+}
+
+/* เริ่มต้นซ่อน Share ตอน capture */
 
 @media screen and (max-width: 1024px) {
 
@@ -1153,3 +1529,4 @@ font-size: 14px;
   left: 2px;  
 }
 }
+
