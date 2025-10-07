@@ -493,7 +493,7 @@ async function fetchKwangData(date) {
     const res = await fetch(`https://momaybackend02-production.up.railway.app/solar-size?date=${date}`);
     const json = await res.json();
 
-    kwangPowerEl.textContent = (json.totalEnergyKwh ?? 0).toFixed(2) + " kWh";
+    kwangPowerEl.textContent = (json.totalEnergyKwh ?? 0).toFixed(2) + " Unit";
     kwangCapacityEl.textContent = (json.solarCapacity_kW ?? 0).toFixed(2) + " kW";
     kwangBillEl.textContent = (json.savingsDay ?? 0).toFixed(2) + " THB";
     kwangMonthEl.textContent = (json.savingsMonth ?? 0).toFixed(2) + " THB";

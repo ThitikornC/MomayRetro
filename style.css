@@ -1066,6 +1066,7 @@ font-size: 14px;
   text-align: center;
   font-size: 14px;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  margin-top: 20px;
 }
 /* ================= Daily Popup ================= */
 #dailyPopup.show {
@@ -1333,6 +1334,23 @@ font-size: 14px;
   color: white;                  /* สีตัวอักษร */
   font-weight: bold;             /* ตัวหนา (เลือกได้) */
 }
+
+.kwangcircle-container .home-icon {
+  width: 30px;       /* ปรับขนาดตามต้องการ */
+  height: 30px;
+  margin-bottom: 5px; /* เว้นระยะจากข้อความด้านล่าง */
+  margin-top: 1px;
+  object-fit: contain; /* ป้องกันรูปบิดเบี้ยว */
+}
+
+.kwangcircle-container .solar-cell-icon {
+  width: 35px;       /* ปรับขนาดตามต้องการ */
+  height: 35px;
+  margin-bottom: 5px; /* เว้นระยะจากข้อความด้านล่าง */
+  margin-top: 1px;
+  object-fit: contain; /* ป้องกันรูปบิดเบี้ยว */
+}
+
 
 /* เริ่มต้นซ่อน Share ตอน capture */
 
