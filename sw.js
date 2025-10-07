@@ -1,7 +1,7 @@
 // ================= Service Worker =================
 
 // เปลี่ยนชื่อ cache เป็นเวอร์ชันใหม่ทุกครั้งอัปเดต
-const CACHE_NAME = 'momay-cache-vB3';
+const CACHE_NAME = 'momay-cache-vB3.1';
 
 // ใส่ versioned URL สำหรับ CSS/JS เพื่อให้ browser โหลดไฟล์ใหม่
 const PRECACHE_URLS = [
