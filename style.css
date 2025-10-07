@@ -1076,26 +1076,36 @@ font-size: 14px;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  
   background-image: url("./images/noise.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   background-color: #f7e3b0; /* สีพื้นทองอ่อน */
+  
   border: 3px solid #5a3b0a; /* ขอบทองเข้ม */
   border-radius: 12px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.25); /* ลดความซับซ้อน */
-  padding: 30px 35px; 
-  max-width: 420px;
-  width: 90%;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+  
+  padding: 20px;       /* ลดลงเล็กน้อยสำหรับมือถือ */
+  max-width: 420px;    /* กว้างสูงสุด */
+  width: 90%;          /* 90% ของหน้าจอมือถือ */
+  max-height: 80vh;    /* สูงสุด 80% ของ viewport */
+  
   text-align: center;
-  display: none; /* ซ่อนตอนเริ่มต้น */
+  display: none;       /* ซ่อนตอนเริ่มต้น */
+  
+  display: flex;
   flex-direction: column;
   align-items: center;
   gap: 20px;
+  
   font-family: "Prompt", sans-serif;
   z-index: 1001;
-  overflow: visible; /* ให้ element ภายในไม่ถูกตัด */
+  
+  overflow: auto;      /* ถ้าเนื้อหายาว จะมี scroll */
 }
+
 
 
 /* หัวข้อ */
@@ -1229,36 +1239,38 @@ font-size: 14px;
 /* ================= Kwang Popup ================= */
 #kwangPopup {
 
-  position: fixed;
+    position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  
   background-image: url("./images/noise.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   background-color: #f7e3b0; /* สีพื้นทองอ่อน */
+  
   border: 3px solid #5a3b0a; /* ขอบทองเข้ม */
   border-radius: 12px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.25); /* ลดความซับซ้อน */
-  padding: 30px 35px; 
-  max-width: 420px;
-  width: 90%;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+  
+  padding: 20px;       /* ลดลงเล็กน้อยสำหรับมือถือ */
+  max-width: 420px;    /* กว้างสูงสุด */
+  width: 90%;          /* 90% ของหน้าจอมือถือ */
+  max-height: 80vh;    /* สูงสุด 80% ของ viewport */
+  
   text-align: center;
-  display: none; /* ซ่อนตอนเริ่มต้น */
+  display: none;       /* ซ่อนตอนเริ่มต้น */
+  
+  display: flex;
   flex-direction: column;
   align-items: center;
   gap: 20px;
+  
   font-family: "Prompt", sans-serif;
   z-index: 1001;
-  overflow: visible; /* ให้ element ภายในไม่ถูกตัด */
-}
-.kwangcircle-wrapper {
-  display: flex;           /* เรียงลูกในแนวนอน */
-  gap: 20px;               /* ระยะห่างระหว่างวงกลม */
-  justify-content: center; /* จัดกลางแนวนอน */
-  align-items: center;     /* จัดกลางแนวตั้ง */
-  width: 100%;             /* ครอบเต็ม popup */
+  
+  overflow: auto;      /* ถ้าเนื้อหายาว จะมี scroll *//
 }
 
 
