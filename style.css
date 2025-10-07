@@ -1351,7 +1351,11 @@ font-size: 14px;
   object-fit: contain; /* ป้องกันรูปบิดเบี้ยว */
 }
 
-
+.arrow {
+  margin-top: 0px;      /* เว้นระยะจากข้อความด้านบน */
+  display: inline-block; /* ให้อยู่ใต้ข้อความ */
+  padding: 0px;
+}
 /* เริ่มต้นซ่อน Share ตอน capture */
 
 @media screen and (max-width: 1024px) {

@@ -565,12 +565,31 @@ if (document.getElementById("dayBeforeDate") && dailyDayBeforeEl) {
 // Diff
 if (dailyDiffEl) {
   const bill = data.diff.electricity_bill;
-  const sign = bill >= 0 ? '+' : '-';
-  const color = bill >= 0 ? 'green' : 'red';
+
+  // ลูกศร SVG
+  const arrowUp = `<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                     <path d="M12 2L5 10h14L12 2z" fill="red"/>
+                   </svg>`;
+  const arrowDown = `<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                       <path d="M12 22l7-8H5l7 8z" fill="green"/>
+                     </svg>`;
+
+  // กำหนดสีตัวเลข
+  const color = bill < 0 ? 'red' : 'green';
+  const arrow = bill < 0 ? arrowUp : arrowDown;
+
   dailyDiffEl.innerHTML = `
-    Daily Bill Change: <span style="color:${color}">${sign}${Math.abs(bill).toFixed(2)}฿</span>
+    <div style="text-align:center; display:inline-flex; align-items:center; gap:6px;">
+      <span>Daily Bill Change: </span>
+      <span style="color:${color}; font-weight:bold;">
+        ${Math.abs(bill).toFixed(2)}฿
+      </span>
+      <span class="arrow">${arrow}</span>
+    </div>
   `;
 }
+
+
 
 
   // แสดง popup
