@@ -1,5 +1,14 @@
 document.addEventListener('DOMContentLoaded', async function() {
-
+function getTodayThai() {
+  const now = new Date();
+  // ปรับเวลาเป็น UTC+7
+  const tzOffset = 7 * 60; // นาที
+  const local = new Date(now.getTime() + tzOffset * 60 * 1000);
+  const yyyy = local.getFullYear();
+  const mm = String(local.getMonth() + 1).padStart(2, '0');
+  const dd = String(local.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+}
   // ================= Date =================
   function updateDate() {
     const dateElement = document.getElementById('Date');
@@ -117,7 +126,7 @@ const res = await fetch('https://api-kx4r63rdjq-an.a.run.app/daily-energy/px_dh?
 
   async function fetchDailyBill() {
     try {
-      const today = new Date().toISOString().split('T')[0];
+      const today = getTodayThai();
       const url = `https://momaybackend02-production.up.railway.app/daily-bill?date=${today}`;
       const res = await fetch(url);
       const json = await res.json();
@@ -239,7 +248,8 @@ const config = {
     currentDayEl.textContent = formatDate(currentDate);
 
     async function fetchDailyData(date){
-      const dateStr = date.toISOString().split('T')[0];
+      const dateStr = getTodayThai();
+
       try{
         const res = await fetch(`https://api-kx4r63rdjq-an.a.run.app/daily-energy/px_dh?date=${dateStr}`);
         const json = await res.json();
@@ -441,7 +451,7 @@ function formatDate(date){
 // อัปเดต UI และเรียก fetch
 function updateKwangDateUI() {
   currentDayElKwang.textContent = formatDate(kwangDate);
-  fetchKwangData(kwangDate.toISOString().split('T')[0]);
+  fetchKwangData(getTodayThai(kwangDate));
 }
 
 // เปิด popup
@@ -474,7 +484,7 @@ nextBtnKwang.addEventListener('click', () => {
 currentDayElKwang.addEventListener('click', () => {
   const tmpInput = document.createElement('input');
   tmpInput.type = 'date';
-  tmpInput.value = kwangDate.toISOString().split('T')[0];
+  tmpInput.value = getTodayThai(kwangDate);
   tmpInput.style.position = 'absolute';
   tmpInput.style.opacity = 0;
   document.body.appendChild(tmpInput);
