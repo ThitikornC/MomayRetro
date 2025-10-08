@@ -1,7 +1,7 @@
 // ================= Cache / Offline =================
 
 // เปลี่ยนชื่อ cache ทุกครั้งที่อัปเดต
-const CACHE_NAME = 'momay-cache-vB3.2';
+const CACHE_NAME = 'momay-cache-vB3.3';
 
 // ไฟล์ที่ต้อง precache
 const PRECACHE_URLS = [
