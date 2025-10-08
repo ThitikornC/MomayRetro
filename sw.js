@@ -1,9 +1,9 @@
-// ================= Service Worker =================
+// ================= Cache / Offline =================
 
-// เปลี่ยนชื่อ cache เป็นเวอร์ชันใหม่ทุกครั้งอัปเดต
+// เปลี่ยนชื่อ cache ทุกครั้งที่อัปเดต
 const CACHE_NAME = 'momay-cache-vB3.2';
 
-// ใส่ versioned URL สำหรับ CSS/JS เพื่อให้ browser โหลดไฟล์ใหม่
+// ไฟล์ที่ต้อง precache
 const PRECACHE_URLS = [
   '/',
   '/index.html',
@@ -19,7 +19,7 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => cache.addAll(PRECACHE_URLS))
-      .then(() => self.skipWaiting()) // ใช้ SW ใหม่ทันที
+      .then(() => self.skipWaiting())
   );
 });
 
@@ -28,11 +28,9 @@ self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
       Promise.all(
-        keys
-          .filter(key => key !== CACHE_NAME) // ลบ cache เก่าทั้งหมด
-          .map(key => caches.delete(key))
+        keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
       )
-    ).then(() => self.clients.claim()) // ให้ SW ใหม่ควบคุม client ทันที
+    ).then(() => self.clients.claim())
   );
 });
 
@@ -40,22 +38,19 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   const requestUrl = new URL(event.request.url);
 
-  // เฉพาะ GET และ http/https
   if (event.request.method !== 'GET' || !['http:', 'https:'].includes(requestUrl.protocol)) return;
 
-  // Network-first สำหรับ API
+  // API requests ใช้ network-first
   if (
     requestUrl.pathname.startsWith('/daily-energy') ||
     requestUrl.pathname.startsWith('/solar-size') ||
     requestUrl.pathname.startsWith('/daily-bill')
   ) {
-    event.respondWith(
-      fetch(event.request).catch(() => caches.match(event.request))
-    );
+    event.respondWith(fetch(event.request).catch(() => caches.match(event.request)));
     return;
   }
 
-  // Cache-first สำหรับ static assets (HTML, CSS, JS, icons)
+  // Cache-first สำหรับไฟล์ static
   event.respondWith(
     caches.match(event.request).then(cached => {
       if (cached) return cached;
@@ -69,10 +64,42 @@ self.addEventListener('fetch', event => {
           return networkResp;
         })
         .catch(() => {
-          // fallback สำหรับ navigation
           if (event.request.mode === 'navigate') return caches.match('/index.html');
           return new Response("", { status: 504, statusText: 'offline' });
         });
+    })
+  );
+});
+
+// ================= Push Notification (Realtime Peak Alert) =================
+
+self.addEventListener('push', event => {
+  let data = { title: 'Energy Notification', body: 'แจ้งเตือนการใช้ไฟฟ้าสูงสุดใหม่', url: '/' };
+  if (event.data) {
+    try { data = event.data.json(); } 
+    catch (e) { console.error('❌ Push data parse error', e); }
+  }
+
+  const options = {
+    body: data.body,
+    icon: '/icons/icon-192.png',
+    badge: '/icons/icon-192.png',
+    data: { url: data.url || '/' }
+  };
+
+  event.waitUntil(self.registration.showNotification(data.title, options));
+});
+
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clientList => {
+      for (const client of clientList) {
+        if (client.url === event.notification.data.url && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      if (clients.openWindow) return clients.openWindow(event.notification.data.url);
     })
   );
 });
