@@ -1,6 +1,5 @@
 // ================= Cache / Offline =================
-const CACHE_NAME = 'momay-cache-vB1.5'; // เปลี่ยนเวอร์ชันเมื่ออัปเดต
-
+const CACHE_NAME = 'momay-cache-vB1.6';
 const PRECACHE_URLS = [
   '/',
   '/index.html',
@@ -39,17 +38,10 @@ self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET' || !['http:', 'https:'].includes(requestUrl.protocol)) return;
 
   // ---- Network-first สำหรับ API requests ----
-  if (
-    requestUrl.pathname.startsWith('/daily-energy') ||
-    requestUrl.pathname.startsWith('/solar-size') ||
-    requestUrl.pathname.startsWith('/daily-bill')
-  ) {
+  if (['/daily-energy', '/solar-size', '/daily-bill'].some(path => requestUrl.pathname.startsWith(path))) {
     event.respondWith(
       fetch(event.request)
-        .then(resp => {
-          if (!resp.ok) throw new Error('Network response not ok');
-          return resp;
-        })
+        .then(resp => resp.ok ? resp : caches.match(event.request))
         .catch(() => caches.match(event.request))
     );
     return;
@@ -63,9 +55,8 @@ self.addEventListener('fetch', event => {
       return fetch(event.request)
         .then(networkResp => {
           if (networkResp && networkResp.ok) {
-            const copy = networkResp.clone();
             caches.open(CACHE_NAME)
-              .then(cache => cache.put(event.request, copy))
+              .then(cache => cache.put(event.request, networkResp.clone()))
               .catch(err => console.warn('❌ Cache put failed:', err));
           }
           return networkResp;
