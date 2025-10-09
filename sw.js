@@ -1,7 +1,7 @@
 // ================= Cache / Offline =================
 
 // เปลี่ยนชื่อ cache ทุกครั้งที่อัปเดต
-const CACHE_NAME = 'momay-cache-vB3.3';
+const CACHE_NAME = 'momay-cache-vB1.4';
 
 // ไฟล์ที่ต้อง precache
 const PRECACHE_URLS = [
@@ -41,14 +41,12 @@ self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET' || !['http:', 'https:'].includes(requestUrl.protocol)) return;
 
   // API requests ใช้ network-first
-  if (
-    requestUrl.pathname.startsWith('/daily-energy') ||
-    requestUrl.pathname.startsWith('/solar-size') ||
-    requestUrl.pathname.startsWith('/daily-bill')
-  ) {
-    event.respondWith(fetch(event.request).catch(() => caches.match(event.request)));
-    return;
-  }
+if (event.request.url.includes('/daily-energy') ||
+    event.request.url.includes('/solar-size') ||
+    event.request.url.includes('/daily-bill')) {
+  event.respondWith(fetch(event.request).catch(() => caches.match(event.request)));
+  return;
+}
 
   // Cache-first สำหรับไฟล์ static
   event.respondWith(
@@ -80,12 +78,13 @@ self.addEventListener('push', event => {
     catch (e) { console.error('❌ Push data parse error', e); }
   }
 
-  const options = {
-    body: data.body,
-    icon: '/icons/icon-192.png',
-    badge: '/icons/icon-192.png',
-    data: { url: data.url || '/' }
-  };
+ const options = {
+  body: data.body,
+  icon: '/icons/icon-192.png',
+  badge: '/icons/icon-192.png',
+  data: { url: data.url || '/' },
+  requireInteraction: true
+};
 
   event.waitUntil(self.registration.showNotification(data.title, options));
 });
@@ -95,9 +94,9 @@ self.addEventListener('notificationclick', event => {
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clientList => {
       for (const client of clientList) {
-        if (client.url === event.notification.data.url && 'focus' in client) {
-          return client.focus();
-        }
+        if (client.url.includes(event.notification.data.url) && 'focus' in client) {
+  return client.focus();
+}
       }
       if (clients.openWindow) return clients.openWindow(event.notification.data.url);
     })
