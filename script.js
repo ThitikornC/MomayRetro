@@ -701,7 +701,7 @@ if ('serviceWorker' in navigator && 'PushManager' in window) {
       };
       const subscription = await reg.pushManager.subscribe(subscribeOptions);
 
-      await fetch('https://momay02-production.up.railway.app/api/subscribe', {
+      await fetch('https://momaybackend02-production.up.railway.app/api/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(subscription)
