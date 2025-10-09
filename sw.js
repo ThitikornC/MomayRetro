@@ -1,9 +1,6 @@
 // ================= Cache / Offline =================
+const CACHE_NAME = 'momay-cache-vB1.5'; // เปลี่ยนเวอร์ชันเมื่ออัปเดต
 
-// เปลี่ยนชื่อ cache ทุกครั้งที่อัปเดต
-const CACHE_NAME = 'momay-cache-vB1.4';
-
-// ไฟล์ที่ต้อง precache
 const PRECACHE_URLS = [
   '/',
   '/index.html',
@@ -20,6 +17,7 @@ self.addEventListener('install', event => {
     caches.open(CACHE_NAME)
       .then(cache => cache.addAll(PRECACHE_URLS))
       .then(() => self.skipWaiting())
+      .catch(err => console.error('❌ Cache install failed:', err))
   );
 });
 
@@ -40,15 +38,24 @@ self.addEventListener('fetch', event => {
 
   if (event.request.method !== 'GET' || !['http:', 'https:'].includes(requestUrl.protocol)) return;
 
-  // API requests ใช้ network-first
-if (event.request.url.includes('/daily-energy') ||
-    event.request.url.includes('/solar-size') ||
-    event.request.url.includes('/daily-bill')) {
-  event.respondWith(fetch(event.request).catch(() => caches.match(event.request)));
-  return;
-}
+  // ---- Network-first สำหรับ API requests ----
+  if (
+    requestUrl.pathname.startsWith('/daily-energy') ||
+    requestUrl.pathname.startsWith('/solar-size') ||
+    requestUrl.pathname.startsWith('/daily-bill')
+  ) {
+    event.respondWith(
+      fetch(event.request)
+        .then(resp => {
+          if (!resp.ok) throw new Error('Network response not ok');
+          return resp;
+        })
+        .catch(() => caches.match(event.request))
+    );
+    return;
+  }
 
-  // Cache-first สำหรับไฟล์ static
+  // ---- Cache-first สำหรับ static files ----
   event.respondWith(
     caches.match(event.request).then(cached => {
       if (cached) return cached;
@@ -57,20 +64,22 @@ if (event.request.url.includes('/daily-energy') ||
         .then(networkResp => {
           if (networkResp && networkResp.ok) {
             const copy = networkResp.clone();
-            caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
+            caches.open(CACHE_NAME)
+              .then(cache => cache.put(event.request, copy))
+              .catch(err => console.warn('❌ Cache put failed:', err));
           }
           return networkResp;
         })
-        .catch(() => {
+        .catch(err => {
+          console.warn('❌ Fetch failed:', err);
           if (event.request.mode === 'navigate') return caches.match('/index.html');
-          return new Response("", { status: 504, statusText: 'offline' });
-        });
+          return new Response('', { status: 504, statusText: 'offline' });
+        })
     })
   );
 });
 
-// ================= Push Notification (Realtime Peak Alert) =================
-
+// ================= Push Notification =================
 self.addEventListener('push', event => {
   let data = { title: 'Energy Notification', body: 'แจ้งเตือนการใช้ไฟฟ้าสูงสุดใหม่', url: '/' };
   if (event.data) {
@@ -78,27 +87,28 @@ self.addEventListener('push', event => {
     catch (e) { console.error('❌ Push data parse error', e); }
   }
 
- const options = {
-  body: data.body,
-  icon: '/icons/icon-192.png',
-  badge: '/icons/icon-192.png',
-  data: { url: data.url || '/' },
-  requireInteraction: true
-};
+  const options = {
+    body: data.body,
+    icon: '/icons/icon-192.png',
+    badge: '/icons/icon-192.png',
+    data: { url: data.url || '/' },
+    requireInteraction: true
+  };
 
   event.waitUntil(self.registration.showNotification(data.title, options));
 });
 
+// ---------------- Notification Click ----------------
 self.addEventListener('notificationclick', event => {
   event.notification.close();
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clientList => {
       for (const client of clientList) {
         if (client.url.includes(event.notification.data.url) && 'focus' in client) {
-  return client.focus();
-}
+          return client.focus();
+        }
       }
-      if (clients.openWindow) return clients.openWindow(event.notification.data.url);
+      return clients.openWindow(event.notification.data.url);
     })
   );
 });
