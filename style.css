@@ -1153,7 +1153,7 @@ font-size: 14px;
 }
 
 .popupValue1 {
-  font-size: 18px;
+  font-size: 14px;
   font-weight: bold;
   color: #2c1810;
   background-color: rgba(255, 255, 255, 0.3);
@@ -1163,7 +1163,7 @@ font-size: 14px;
   margin-top: 15px; /* เพิ่มระยะห่างจากวงกลม */
 }
 .popupValue2 {
-  font-size: 18px;
+  font-size: 14px;
   font-weight: bold;
   color: #2c1810;
   background-color: rgba(255, 255, 255, 0.3);
@@ -1413,7 +1413,7 @@ font-size: 14px;
 #reportWrapper {
     width: 794px;          /* ขนาด A4 กว้าง */
     min-height: 1123px;    /* ขนาด A4 สูง */
-    padding: 40px;
+    padding: 60px 40px 40px 40px;
     background-color: #fff;
     border: 3px solid #8B4513;
     border-radius: 12px;
@@ -1433,6 +1433,10 @@ font-size: 14px;
     overflow: visible;
     opacity: 0; /* ซ่อนตอนไม่ใช้งาน */
 }
+#reportWrapper p {
+  text-align: left;
+  margin: 4px 0;
+}
 
 #reportWrapper h2 {
     margin-bottom: 15px;
@@ -1442,21 +1446,51 @@ font-size: 14px;
 
 #reportWrapper p {
     margin: 8px 0;
-    font-size: 16px;
+    font-size: 14px;
 }
 
+.info-container {
+  display: flex;
+  justify-content: space-between; /* ให้ box1 ซ้าย box2 ขวา */
+  gap: 20px; /* ระยะห่างระหว่างกล่อง */
+}
+
+.info-box1 {
+  border: 2px solid #ecc246ff;
+  border-radius: 8px;
+  padding: 12px 16px;
+  background-color: #fff5e6; /* สีอ่อนส้ม */
+  width: 49%;
+  box-sizing: border-box;
+  text-align: left;
+  float: left; /* วางซ้าย */
+}
+.padded-bottom {
+  padding-bottom: 8px; /* ปรับค่าได้ตามต้องการ */
+}
+.info-box2 {
+  border: 2px solid #50bcf2ff;
+  border-radius: 8px;
+  padding: 12px 16px;
+  background-color: #e6f0ff; /* สีอ่อนฟ้า */
+  width: 49%;
+  box-sizing: border-box;
+  text-align: left;
+  float: right; /* วางขวา */
+}
+
+
 #kwangHourlyTable {
-    width: 100%;
+    width: 100%;              /* กว้างเต็มจอ */
     border-collapse: collapse;
-    margin-top: 20px;
     table-layout: fixed;
 }
 
 #kwangHourlyTable th, #kwangHourlyTable td {
     border: 1px solid #ccc;
-    padding: 6px 8px;
+    padding: 4px 6px;
     text-align: center;
-    font-size: 14px;
+    font-size: 12px;
     word-wrap: break-word;
 }
 
@@ -1467,6 +1501,7 @@ font-size: 14px;
 #kwangHourlyTable tbody tr:nth-child(even) {
     background-color: #fafafa;
 }
+
 
 
 #info_icon {
@@ -2230,4 +2265,8 @@ font-size: 14px;
   z-index: 10;        /* วางเหนือ element อื่น */
 }
 }
-
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}

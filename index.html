@@ -11,6 +11,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <link rel="preconnect" href="https://api-kx4r63rdjq-an.a.run.app">
+  <link rel="preconnect" href="https://momaybackend02-production.up.railway.app">
 
   <!-- iOS Safari full screen fix -->
   <meta name="apple-mobile-web-app-title" content="Momay">
@@ -30,8 +32,6 @@
 </div>
    
 </div>
-
-
 
 <div class="Top_Container">
   <div class="ClientName_Container">
@@ -232,18 +232,34 @@
 
 <!-- Report Wrapper -->
 <div id="reportWrapper">
-  <h2>Solar Report</h2>
+<img src="./images/kwang_logo_report.png" 
+     alt="Kwangreport" 
+     style="width:100%; max-width:213px; height:auto; display:block; margin-left:-20px;">
+     <p>Client Name: <span>Poolvilla</span></p>
   <p>Date: <span id="kwangDateReport"></span></p>
-  <p>Electricity usage (06:00-18:00): <span id="kwangPowerReport">-</span></p>
-  <p>Recommended solar capacity: <span id="kwangCapacityReport">-</span></p>
-  <p>Daily savings: <span id="kwangBillReport">-</span></p>
-  <p>Monthly savings: <span id="kwangMonthReport">-</span></p>
-
+  <p>Electricity usage (within 1 day) :  <strong><span id="kwangTOTEL"></span></strong></p>
+<p class="padded-bottom">
+  Electricity Bill (within 1 day) : <strong><span id="kwangTOTBill"></span></strong>
+</p>
+<div class="info-container">
+  <div class="info-box1">
+    <p>Electricity usage (06:00AM–18:00PM):  <strong><span id="kwangPowerReport">-</span></strong></p>
+    <p>Recommended Solar Cell Installation:  <strong><span id="kwangCapacityReport">-</span></strong></p>
+    <p>Daily savings:  <strong><span id="kwangBillReport">-</span></strong></p>
+    <p>Monthly savings:  <strong><span id="kwangMonthReport">-</span></strong></p>
+  </div>
+  <div class="info-box2">
+    <p>Electricity usage (18:00PM–6:00AM):  <strong><span id="kwangnight">-</span></strong></p>
+  </div>
+</div>
+   <div style="margin-top:20px;">
+    <canvas id="EnergyChartReport" width="600" height="300"></canvas>
+  </div>
   <table id="kwangHourlyTable">
     <thead>
       <tr>
         <th>Hour</th>
-        <th>Energy (kWh)</th>
+        <th>Energy (Unit)</th>
       </tr>
     </thead>
     <tbody>
