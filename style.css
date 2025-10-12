@@ -2083,6 +2083,11 @@ font-size: 14px;
   .fc .fc-day-today {
     background: #fef3c7 !important;
   }
+  #maincon_info {
+  top: -290px;          /* ระยะจากด้านบน */
+  right: 94%;         /* ระยะจากด้านซ้าย */
+  z-index: 10;        /* วางเหนือ element อื่น */
+}
 }
 
 
@@ -2145,6 +2150,12 @@ font-size: 14px;
 }
 #weather {
   left: 2px;  
+}
+
+  #maincon_info {
+  top: -290px;          /* ระยะจากด้านบน */
+  right: 120%;         /* ระยะจากด้านซ้าย */
+  z-index: 10;        /* วางเหนือ element อื่น */
 }
 }
 
