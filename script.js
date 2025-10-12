@@ -828,34 +828,29 @@ setInterval(updateBadge, 10000);
 // report
 document.getElementById("generateReport").addEventListener("click", async () => {
   try {
-    // ดึงวันที่จาก span ของ popup
     const currentDayElKwang = document.getElementById('kwangCurrentDay');
-    const rawDate = currentDayElKwang.textContent.trim(); // เช่น "10 - October - 2025"
-
-    // แปลงเป็น format yyyy-mm-dd สำหรับ fetch
+    const rawDate = currentDayElKwang.textContent.trim(); 
     const [dayStr, monthStr, yearStr] = rawDate.split(' - ');
     const monthNames = ["January","February","March","April","May","June",
                         "July","August","September","October","November","December"];
-    const month = String(monthNames.indexOf(monthStr) + 1).padStart(2, '0');
-    const day = dayStr.padStart(2, '0');
+    const month = String(monthNames.indexOf(monthStr) + 1).padStart(2,'0');
+    const day = dayStr.padStart(2,'0');
     const year = yearStr;
     const apiDate = `${year}-${month}-${day}`;
 
-    // ดึงข้อมูลจาก backend
+    // fetch ข้อมูลก่อน
     const res = await fetch(`https://momaybackend02-production.up.railway.app/solar-size?date=${apiDate}`);
     if (!res.ok) throw new Error("Network response was not ok");
     const json = await res.json();
 
-    // เตรียมองค์ประกอบ report
+    // เตรียม wrapper และอัปเดตข้อมูล
     const wrapper = document.getElementById("reportWrapper");
-
     document.getElementById("kwangDateReport").textContent = rawDate;
     document.getElementById("kwangPowerReport").textContent = (json.dayEnergy ?? 0).toFixed(2) + " Unit";
     document.getElementById("kwangCapacityReport").textContent = (json.solarCapacity_kW ?? 0).toFixed(2) + " kW";
     document.getElementById("kwangBillReport").textContent = (json.savingsDay ?? 0).toFixed(2) + " THB";
     document.getElementById("kwangMonthReport").textContent = (json.savingsMonth ?? 0).toFixed(2) + " THB";
 
-    // อัปเดตตาราง Hourly
     const tbody = document.querySelector("#kwangHourlyTable tbody");
     tbody.innerHTML = "";
     if (json.hourly && json.hourly.length > 0) {
@@ -868,45 +863,53 @@ document.getElementById("generateReport").addEventListener("click", async () => 
       tbody.innerHTML = '<tr><td colspan="2">No data</td></tr>';
     }
 
-    // ปรับตำแหน่งให้ภาพอยู่กลางและไม่ล้น
+    // render wrapper แบบซ่อน
     wrapper.style.opacity = 1;
     wrapper.style.position = 'absolute';
-    wrapper.style.left = '50%';
-    wrapper.style.top = '50%';
-    wrapper.style.transform = 'translate(-50%, -50%)';
-    wrapper.style.width = '794px'; // A4 ความกว้าง
-    wrapper.style.height = 'auto';
-    wrapper.style.overflow = 'visible';
-
-    // จับภาพ report
-    const canvas = await html2canvas(wrapper, { scale: 2, useCORS: true });
-    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-    const file = new File([blob], `KwangReport-${apiDate}.png`, { type: 'image/png' });
-
-    // ✅ ถ้ามือถือรองรับ Web Share API → เปิดเมนูแชร์
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({
-        title: 'Kwang Solar Report',
-        text: `รายงานพลังงานวันที่ ${rawDate}`,
-        files: [file],
-      });
-    } else {
-      // 💻 ถ้าไม่รองรับ (คอมฯ) → ดาวน์โหลดอัตโนมัติ
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = `KwangReport-${apiDate}.png`;
-      link.click();
-      URL.revokeObjectURL(link.href);
-    }
-
-    // ซ่อน wrapper หลัง capture เสร็จ
-    wrapper.style.opacity = 0;
     wrapper.style.left = '-9999px';
+    wrapper.style.top = '0';
+    wrapper.style.visibility = 'visible';
+
+    // สร้าง canvas **ตรงใน click handler** เพื่อถือว่าเป็น gesture
+    html2canvas(wrapper, { scale: 2, useCORS: true }).then(canvas => {
+      canvas.toBlob(blob => {
+        const file = new File([blob], `KwangReport-${apiDate}.png`, { type: 'image/png' });
+
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          // เรียก share ตรงนี้ → นับเป็น gesture
+          navigator.share({
+            title: 'Kwang Solar Report',
+            text: `รายงานพลังงานวันที่ ${rawDate}`,
+            files: [file],
+          }).catch(err => {
+            console.error('Share failed:', err);
+            // fallback ดาวน์โหลด
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `KwangReport-${apiDate}.png`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+          });
+        } else {
+          const link = document.createElement("a");
+          link.href = URL.createObjectURL(blob);
+          link.download = `KwangReport-${apiDate}.png`;
+          link.click();
+          URL.revokeObjectURL(link.href);
+        }
+
+        // ซ่อน wrapper หลัง capture
+        wrapper.style.opacity = 0;
+        wrapper.style.left = '-9999px';
+      });
+    });
+
   } catch (err) {
     console.error("Generate report failed:", err);
     alert("ไม่สามารถสร้างรายงานได้ ลองใหม่อีกครั้ง");
   }
 });
+
 
 
 });
