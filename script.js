@@ -921,6 +921,25 @@ document.getElementById("generateReport").addEventListener("click", async () => 
     alert("ไม่สามารถสร้างรายงานได้ ลองใหม่อีกครั้ง");
   }
 });
+//คุม info_image
+const infoIcon = document.getElementById('info_icon');
+const mainConInfo = document.getElementById('maincon_info');
+
+infoIcon.addEventListener('click', () => {
+  if (mainConInfo.style.display === 'none' || mainConInfo.style.display === '') {
+    mainConInfo.style.display = 'block';
+    // ให้ fade-in
+    setTimeout(() => {
+      mainConInfo.style.opacity = '1';
+    }, 10); // ต้อง delay เล็กน้อยเพื่อให้ transition ทำงาน
+  } else {
+    // fade-out
+    mainConInfo.style.opacity = '0';
+    setTimeout(() => {
+      mainConInfo.style.display = 'none';
+    }, 400); // ต้องรอให้ animation fade-out จบก่อนซ่อน
+  }
+});
 
 
 

@@ -1268,7 +1268,7 @@ font-size: 14px;
 
   padding: 25px 30px;
   border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
   width: 90%;
   max-width: 400px;
   text-align: center;
@@ -1467,6 +1467,493 @@ font-size: 14px;
 #kwangHourlyTable tbody tr:nth-child(even) {
     background-color: #fafafa;
 }
+
+
+#info_icon {
+  position: absolute; /* จำเป็น */
+  top: 4%;          /* ระยะจากบน */
+  left: 10px;        /* ระยะจากขวา */
+  width: 40px;
+  height: 40px;
+  z-index: 10;
+}
+
+#maincon_info {
+  position: relative; /* หรือ relative ขึ้นกับว่าต้องการวางแบบไหน */
+  top: -290px;          /* ระยะจากด้านบน */
+  right: 100%;         /* ระยะจากด้านซ้าย */
+  z-index: 10;        /* วางเหนือ element อื่น */
+  display:none;
+  opacity: 0;              /* สำหรับ animation fade */
+  transition: opacity 0.4s ease; /* ความลื่นของ fade */
+}
+#info_icon img {
+  width: 50%;
+  height: 100%;
+  object-fit: contain; /* รักษาสัดส่วน */
+}
+
+#Bar_info {
+  width: 140px;          /* ความกว้างของสี่เหลี่ยม */
+  height: 250px;         /* ความสูง */
+  background-color: rgba(0, 0, 0, 0.6); /* สีดำโปร่งแสง 50% */
+  border: 3px solid #ea0505ff; /* เส้นขอบ */
+  border-radius: 5px;    /* ปรับโค้งมุมเล็กน้อย */
+  position: absolute;    /* สำหรับวาง child ถ้าต้องการ */
+  margin: 20px auto;   
+  z-index: 20;  /* วางตรงกลาง container (แนวนอน) */
+  top: 45%;          /* ระยะจากบน */
+  left: 220px;    
+}
+
+#Bar_number {
+  position: absolute;   /* ขยับตาม top/left */
+  top: 1px;            
+  left: 10%;            
+  transform: translateX(-50%);
+  
+  width: 20px;          /* ขนาดวงกลม */
+  height: 20px;
+  background-color: #ea0505ff; /* สีพื้นวงกลม */
+  border-radius: 50%;   /* ทำเป็นวงกลม */
+  
+  display: flex;        /* จัดเลขตรงกลางวงกลม */
+  justify-content: center;
+  align-items: center;
+  
+  font-size: 14px;
+  font-weight: bold;
+  color: #f8f6f6ff;          /* สีตัวเลข */
+}
+
+#Bar_text {
+  display: block;
+  margin-top: 210px;
+  font-size: 8.5px;
+  line-height: 1.4;
+  color: #fff;
+  text-align: left;
+   font-weight: bold;
+}
+
+#Popup_info {
+  width: 140px;          /* ความกว้างของสี่เหลี่ยม */
+  height: 50px;         /* ความสูง */
+  background-color: rgba(0, 0, 0, 0.6); /* สีดำโปร่งแสง 50% */
+  border: 3px solid #ea0505ff; /* เส้นขอบ */
+  border-radius: 5px;    /* ปรับโค้งมุมเล็กน้อย */
+  position: absolute;    /* สำหรับวาง child ถ้าต้องการ */
+  margin: 20px auto;   
+  z-index: 20;  /* วางตรงกลาง container (แนวนอน) */
+  top: -20%;          /* ระยะจากบน */
+  left: 190px;  
+}
+
+#Popup_number {
+  position: absolute;   /* ขยับตาม top/left */
+  top: 1px;            
+  left: 10%;            
+  transform: translateX(-50%);
+  
+  width: 20px;          /* ขนาดวงกลม */
+  height: 20px;
+  background-color: #ea0505ff; /* สีพื้นวงกลม */
+  border-radius: 50%;   /* ทำเป็นวงกลม */
+  
+  display: flex;        /* จัดเลขตรงกลางวงกลม */
+  justify-content: center;
+  align-items: center;
+  
+  font-size: 14px;
+  font-weight: bold;
+  color: #f8f6f6ff;            /* ไม่ย่อเมื่อขนาดข้อความยาว */
+}
+
+#Popup_text {
+  display: block;
+  margin-top: 200px;
+  font-size: 8.5px;
+  line-height: 1.4;
+  color: #fff;
+  text-align: left;
+  font-weight: bold;
+  
+  border: 2px solid #ec1717ff;    /* กรอบสีขาว */
+  border-radius: 5px;         /* มุมโค้งเล็กน้อย */
+  padding: 5px 8px;           /* เว้นระยะด้านในข้อความ */
+  background-color: rgba(0,0,0,0.5); /* พื้นหลังโปร่งเล็กน้อย */
+}
+
+.line-horizontal  {
+  width: 30px;              /* ความยาวเส้น */
+  height: 2px;               /* ความหนาเส้น */
+  background-color: #ec0909ff;    /* สีของเส้น */
+  
+  position: absolute;        /* สามารถขยับอิสระ */
+  top: 25px;                 /* ระยะจากบน container */
+  left: -30px;                /* ระยะจากซ้าย container */
+}
+.line-horizontal2  {
+  width: 30px;              /* ความยาวเส้น */
+  height: 2px;               /* ความหนาเส้น */
+  background-color: #ec0909ff;    /* สีของเส้น */
+  
+  position: absolute;        /* สามารถขยับอิสระ */
+  top: 223px;                 /* ระยะจากบน container */
+  left: -30px;                /* ระยะจากซ้าย container */
+}
+.line-vertical {
+  position: absolute;
+  top: 25px;            /* ระยะจากบน container */
+  left: -22%;          /* ระยะจากซ้าย container */
+  width: 2px;           /* ความหนาเส้น */
+  height: 200px;        /* ความยาวเส้น */
+  background-color: #f20909ff;
+}
+
+#Amp_info {
+  width: 140px;          /* ความกว้างของสี่เหลี่ยม */
+  height: 100px;         /* ความสูง */
+  background-color: rgba(0, 0, 0, 0.6); /* สีดำโปร่งแสง 50% */
+  border: 3px solid #ea0505ff; /* เส้นขอบ */
+  border-radius: 5px;    /* ปรับโค้งมุมเล็กน้อย */
+  position: absolute;    /* สำหรับวาง child ถ้าต้องการ */
+  margin: 20px auto;   
+  z-index: 20;  /* วางตรงกลาง container (แนวนอน) */
+  top: 2.5%;          /* ระยะจากบน */
+  left: 190px;   
+}
+
+#Amp_number {
+  position: absolute;   /* ขยับตาม top/left */
+  top: 1px;            
+  left: 10%;            
+  transform: translateX(-50%);
+  
+  width: 20px;          /* ขนาดวงกลม */
+  height: 20px;
+  background-color: #ea0505ff; /* สีพื้นวงกลม */
+  border-radius: 50%;   /* ทำเป็นวงกลม */
+  
+  display: flex;        /* จัดเลขตรงกลางวงกลม */
+  justify-content: center;
+  align-items: center;
+  
+  font-size: 14px;
+  font-weight: bold;
+  color: #f8f6f6ff;            /* ไม่ย่อเมื่อขนาดข้อความยาว */
+}
+
+#Amp_text {
+  display: block;
+  margin-top: 70px;
+  margin-left : 10px;
+  font-size: 8.5px;
+  line-height: 1.4;
+  color: #fff;
+  text-align: left;
+  font-weight: bold;
+  
+}
+#Name_info {
+  width: 185px;          /* ความกว้างของสี่เหลี่ยม */
+  height: 140px;         /* ความสูง */
+  background-color: rgba(0, 0, 0, 0.6); /* สีดำโปร่งแสง 50% */
+  border: 3px solid #ea0505ff; /* เส้นขอบ */
+  border-radius: 5px;    /* ปรับโค้งมุมเล็กน้อย */
+  position: absolute;    /* สำหรับวาง child ถ้าต้องการ */
+  margin: 20px auto;   
+  z-index: 20;  /* วางตรงกลาง container (แนวนอน) */
+  top: -80%;          /* ระยะจากบน */
+  left:-44px;   
+}
+
+#Name_number {
+  position: absolute;   /* ขยับตาม top/left */
+  top: 1px;            
+  left: 10%;            
+  transform: translateX(-50%);
+  
+  width: 20px;          /* ขนาดวงกลม */
+  height: 20px;
+  background-color: #ea0505ff; /* สีพื้นวงกลม */
+  border-radius: 50%;   /* ทำเป็นวงกลม */
+  
+  display: flex;        /* จัดเลขตรงกลางวงกลม */
+  justify-content: center;
+  align-items: center;
+  
+  font-size: 14px;
+  font-weight: bold;
+  color: #f8f6f6ff;            /* ไม่ย่อเมื่อขนาดข้อความยาว */
+}
+
+#Name_text {
+  display: block;
+  margin-top:5px;
+  margin-left : 30px;
+  font-size: 8.5px;
+  line-height: 1.4;
+  color: #fff;
+  text-align: left;
+  font-weight: bold;
+  
+}
+
+#Bill_info {
+  width: 185px;          /* ความกว้างของสี่เหลี่ยม */
+  height: 140px;         /* ความสูง */
+  background-color: rgba(0, 0, 0, 0.6); /* สีดำโปร่งแสง 50% */
+  border: 3px solid #ea0505ff; /* เส้นขอบ */
+  border-radius: 5px;    /* ปรับโค้งมุมเล็กน้อย */
+  position: absolute;    /* สำหรับวาง child ถ้าต้องการ */
+  margin: 20px auto;   
+  z-index: 20;  /* วางตรงกลาง container (แนวนอน) */
+  top: -80%;          /* ระยะจากบน */
+  left: 153px;   
+}
+
+#Bill_number {
+  position: absolute;   /* ขยับตาม top/left */
+  top: 1px;            
+  left: 10%;            
+  transform: translateX(-50%);
+  
+  width: 20px;          /* ขนาดวงกลม */
+  height: 20px;
+  background-color: #ea0505ff; /* สีพื้นวงกลม */
+  border-radius: 50%;   /* ทำเป็นวงกลม */
+  
+  display: flex;        /* จัดเลขตรงกลางวงกลม */
+  justify-content: center;
+  align-items: center;
+  
+  font-size: 14px;
+  font-weight: bold;
+  color: #f8f6f6ff;            /* ไม่ย่อเมื่อขนาดข้อความยาว */
+}
+
+#Bill_text {
+  display: block;
+  margin-top:5px;
+  margin-left : 30px;
+  font-size: 8.5px;
+  line-height: 1.4;
+  color: #fff;
+  text-align: left;
+  font-weight: bold;
+  
+}
+#BillCal_text {
+  display: block;
+  margin-top:5px;
+  margin-left : 30px;
+  font-size: 8.5px;
+  line-height: 1.4;
+  color: #fff;
+  text-align: left;
+  font-weight: bold;
+  
+}
+#Bill_info {
+  width: 185px;          /* ความกว้างของสี่เหลี่ยม */
+  height: 140px;         /* ความสูง */
+  background-color: rgba(0, 0, 0, 0.6); /* สีดำโปร่งแสง 50% */
+  border: 3px solid #ea0505ff; /* เส้นขอบ */
+  border-radius: 5px;    /* ปรับโค้งมุมเล็กน้อย */
+  position: absolute;    /* สำหรับวาง child ถ้าต้องการ */
+  margin: 20px auto;   
+  z-index: 20;  /* วางตรงกลาง container (แนวนอน) */
+  top: -80%;          /* ระยะจากบน */
+  left: 153px;   
+}
+
+#Bill_number {
+  position: absolute;   /* ขยับตาม top/left */
+  top: 1px;            
+  left: 10%;            
+  transform: translateX(-50%);
+  
+  width: 20px;          /* ขนาดวงกลม */
+  height: 20px;
+  background-color: #ea0505ff; /* สีพื้นวงกลม */
+  border-radius: 50%;   /* ทำเป็นวงกลม */
+  
+  display: flex;        /* จัดเลขตรงกลางวงกลม */
+  justify-content: center;
+  align-items: center;
+  
+  font-size: 14px;
+  font-weight: bold;
+  color: #f8f6f6ff;            /* ไม่ย่อเมื่อขนาดข้อความยาว */
+}
+
+#Bill_text {
+  display: block;
+  margin-top:5px;
+  margin-left : 30px;
+  font-size: 8.5px;
+  line-height: 1.4;
+  color: #fff;
+  text-align: left;
+  font-weight: bold;
+  
+}
+#Bill_info {
+  width: 185px;          /* ความกว้างของสี่เหลี่ยม */
+  height: 140px;         /* ความสูง */
+  background-color: rgba(0, 0, 0, 0.6); /* สีดำโปร่งแสง 50% */
+  border: 3px solid #ea0505ff; /* เส้นขอบ */
+  border-radius: 5px;    /* ปรับโค้งมุมเล็กน้อย */
+  position: absolute;    /* สำหรับวาง child ถ้าต้องการ */
+  margin: 20px auto;   
+  z-index: 20;  /* วางตรงกลาง container (แนวนอน) */
+  top: -80%;          /* ระยะจากบน */
+  left: 153px;   
+}
+
+#Bill_number {
+  position: absolute;   /* ขยับตาม top/left */
+  top: 1px;            
+  left: 10%;            
+  transform: translateX(-50%);
+  
+  width: 20px;          /* ขนาดวงกลม */
+  height: 20px;
+  background-color: #ea0505ff; /* สีพื้นวงกลม */
+  border-radius: 50%;   /* ทำเป็นวงกลม */
+  
+  display: flex;        /* จัดเลขตรงกลางวงกลม */
+  justify-content: center;
+  align-items: center;
+  
+  font-size: 14px;
+  font-weight: bold;
+  color: #f8f6f6ff;            /* ไม่ย่อเมื่อขนาดข้อความยาว */
+}
+
+#Bill_text {
+  display: block;
+  margin-top:5px;
+  margin-left : 30px;
+  font-size: 8.5px;
+  line-height: 1.4;
+  color: #fff;
+  text-align: left;
+  font-weight: bold;
+  
+}
+#BillCal_text {
+  display: block;
+  margin-top:5px;
+  margin-left : 30px;
+  font-size: 8.5px;
+  line-height: 1.4;
+  color: #fff;
+  text-align: left;
+  font-weight: bold;
+  
+}
+#Floor_info {
+  width: 310px;          /* ความกว้างของสี่เหลี่ยม */
+  height: 90px;         /* ความสูง */
+  background-color: rgba(0, 0, 0, 0.6); /* สีดำโปร่งแสง 50% */
+  border: 3px solid #ea0505ff; /* เส้นขอบ */
+  border-radius: 5px;    /* ปรับโค้งมุมเล็กน้อย */
+  position: absolute;    /* สำหรับวาง child ถ้าต้องการ */
+  margin: 20px auto;   
+  z-index: 20;  /* วางตรงกลาง container (แนวนอน) */
+  top: 95%;          /* ระยะจากบน */
+  left: -10px;   
+}
+
+#Floor_number {
+  position: absolute;   /* ขยับตาม top/left */
+  top: 1px;            
+  left: 5%;            
+  transform: translateX(-50%);
+  
+  width: 20px;          /* ขนาดวงกลม */
+  height: 20px;
+  background-color: #ea0505ff; /* สีพื้นวงกลม */
+  border-radius: 50%;   /* ทำเป็นวงกลม */
+  
+  display: flex;        /* จัดเลขตรงกลางวงกลม */
+  justify-content: center;
+  align-items: center;
+  
+  font-size: 14px;
+  font-weight: bold;
+  color: #f8f6f6ff;            /* ไม่ย่อเมื่อขนาดข้อความยาว */
+}
+#Floor_text {
+  display: block;
+  margin-top:5px;
+  margin-left : 30px;
+  font-size: 8.5px;
+  line-height: 1.4;
+  color: #fff;
+  text-align: left;
+  font-weight: bold;
+  
+}
+#Floor_text2 {
+  display: block;
+  margin-top:5px;
+  margin-left : 30px;
+  font-size: 8px;
+  line-height: 1.4;
+  color: #fff;
+  text-align: left;
+  font-weight: bold;
+  
+}
+
+#Chart_info {
+  width: 370px;          /* ความกว้างของสี่เหลี่ยม */
+  height: 220px;         /* ความสูง */
+  background-color: rgba(0, 0, 0, 0.6); /* สีดำโปร่งแสง 50% */
+  border: 3px solid #ea0505ff; /* เส้นขอบ */
+  border-radius: 5px;    /* ปรับโค้งมุมเล็กน้อย */
+  position: absolute;    /* สำหรับวาง child ถ้าต้องการ */
+  margin: 20px auto;   
+  z-index: 20;  /* วางตรงกลาง container (แนวนอน) */
+  top: 85%;          /* ระยะจากบน */
+  left: -30px;   
+}
+
+#Chart_number {
+  position: absolute;   /* ขยับตาม top/left */
+  top: 5px;            
+  left: 5%;            
+  transform: translateX(-50%);
+  
+  width: 20px;          /* ขนาดวงกลม */
+  height: 20px;
+  background-color: #ea0505ff; /* สีพื้นวงกลม */
+  border-radius: 50%;   /* ทำเป็นวงกลม */
+  
+  display: flex;        /* จัดเลขตรงกลางวงกลม */
+  justify-content: center;
+  align-items: center;
+  
+  font-size: 14px;
+  font-weight: bold;
+  color: #f8f6f6ff;            /* ไม่ย่อเมื่อขนาดข้อความยาว */
+}
+#Chart_text {
+  display: block;
+  margin-top:10px;
+  margin-left : 40px;
+  font-size: 8.5px;
+  line-height: 1.4;
+  color: #fff;
+  text-align: left;
+  font-weight: bold;
+  
+}
+
+
 @media screen and (max-width: 1024px) {
 
 #Date_icon {
