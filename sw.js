@@ -1,5 +1,5 @@
 // ================= Cache / Offline =================
-const CACHE_NAME = 'momay-cache-vB1.6';
+const CACHE_NAME = 'momay-cache-vB1.7';
 const PRECACHE_URLS = [
   '/',
   '/index.html',
@@ -89,9 +89,11 @@ self.addEventListener('push', event => {
 
   event.waitUntil(
     self.registration.showNotification(data.title, options).then(() => {
-      // ส่งข้อความไปหน้าเว็บ
+      // ส่ง message ไปหน้าเว็บให้ popup แสดง
       clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clients => {
-        clients.forEach(client => client.postMessage(data));
+        clients.forEach(client => {
+          client.postMessage({ type: 'dailyPopup', payload: data });
+        });
       });
     })
   );
