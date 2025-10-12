@@ -850,12 +850,12 @@ document.getElementById("generateReport").addEventListener("click", async () => 
     const year = yearStr;
     const apiDate = `${year}-${month}-${day}`;
 
-    // fetch ข้อมูล
+    // fetch ข้อมูลก่อน
     const res = await fetch(`https://momaybackend02-production.up.railway.app/solar-size?date=${apiDate}`);
     if (!res.ok) throw new Error("Network response was not ok");
     const json = await res.json();
 
-    // เตรียม wrapper
+    // เตรียม wrapper และอัปเดตข้อมูล
     const wrapper = document.getElementById("reportWrapper");
     document.getElementById("kwangDateReport").textContent = rawDate;
     document.getElementById("kwangPowerReport").textContent = (json.dayEnergy ?? 0).toFixed(2) + " Unit";
@@ -882,17 +882,33 @@ document.getElementById("generateReport").addEventListener("click", async () => 
     wrapper.style.top = '0';
     wrapper.style.visibility = 'visible';
 
-    // สร้าง canvas แล้วดาวน์โหลด
+    // สร้าง canvas **ตรงใน click handler** เพื่อถือว่าเป็น gesture
     html2canvas(wrapper, { scale: 2, useCORS: true }).then(canvas => {
       canvas.toBlob(blob => {
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = `KwangReport-${apiDate}.png`;
-        document.body.appendChild(link);  // บางเบราว์เซอร์ต้อง append ก่อน click
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
+        const file = new File([blob], `KwangReport-${apiDate}.png`, { type: 'image/png' });
+
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          // เรียก share ตรงนี้ → นับเป็น gesture
+          navigator.share({
+            title: 'Kwang Solar Report',
+            text: `รายงานพลังงานวันที่ ${rawDate}`,
+            files: [file],
+          }).catch(err => {
+            console.error('Share failed:', err);
+            // fallback ดาวน์โหลด
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `KwangReport-${apiDate}.png`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+          });
+        } else {
+          const link = document.createElement("a");
+          link.href = URL.createObjectURL(blob);
+          link.download = `KwangReport-${apiDate}.png`;
+          link.click();
+          URL.revokeObjectURL(link.href);
+        }
 
         // ซ่อน wrapper หลัง capture
         wrapper.style.opacity = 0;
@@ -905,7 +921,6 @@ document.getElementById("generateReport").addEventListener("click", async () => 
     alert("ไม่สามารถสร้างรายงานได้ ลองใหม่อีกครั้ง");
   }
 });
-
 //คุม info_image
 const infoIcon = document.getElementById('info_icon');
 const mainConInfo = document.getElementById('maincon_info');
