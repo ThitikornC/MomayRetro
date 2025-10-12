@@ -606,13 +606,25 @@ if (dailyDiffEl) {
 }
 
 // ฟังก์ชันเปิด popup
-function showDailyPopup() {
+async function showDailyPopup() {
   if (dailyPopupEl && overlayEl) {
-    dailyPopupEl.style.display = 'block';
     overlayEl.style.display = 'block';
-    updateDailyDiff();
+    dailyPopupEl.style.display = 'block';
+
+    // เพิ่มคลาสอนิเมชั่น
+    dailyPopupEl.classList.add('show-popup');
+    dailyPopupEl.classList.remove('hide-popup');
+
+    // สั่งมือถือสั่น (ถ้ามือถือรองรับ)
+    if (navigator.vibrate) {
+      navigator.vibrate([200, 100, 200]);
+    }
+
+    // อัปเดตข้อมูล
+    await updateDailyDiff();
   }
 }
+
 
 // ฟังก์ชันปิด popup
 function hideDailyPopup() {
