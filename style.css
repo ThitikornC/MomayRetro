@@ -2017,7 +2017,7 @@ font-size: 14px;
 }
 }
 /* ================= Responsive สำหรับมือถือ ================= */
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 414px) {
   
   /* Container ปฏิทิน */
   #calendar {
@@ -2090,6 +2090,78 @@ font-size: 14px;
 }
 }
 
+@media screen and (max-width: 411px) {
+  
+  /* Container ปฏิทิน */
+  #calendar {
+    width: 100%;      /* เต็มความกว้างหน้าจอ */
+    max-width: 320px; /* จำกัดสูงสุด */
+    height: 70%;
+     max-height: 500px;
+    padding: 9px;
+  
+  }
+
+  /* Toolbar (Title + Buttons) */
+  .fc .fc-toolbar-title {
+    font-size: 1rem !important;
+    width: auto !important;
+    height: auto !important;
+    padding: 2px 4px !important;
+    margin: 2px !important;
+  }
+  .fc .fc-toolbar-prev,
+  .fc .fc-toolbar-next,
+  .fc .fc-button {
+    font-size: 0.8rem !important;
+    padding: 2px 6px !important;
+  }
+  .fc .fc-button-primary {
+    font-size: 0.8rem !important;
+    padding: 2px 6px !important;
+  }
+
+  /* ตารางวัน */
+  .fc-daygrid-day {
+    min-height: 20px !important;
+    max-height: 20px !important;
+    width: auto !important;
+    padding: 2px !important;
+  }
+
+  /* ตัวเลขวัน */
+  .fc-daygrid-day-number {
+    font-size: 0.5rem !important;
+    margin-right: 0 !important;
+    margin-bottom: 2px !important;
+  }
+
+  /* Event */
+  .fc-event {
+    font-size: 0.65rem !important;
+    padding: 1px 2px !important;
+  }
+  .fc-event .fc-event-title {
+     font-size: 9px !important;
+    line-height: 1.1 !important;
+  }
+
+  /* Header column (Sun, Mon, ...) */
+  .fc .fc-col-header-cell-cushion {
+    font-size: 0.7rem !important;
+    padding: 2px !important;
+  }
+
+  /* Day today highlight */
+  .fc .fc-day-today {
+    background: #fef3c7 !important;
+  }
+  #maincon_info {
+  top: -290px;          /* ระยะจากด้านบน */
+  right: 100%;         /* ระยะจากด้านซ้าย */
+  z-index: 10;        /* วางเหนือ element อื่น */
+}
+}
 
 @media screen and (max-width: 375px) {
   body {
