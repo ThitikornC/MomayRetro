@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kwang Solar Dashboard</title>
+<style>
+    body { font-family: sans-serif; padding: 20px; }
+    h2 { margin-bottom: 10px; }
+    input[type=date] { padding: 5px; margin-right: 10px; }
+    button { padding: 5px 10px; margin-right: 5px; margin-top: 10px;}
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background: #f0f0f0; }
+    canvas { margin-top: 20px; max-width: 100%; }
+</style>
+</head>
+<body id="dashboard">
+
+<h2>Kwang Solar Data</h2>
+
+<input type="date" id="kwangDateInput">
+<button id="kwangPrevDay">Previous Day</button>
+<button id="kwangNextDay">Next Day</button>
+
+<div id="kwangSummary">
+    <p>รวมพลังงาน: <span id="kwangPower">-</span></p>
+    <p>ความจุโซลาร์: <span id="kwangCapacity">-</span></p>
+    <p>ประหยัดต่อวัน: <span id="kwangBill">-</span></p>
+    <p>ประหยัดต่อเดือน: <span id="kwangMonth">-</span></p>
+    <p>รวมรายชั่วโมง: <span id="kwangKW">-</span></p>
+</div>
+
+<table id="kwangHourlyTable">
+    <thead>
+        <tr>
+            <th>Hour</th>
+            <th>Energy (kWh)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td colspan="2">No data</td></tr>
+    </tbody>
+</table>
+
+<button id="downloadPNG">Download PNG</button>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- html2canvas -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+<script>
+const kwangPowerEl = document.getElementById("kwangPower");
+const kwangBillEl = document.getElementById("kwangBill");
+const kwangCapacityEl = document.getElementById("kwangCapacity");
+const kwangMonthEl = document.getElementById("kwangMonth");
+const kwangKWEl = document.getElementById("kwangKW");
+const prevBtnKwang = document.getElementById('kwangPrevDay');
+const nextBtnKwang = document.getElementById('kwangNextDay');
+const dateInput = document.getElementById('kwangDateInput');
+let kwangDate = new Date();
+let kwangHourlyData = [];
+let chart;
+
+function formatDate(date){
+    const d = String(date.getDate()).padStart(2,'0');
+    const month = String(date.getMonth()+1).padStart(2,'0');
+    const y = date.getFullYear();
+    return `${y}-${month}-${d}`;
+}
+
+function updateKwangDateUI() {
+    dateInput.value = formatDate(kwangDate);
+    fetchKwangData(formatDate(kwangDate));
+}
+
+prevBtnKwang.addEventListener('click', () => {
+    kwangDate.setDate(kwangDate.getDate() - 1);
+    updateKwangDateUI();
+});
+nextBtnKwang.addEventListener('click', () => {
+    kwangDate.setDate(kwangDate.getDate() + 1);
+    updateKwangDateUI();
+});
+dateInput.addEventListener('change', () => {
+    kwangDate = new Date(dateInput.value);
+    updateKwangDateUI();
+});
+
+async function fetchKwangData(date) {
+    try {
+        const res = await fetch(`https://momaybackend02-production.up.railway.app/solar-size?date=${date}`);
+        const json = await res.json();
+
+        kwangPowerEl.textContent = (json.totalEnergyKwh ?? 0).toFixed(2) + " Unit";
+        kwangCapacityEl.textContent = (json.solarCapacity_kW ?? 0).toFixed(2) + " kW";
+        kwangBillEl.textContent = (json.savingsDay ?? 0).toFixed(2) + " THB";
+        kwangMonthEl.textContent = (json.savingsMonth ?? 0).toFixed(2) + " THB";
+
+        kwangHourlyData = json.hourly ?? [];
+        const totalDailyKwh = kwangHourlyData.reduce((sum,h)=> sum + (h.energy_kwh ?? 0),0);
+        kwangKWEl.textContent = totalDailyKwh.toFixed(2) + " kWh";
+
+        renderHourlyTable();
+        renderChart();
+    } catch(err){
+        console.error(err);
+        kwangPowerEl.textContent = "-";
+        kwangCapacityEl.textContent = "-";
+        kwangBillEl.textContent = "-";
+        kwangMonthEl.textContent = "-";
+        kwangKWEl.textContent = "-";
+        kwangHourlyData = [];
+        renderHourlyTable();
+    }
+}
+
+function renderHourlyTable() {
+    const tbody = document.querySelector("#kwangHourlyTable tbody");
+    tbody.innerHTML = "";
+    if(!kwangHourlyData || kwangHourlyData.length === 0){
+        tbody.innerHTML = `<tr><td colspan="2">No hourly data</td></tr>`;
+        return;
+    }
+    kwangHourlyData.forEach(h => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${h.hour}</td><td>${(h.energy_kwh ?? 0).toFixed(2)}</td>`;
+        tbody.appendChild(tr);
+    });
+}
+
+function renderChart() {
+    const ctx = document.getElementById('EnergyChart').getContext('2d');
+    const labels = kwangHourlyData.map(h => h.hour);
+    const data = kwangHourlyData.map(h => h.energy_kwh ?? 0);
+
+    if(chart) chart.destroy();
+    chart = new Chart(ctx, {
+        type: 'line',
+        data: { labels, datasets: [{ label: 'Energy (kWh)', data, borderColor: 'blue', fill: false }] },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+}
+
+// ดาวน์โหลด PNG ทั้งหน้า
+document.getElementById('downloadPNG').addEventListener('click', () => {
+    html2canvas(document.getElementById('dashboard')).then(canvas => {
+        const link = document.createElement('a');
+        link.download = `kwang_solar_${formatDate(kwangDate)}.png`;
+        link.href = canvas.toDataURL();
+        link.click();
+    });
+});
+
+updateKwangDateUI();
+</script>
+
+</body>
+</html>

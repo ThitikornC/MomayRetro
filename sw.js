@@ -32,26 +32,28 @@ self.addEventListener('activate', event => {
 });
 
 // ---------------- Fetch ----------------
+const API_PATHS = ['/daily-energy', '/solar-size', '/daily-bill'];
 self.addEventListener('fetch', event => {
   const requestUrl = new URL(event.request.url);
 
   if (event.request.method !== 'GET' || !['http:', 'https:'].includes(requestUrl.protocol)) return;
 
-  // ---- Network-first สำหรับ API requests ----
-  if (['/daily-energy', '/solar-size', '/daily-bill'].some(path => requestUrl.pathname.startsWith(path))) {
+  if (API_PATHS.some(path => requestUrl.pathname.includes(path))) {
+    // Network-first สำหรับ API
     event.respondWith(
       fetch(event.request)
         .then(resp => resp.ok ? resp : caches.match(event.request))
-        .catch(() => caches.match(event.request))
+        .catch(() => caches.match(event.request) ||
+          new Response(JSON.stringify({ error: 'offline' }), { headers: { 'Content-Type': 'application/json' } })
+        )
     );
     return;
   }
 
-  // ---- Cache-first สำหรับ static files ----
+  // Cache-first สำหรับ static files
   event.respondWith(
     caches.match(event.request).then(cached => {
       if (cached) return cached;
-
       return fetch(event.request)
         .then(networkResp => {
           if (networkResp && networkResp.ok) {
@@ -74,8 +76,7 @@ self.addEventListener('fetch', event => {
 self.addEventListener('push', event => {
   let data = { title: 'Energy Notification', body: 'แจ้งเตือนการใช้ไฟฟ้าสูงสุดใหม่', url: '/' };
   if (event.data) {
-    try { data = event.data.json(); } 
-    catch (e) { console.error('❌ Push data parse error', e); }
+    try { data = event.data.json(); } catch (e) { console.error('❌ Push data parse error', e); }
   }
 
   const options = {
@@ -86,7 +87,14 @@ self.addEventListener('push', event => {
     requireInteraction: true
   };
 
-  event.waitUntil(self.registration.showNotification(data.title, options));
+  event.waitUntil(
+    self.registration.showNotification(data.title, options).then(() => {
+      // ส่งข้อความไปหน้าเว็บ
+      clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clients => {
+        clients.forEach(client => client.postMessage(data));
+      });
+    })
+  );
 });
 
 // ---------------- Notification Click ----------------
@@ -94,12 +102,33 @@ self.addEventListener('notificationclick', event => {
   event.notification.close();
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clientList => {
+      const url = new URL(event.notification.data.url, self.location.origin).href;
       for (const client of clientList) {
-        if (client.url.includes(event.notification.data.url) && 'focus' in client) {
-          return client.focus();
-        }
+        if (client.url === url && 'focus' in client) return client.focus();
       }
-      return clients.openWindow(event.notification.data.url);
+      return clients.openWindow(url);
     })
   );
 });
+
+// ---------------- Push Subscription Change ----------------
+self.addEventListener('pushsubscriptionchange', async event => {
+  console.log('🔄 Push subscription changed');
+  const applicationServerKey = urlBase64ToUint8Array('BB2fZ3NOzkWDKOi8H5jhbwICDTv760wIB6ZD2PwmXcUA_B5QXkXtely4b4JZ5v5b88VX1jKa7kRfr94nxqiksqY');
+  event.waitUntil(
+    self.registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey })
+      .then(newSub => fetch('https://momaybackend02-production.up.railway.app/api/subscribe', {
+        method: 'POST',
+        body: JSON.stringify(newSub),
+        headers: { 'Content-Type': 'application/json' }
+      }))
+  );
+});
+
+// ---------------- Utility ----------------
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = atob(base64);
+  return Uint8Array.from([...rawData].map(char => char.charCodeAt(0)));
+}

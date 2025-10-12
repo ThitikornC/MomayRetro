@@ -422,6 +422,7 @@ const kwangBillEl = document.getElementById("kwangBill");
 const kwangCapacityEl = document.getElementById("kwangCapacity");
 const kwangMonthEl = document.getElementById("kwangMonth");
 
+
 const prevBtnKwang = document.getElementById('kwangPrevDay');
 const nextBtnKwang = document.getElementById('kwangNextDay');
 const currentDayElKwang = document.getElementById('kwangCurrentDay');
@@ -429,83 +430,88 @@ const currentDayElKwang = document.getElementById('kwangCurrentDay');
 let kwangDate = new Date();
 
 // แปลงวันที่เป็นข้อความ
-function formatDate(date){
-  const d = String(date.getDate()).padStart(2,'0');
-  const monthNames = ["January","February","March","April","May","June",
-                      "July","August","September","October","November","December"];
-  const m = monthNames[date.getMonth()];
-  const y = date.getFullYear();
-  return `${d} - ${m} - ${y}`;
+function formatDate(date) {
+    const d = String(date.getDate()).padStart(2, '0');
+    const monthNames = [
+        "January","February","March","April","May","June",
+        "July","August","September","October","November","December"
+    ];
+    const m = monthNames[date.getMonth()];
+    const y = date.getFullYear();
+    return `${d} - ${m} - ${y}`;
 }
 
 // อัปเดต UI และเรียก fetch
 function updateKwangDateUI() {
-  currentDayElKwang.textContent = formatDate(kwangDate);
-  fetchKwangData(kwangDate.toISOString().split('T')[0]);
+    currentDayElKwang.textContent = formatDate(kwangDate);
+    fetchKwangData(kwangDate.toISOString().split('T')[0]);
 }
 
 // เปิด popup
 kwangIcon.addEventListener("click", () => {
-  kwangPopup.classList.add("active");
-  kwangPopup.style.display = "flex";
-  overlay.style.display = "block";   // ✅ แสดง overlay
-  updateKwangDateUI();
+    kwangPopup.classList.add("active");
+    kwangPopup.style.display = "flex";
+    overlay.style.display = "block";   // ✅ แสดง overlay
+    updateKwangDateUI();
 });
 
 // ปิด popup เมื่อคลิก overlay
 overlay.addEventListener("click", () => {
-  kwangPopup.style.display = "none";
-  kwangPopup.classList.remove("active"); // ✅ เอา active ออกด้วย
-  overlay.style.display = "none";       // ✅ ซ่อน overlay
+    kwangPopup.style.display = "none";
+    kwangPopup.classList.remove("active"); // ✅ เอา active ออกด้วย
+    overlay.style.display = "none";       // ✅ ซ่อน overlay
 });
 
 // ปุ่ม prev/next
 prevBtnKwang.addEventListener('click', () => {
-  kwangDate.setDate(kwangDate.getDate() - 1);
-  updateKwangDateUI();
+    kwangDate.setDate(kwangDate.getDate() - 1);
+    updateKwangDateUI();
 });
 
 nextBtnKwang.addEventListener('click', () => {
-  kwangDate.setDate(kwangDate.getDate() + 1);
-  updateKwangDateUI();
+    kwangDate.setDate(kwangDate.getDate() + 1);
+    updateKwangDateUI();
 });
 
 // กดวันที่เพื่อเลือกปฏิทินจริง
 currentDayElKwang.addEventListener('click', () => {
-  const tmpInput = document.createElement('input');
-  tmpInput.type = 'date';
-  tmpInput.value = kwangDate.toISOString().split('T')[0];
-  tmpInput.style.position = 'absolute';
-  tmpInput.style.opacity = 0;
-  document.body.appendChild(tmpInput);
-  tmpInput.focus();
-  tmpInput.onchange = () => {
-    kwangDate = new Date(tmpInput.value);
-    updateKwangDateUI();
-    document.body.removeChild(tmpInput);
-  }
-  tmpInput.click();
+    const tmpInput = document.createElement('input');
+    tmpInput.type = 'date';
+    tmpInput.value = kwangDate.toISOString().split('T')[0];
+    tmpInput.style.position = 'absolute';
+    tmpInput.style.opacity = 0;
+    document.body.appendChild(tmpInput);
+    tmpInput.focus();
+
+    tmpInput.onchange = () => {
+        kwangDate = new Date(tmpInput.value);
+        updateKwangDateUI();
+        document.body.removeChild(tmpInput);
+    };
+
+    tmpInput.click();
 });
 
 // fetch ข้อมูล
 async function fetchKwangData(date) {
-  try {
-    const res = await fetch(`https://momaybackend02-production.up.railway.app/solar-size?date=${date}`);
-    const json = await res.json();
+    try {
+        const res = await fetch(`https://momaybackend02-production.up.railway.app/solar-size?date=${date}`);
+        const json = await res.json();
 
-    kwangPowerEl.textContent = (json.totalEnergyKwh ?? 0).toFixed(2) + " Unit";
-    kwangCapacityEl.textContent = (json.solarCapacity_kW ?? 0).toFixed(2) + " kW";
-    kwangBillEl.textContent = (json.savingsDay ?? 0).toFixed(2) + " THB";
-    kwangMonthEl.textContent = (json.savingsMonth ?? 0).toFixed(2) + " THB";
-  
-  } catch (err) {
-    kwangPowerEl.textContent = "- kWh";
-    kwangCapacityEl.textContent = "- kW";
-    kwangBillEl.textContent = "- THB";
-    kwangMonthEl.textContent = "- THB";
-  }
+        kwangPowerEl.textContent = (json.dayEnergy ?? 0).toFixed(2) + " Unit";
+        kwangCapacityEl.textContent = (json.solarCapacity_kW ?? 0).toFixed(2) + " kW";
+        kwangBillEl.textContent = (json.savingsDay ?? 0).toFixed(2) + " THB";
+        kwangMonthEl.textContent = (json.savingsMonth ?? 0).toFixed(2) + " THB";
+    
+
+    } catch (err) {
+        kwangPowerEl.textContent = "- Unit";
+        kwangCapacityEl.textContent = "- kW";
+        kwangBillEl.textContent = "- THB";
+        kwangMonthEl.textContent = "- THB";
+        console.error("Fetch Kwang Data Error:", err);
+    }
 }
-
 
 // ================= Daily Diff =================
 const dailyYesterdayEl = document.getElementById("dailyYesterday");
@@ -643,48 +649,17 @@ window.addEventListener('beforeinstallprompt', (e) => {
 window.addEventListener('appinstalled', () => {
   console.log('PWA installed!');
 });
-/*
-  // ================= Daily Popup Capture =================
-  const downloadBtn = document.getElementById('downloadBtn');
-  const dailyPopupForCapture = document.getElementById('dailyPopup');
 
-  downloadBtn.addEventListener('click', async () => {
-    const originalDisplay = dailyPopupForCapture.style.display;
-    dailyPopupForCapture.style.display = 'flex';
-    dailyPopupForCapture.style.position = 'absolute';
-    dailyPopupForCapture.style.zIndex = 9999;
+// เมื่อ user ติดตั้งแล้ว
+window.addEventListener('appinstalled', () => {
+  console.log('PWA installed!');
+});
 
-    try {
-      const dataUrl = await domtoimage.toPng(dailyPopupForCapture, {
-        width: dailyPopupForCapture.offsetWidth,
-        height: dailyPopupForCapture.offsetHeight,
-        style: {
-          transform: 'scale(1)',
-          transformOrigin: 'top left'
-        },
-        filter: (node) => node.id !== 'shareBtn' // ไม่ capture ปุ่ม Share
-      });
-
-      const link = document.createElement('a');
-      link.href = dataUrl;
-      link.download = 'daily_summary.png';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-    } catch (err) {
-      console.error('Capture failed:', err);
-      alert('Failed to capture image.');
-    } finally {
-      dailyPopupForCapture.style.display = originalDisplay;
-    }
-    console.log(domtoimage);
-  });
-*/
+// ================= Service Worker & Push Registration =================
 if ('serviceWorker' in navigator && 'PushManager' in window) {
   window.addEventListener('load', async () => {
     try {
-      const reg = await navigator.serviceWorker.register('/sw.js');
+      const reg = await navigator.serviceWorker.register('/service-worker.js');
       console.log('✅ Service Worker registered', reg);
 
       const permission = await Notification.requestPermission();
@@ -695,22 +670,23 @@ if ('serviceWorker' in navigator && 'PushManager' in window) {
 
       const subscribeOptions = {
         userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(
-          'BB2fZ3NOzkWDKOi8H5jhbwICDTv760wIB6ZD2PwmXcUA_B5QXkXtely4b4JZ5v5b88VX1jKa7kRfr94nxqiksqY'
-        )
+        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
       };
       const subscription = await reg.pushManager.subscribe(subscribeOptions);
 
-      await fetch('https://momaybackend02-production.up.railway.app/api/subscribe', {
+      await fetch(`${API_BASE}/api/subscribe`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(subscription)
       });
 
-      console.log('✅ Push registered');
+      navigator.serviceWorker.addEventListener('message', event => {
+        const { title, body } = event.data;
+        addInstantNotification(title, body);
+      });
 
     } catch (err) {
-      console.error('❌ Error registering push', err);
+      console.error('❌ Error registering push:', err);
     }
   });
 }
@@ -721,6 +697,216 @@ function urlBase64ToUint8Array(base64String) {
   const rawData = atob(base64);
   return Uint8Array.from([...rawData].map(char => char.charCodeAt(0)));
 }
+
+const API_BASE = 'https://momaybackend02-production.up.railway.app';
+const bellIcon = document.getElementById('Bell_icon');
+const bellBadge = document.getElementById('bellBadge');
+const notipopup = document.getElementById('notificationPopup');
+const notifItems = document.getElementById('notificationItems');
+const markAllBtn = document.getElementById('markAllRead');
+const clearReadBtn = document.getElementById('clearRead');
+const notifPopupContainer = notipopup; // เปลี่ยนชื่อแทนคำว่า popup
+
+// ====== เปิด/ปิด notification popup ======
+bellIcon.addEventListener('click', async () => {
+  const isHidden = notifPopupContainer.style.display === 'none' || notifPopupContainer.style.display === '';
+  notifPopupContainer.style.display = isHidden ? 'block' : 'none';
+
+  if (isHidden) {
+    await loadNotifications();
+
+    // เมื่อเปิด popup ถือว่าอ่านแล้ว
+    document.querySelectorAll('.notification-item.unread').forEach(item => {
+      item.classList.remove('unread');
+      item.classList.add('read');
+    });
+    updateBadge();
+
+    // อัปเดต backend ว่าทุก notification อ่านแล้ว
+    try {
+      await fetch(`${API_BASE}/api/notifications/read-all`, { method: 'PATCH' });
+    } catch (err) {
+      console.error('Failed to mark all notifications as read on server', err);
+    }
+  }
+});
+
+document.addEventListener('click', e => {
+  if (!bellIcon.contains(e.target) && !notifPopupContainer.contains(e.target))
+    notifPopupContainer.style.display = 'none';
+});
+
+// ====== โหลด badge ======
+function updateBadge() {
+  const count = document.querySelectorAll('.notification-item.unread').length;
+  bellBadge.textContent = count;
+  bellBadge.style.display = count > 0 ? 'block' : 'none';
+}
+
+// ====== โหลด notifications ======
+async function loadNotifications() {
+  notifItems.innerHTML = '<p style="text-align:center; padding:10px;">⏳ กำลังโหลด...</p>';
+  try {
+    const res = await fetch(`${API_BASE}/api/notifications?limit=20`);
+    const data = await res.json();
+
+    if (!data.length) {
+      notifItems.innerHTML = '<p style="text-align:center; padding:10px;">ไม่มีการแจ้งเตือน</p>';
+      return;
+    }
+
+    notifItems.innerHTML = '';
+    data.forEach(n => {
+      const div = document.createElement('div');
+      div.className = `notification-item ${n.read ? 'read' : 'unread'}`;
+      div.innerHTML = `
+        <div class="title">${n.title}</div>
+        <div class="message">${n.message}</div>
+        <div class="time">${new Date(n.timestamp).toLocaleString('th-TH')}</div>
+        <button class="mark-read" data-id="${n._id}" style="font-size:10px;">อ่านแล้ว</button>
+        <button class="delete" data-id="${n._id}" style="font-size:10px; color:red;">ลบ</button>
+      `;
+      notifItems.appendChild(div);
+    });
+
+    notifItems.querySelectorAll('.mark-read').forEach(btn => {
+      btn.addEventListener('click', () => {
+        btn.closest('.notification-item').classList.remove('unread');
+        btn.closest('.notification-item').classList.add('read');
+        updateBadge();
+      });
+    });
+
+    notifItems.querySelectorAll('.delete').forEach(btn => {
+      btn.addEventListener('click', () => deleteNotif(btn.dataset.id));
+    });
+  } catch (err) {
+    console.error('Load notifications failed', err);
+  }
+}
+
+// ====== ลบแจ้งเตือนเฉพาะหน้าเว็บ ======
+function deleteNotif(id) {
+  const notifItem = document.querySelector(`button.delete[data-id="${id}"]`)?.closest('.notification-item');
+  if (notifItem) notifItem.remove();
+  updateBadge();
+}
+
+// ====== ลบ notifications ที่อ่านแล้ว (หน้าเว็บ) ======
+clearReadBtn.addEventListener('click', () => {
+  document.querySelectorAll('.notification-item.read').forEach(el => el.remove());
+  updateBadge();
+});
+
+// ====== แสดง notification ใหม่บน popup ======
+function addInstantNotification(title, body) {
+  const div = document.createElement('div');
+  div.className = 'notification-item unread';
+  div.innerHTML = `
+    <div class="title">${title}</div>
+    <div class="message">${body}</div>
+    <div class="time">${new Date().toLocaleString('th-TH')}</div>
+    <button class="mark-read" style="font-size:10px;">อ่านแล้ว</button>
+    <button class="delete" style="font-size:10px; color:red;">ลบ</button>
+  `;
+  notifItems.prepend(div);
+
+  // เพิ่ม event ให้ปุ่มใหม่
+  div.querySelector('.mark-read').addEventListener('click', () => {
+    div.classList.remove('unread');
+    div.classList.add('read');
+    updateBadge();
+  });
+  div.querySelector('.delete').addEventListener('click', () => div.remove());
+  updateBadge();
+}
+
+// เริ่มต้นโหลด badge ทุก 10 วินาที
+updateBadge();
+setInterval(updateBadge, 10000);
+
+// report
+document.getElementById("generateReport").addEventListener("click", async () => {
+  try {
+    // ดึงวันที่จาก span ของ popup
+    const currentDayElKwang = document.getElementById('kwangCurrentDay');
+    const rawDate = currentDayElKwang.textContent.trim(); // เช่น "10 - October - 2025"
+
+    // แปลงเป็น format yyyy-mm-dd สำหรับ fetch
+    const [dayStr, monthStr, yearStr] = rawDate.split(' - ');
+    const monthNames = ["January","February","March","April","May","June",
+                        "July","August","September","October","November","December"];
+    const month = String(monthNames.indexOf(monthStr) + 1).padStart(2, '0');
+    const day = dayStr.padStart(2, '0');
+    const year = yearStr;
+    const apiDate = `${year}-${month}-${day}`;
+
+    // ดึงข้อมูลจาก backend
+    const res = await fetch(`https://momaybackend02-production.up.railway.app/solar-size?date=${apiDate}`);
+    if (!res.ok) throw new Error("Network response was not ok");
+    const json = await res.json();
+
+    // เตรียมองค์ประกอบ report
+    const wrapper = document.getElementById("reportWrapper");
+
+    document.getElementById("kwangDateReport").textContent = rawDate;
+    document.getElementById("kwangPowerReport").textContent = (json.dayEnergy ?? 0).toFixed(2) + " Unit";
+    document.getElementById("kwangCapacityReport").textContent = (json.solarCapacity_kW ?? 0).toFixed(2) + " kW";
+    document.getElementById("kwangBillReport").textContent = (json.savingsDay ?? 0).toFixed(2) + " THB";
+    document.getElementById("kwangMonthReport").textContent = (json.savingsMonth ?? 0).toFixed(2) + " THB";
+
+    // อัปเดตตาราง Hourly
+    const tbody = document.querySelector("#kwangHourlyTable tbody");
+    tbody.innerHTML = "";
+    if (json.hourly && json.hourly.length > 0) {
+      json.hourly.forEach(hourData => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${hourData.hour}</td><td>${hourData.energy_kwh}</td>`;
+        tbody.appendChild(tr);
+      });
+    } else {
+      tbody.innerHTML = '<tr><td colspan="2">No data</td></tr>';
+    }
+
+    // ปรับตำแหน่งให้ภาพอยู่กลางและไม่ล้น
+    wrapper.style.opacity = 1;
+    wrapper.style.position = 'absolute';
+    wrapper.style.left = '50%';
+    wrapper.style.top = '50%';
+    wrapper.style.transform = 'translate(-50%, -50%)';
+    wrapper.style.width = '794px'; // A4 ความกว้าง
+    wrapper.style.height = 'auto';
+    wrapper.style.overflow = 'visible';
+
+    // จับภาพ report
+    const canvas = await html2canvas(wrapper, { scale: 2, useCORS: true });
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+    const file = new File([blob], `KwangReport-${apiDate}.png`, { type: 'image/png' });
+
+    // ✅ ถ้ามือถือรองรับ Web Share API → เปิดเมนูแชร์
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({
+        title: 'Kwang Solar Report',
+        text: `รายงานพลังงานวันที่ ${rawDate}`,
+        files: [file],
+      });
+    } else {
+      // 💻 ถ้าไม่รองรับ (คอมฯ) → ดาวน์โหลดอัตโนมัติ
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `KwangReport-${apiDate}.png`;
+      link.click();
+      URL.revokeObjectURL(link.href);
+    }
+
+    // ซ่อน wrapper หลัง capture เสร็จ
+    wrapper.style.opacity = 0;
+    wrapper.style.left = '-9999px';
+  } catch (err) {
+    console.error("Generate report failed:", err);
+    alert("ไม่สามารถสร้างรายงานได้ ลองใหม่อีกครั้ง");
+  }
+});
 
 
 });

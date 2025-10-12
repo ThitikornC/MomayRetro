@@ -1358,6 +1358,115 @@ font-size: 14px;
 }
 /* เริ่มต้นซ่อน Share ตอน capture */
 
+/* Badge กระดิ่ง */
+#Bell_icon {
+  position: relative;
+  cursor: pointer;
+}
+
+#Bell_icon img {
+  display: block;
+}
+
+#Bell_icon {
+  position: relative;
+  cursor: pointer;
+}
+
+#bellBadge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 12px;
+  font-weight: bold;
+  text-align: center;
+}
+
+
+/* Popup notification */
+#notificationPopup {
+  display: none;
+  position: absolute;
+  top: 40px; /* ปรับตาม layout */
+  right: 0;
+  width: 300px;
+  max-height: 400px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ccc;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  z-index: 999;
+  padding: 10px;
+}
+.notification-item {
+  border-bottom: 1px solid #eee;
+  padding: 5px;
+}
+.notification-item.unread {
+  background-color: #f5f5f5;
+}
+
+#reportWrapper {
+    width: 794px;          /* ขนาด A4 กว้าง */
+    min-height: 1123px;    /* ขนาด A4 สูง */
+    padding: 40px;
+    background-color: #fff;
+    border: 3px solid #8B4513;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+    font-family: Arial, sans-serif;
+    text-align: center;
+    box-sizing: border-box;
+
+    /* อยู่กลางจอ */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(1);
+    transform-origin: top left;
+
+    /* ให้เนื้อหา overflow ได้ */
+    overflow: visible;
+    opacity: 0; /* ซ่อนตอนไม่ใช้งาน */
+}
+
+#reportWrapper h2 {
+    margin-bottom: 15px;
+    color: #8B4513;
+    font-size: 28px;
+}
+
+#reportWrapper p {
+    margin: 8px 0;
+    font-size: 16px;
+}
+
+#kwangHourlyTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    table-layout: fixed;
+}
+
+#kwangHourlyTable th, #kwangHourlyTable td {
+    border: 1px solid #ccc;
+    padding: 6px 8px;
+    text-align: center;
+    font-size: 14px;
+    word-wrap: break-word;
+}
+
+#kwangHourlyTable th {
+    background-color: #f5f5f5;
+}
+
+#kwangHourlyTable tbody tr:nth-child(even) {
+    background-color: #fafafa;
+}
 @media screen and (max-width: 1024px) {
 
 #Date_icon {

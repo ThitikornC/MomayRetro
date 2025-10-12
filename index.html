@@ -15,7 +15,7 @@
   <!-- iOS Safari full screen fix -->
   <meta name="apple-mobile-web-app-title" content="Momay">
   <!-- ใส่ CSS versioned แทนตัวเดิม -->
-  <link rel="stylesheet" href="style.css?v=1.6">
+  <link rel="stylesheet" href="style.css?v=">
 </head>
 
 <body>
@@ -46,53 +46,46 @@
 </div>
   
 <div class="Main_Container">
-    <div class="Containerglow"></div>
+  <div class="Containerglow"></div>
   <div id="Main_Picinfo">
     <img src="./images/light.png">
-     <div class="glow"></div>
-     <div id="Icons_group">
-  <div id="Calendar_icon">
-    <img src="./images/calendar_icon.png" alt="Calendar">
+    <div class="glow"></div>
+    <div id="Icons_group">
+      
+      <div id="Calendar_icon">
+        <img src="./images/calendar_icon.png" alt="Calendar">
+      </div>
+      
+      <div id="Kwang_icon">
+        <img src="./images/Kwang_icon.png" alt="Kwang">
+      </div>
+      
+      <div id="Bell_icon">
+        <img src="./images/Bell_icon.png" alt="Bell">
+        <span id="bellBadge">0</span>
+      </div>
+      
+    </div>
   </div>
-  <div id="Kwang_icon">
-    <img src="./images/Kwang_icon.png" alt="Kwang">
-  </div>
-  <div id="Bell_icon">
-    <img src="./images/Bell_icon.png" alt="Bell">
-  </div>
-</div>
-  </div>
+
   <div class="Meter">
-   <h1> 30/100 Amp</h1>
-   <h1> 3 Phase</h1>
+    <h1>30/100 Amp</h1>
+    <h1>3 Phase</h1>
   </div>
-  <!--
-  <div id="Meter_Pic">
-  <img src="./images/meter.png">
-  </div>
-  <div class="Meterunit">
-  <div>5555</div>
-</div>
-  -->
-  <!-- Floor Bars แนวนอน -->
 
-
-  <!-- Total Bar วางหลัง floor bars 
-  <div class="Marker" id="marker1">50%</div>
-  <div class="Marker" id="marker2"></div>
-  <div class="Marker" id="marker3"></div>
- -->
-    <div id="Total_Bar">
+  <div id="Total_Bar">
     <div id="Total_Bar_Text"></div>
     <div class="progress-bar"></div>
   </div>
-
-<!--
-  <div id="Bar_Bg">
-    <img src="./images/Wood_bar.png">
-  </div>
--->
 </div>
+<div id="notificationPopup">
+  <div id="notificationItems"></div>
+  <div style="text-align:center; margin-top:5px;">
+    <button id="markAllRead">อ่านทั้งหมด</button>
+    <button id="clearRead">ลบที่อ่านแล้ว</button>
+  </div>
+</div>
+
 <div class="Floor_Container">
   <div class="floor-wrapper">
     <h1 class="Bar_name">floor1</h1>
@@ -139,6 +132,8 @@
     <div class="popupValue2">Monthly Savings: <span id="kwangMonth">- THB</span></div>
 
     <img src="./images/Kwang_baner.png" alt="Kwang_baner" width="64" height="113" class="Kwang_baner">
+  <img id="generateReport" src="./images/share.png" alt="Generate Report" 
+     style="width:30px; height:30px; cursor:pointer; padding-top:10px;">
   </div>
 </div>
 
@@ -191,6 +186,30 @@
   <div id="calendar"></div>
 </div>
 
+<!-- Report Wrapper -->
+<div id="reportWrapper">
+  <h2>Solar Report</h2>
+  <p>Date: <span id="kwangDateReport"></span></p>
+  <p>Electricity usage (06:00-18:00): <span id="kwangPowerReport">-</span></p>
+  <p>Recommended solar capacity: <span id="kwangCapacityReport">-</span></p>
+  <p>Daily savings: <span id="kwangBillReport">-</span></p>
+  <p>Monthly savings: <span id="kwangMonthReport">-</span></p>
+
+  <table id="kwangHourlyTable">
+    <thead>
+      <tr>
+        <th>Hour</th>
+        <th>Energy (kWh)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td colspan="2">No data</td></tr>
+    </tbody>
+  </table>
+</div>
+
+
+  
 <!--
 <div id="DatePopup" class="popup">
   <div id="popupContent">
@@ -211,7 +230,7 @@ if ('serviceWorker' in navigator) {
 }
 
 </script>
-<script src="https://cdn.jsdelivr.net/npm/dom-to-image-more@2.9.0/dist/dom-to-image-more.min.js "></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
