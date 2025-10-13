@@ -828,19 +828,30 @@ font-size: 14px;
   cursor: pointer;
 }
 #currentDay {
-  color: #000; /* สีดำ */
-  font-weight: bold; /* ถ้าต้องการหนา */
-}
-#prevDay, #nextDay {
-  color: #000 !important;       /* สีตัวอักษร / ลูกศร */
-  background: none;  /* ถ้าไม่อยากให้มีพื้นหลัง */
-  border: none;      /* ถ้าไม่อยากให้มีกรอบ */
-  font-size: 20px;   /* ปรับขนาดลูกศร */
-  cursor: pointer;   /* เมาส์เป็น pointer */
-  background: none !important;  /* เอาพื้นหลังเขียว */
-  border: none !important;      /* เอากรอบ */
+  color: #000;
+  font-weight: bold;
 }
 
+#prevDay, #nextDay {
+  color: #000 !important;
+  background: none !important;
+  border: none !important;
+  font-size: 20px;
+  cursor: pointer;
+  
+  /* เพิ่มเฉพาะนี้เพื่อให้คลิกได้ */
+  pointer-events: auto !important;
+  z-index: 999 !important;
+  position: relative;
+  padding: 10px;
+}
+
+/* เพิ่ม z-index ให้ container */
+#PickDate {
+  position: relative;
+  z-index: 999;
+  pointer-events: auto;
+}
 
 
 

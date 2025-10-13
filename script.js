@@ -175,9 +175,58 @@ document.addEventListener('DOMContentLoaded', async function() {
   fetchDailyBill();
   setInterval(fetchDailyBill, 30000); // เปลี่ยนเป็น 30 วินาที
 
-  // ================= Chart.js (Lazy Load) =================
+  // ================= Chart.js (Load ทันที - ไม่มี Lazy Load) =================
   let chartInitialized = false;
   let chart = null;
+  let currentDate = new Date();
+
+  function formatDateDisplay(date){
+    const d=String(date.getDate()).padStart(2,'0');
+    const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    const m = monthNames[date.getMonth()];     
+    const y=date.getFullYear();
+    return `${d} - ${m} - ${y}`;
+  }
+
+  async function fetchDailyData(date){
+    const dateStr = date.toISOString().split('T')[0];
+    try{
+      const res = await fetch(`https://api-kx4r63rdjq-an.a.run.app/daily-energy/px_dh?date=${dateStr}`);
+      const json = await res.json();
+      return json.data;
+    }catch(err){console.error(err); return [];}
+  }
+
+  async function updateChartData(date){
+    if (!chart) return;
+    
+    const values = await fetchDailyData(date);
+    const chartData = new Array(1440).fill(null);
+    values.forEach(item=>{
+      const t = new Date(item.timestamp);
+      const idx = t.getUTCHours()*60 + t.getUTCMinutes();
+      chartData[idx] = item.power;
+    });
+    let maxVal=null, maxIdx=null, sum=0, count=0;
+    chartData.forEach((v,i)=>{
+      if(v!==null){ if(maxVal===null||v>maxVal){ maxVal=v; maxIdx=i; } sum+=v; count++; }
+    });
+    const avgVal = count>0?sum/count:null;
+
+    const canvas = document.getElementById('EnergyChart');
+    const ctx = canvas.getContext('2d');
+    const gradient = ctx.createLinearGradient(0,0,0,400);
+    gradient.addColorStop(0,'rgba(139,69,19,0.4)');
+    gradient.addColorStop(0.5,'rgba(210,180,140,0.3)');
+    gradient.addColorStop(1,'rgba(245,222,179,0.1)');
+
+    chart.data.datasets=[
+      {label:'Power', data:chartData, borderColor:'#8B4513', backgroundColor:gradient, fill:true, borderWidth:0.5, tension:0.3, pointRadius:0.1},
+      {label:'Max', data:new Array(1440).fill(null).map((_,i)=>i===maxIdx?maxVal:null), borderColor:'#ff9999', pointRadius:5, pointBackgroundColor:'#ff9999', fill:false, showLine:false},
+      {label:'Average', data:new Array(1440).fill(avgVal), borderColor:'#000', borderDash:[5,5], fill:false, pointRadius:0,  borderWidth: 1}
+    ];
+    chart.update();
+  }
 
   async function initializeChart() {
     if (chartInitialized) return;
@@ -269,74 +318,105 @@ document.addEventListener('DOMContentLoaded', async function() {
     chart = new Chart(ctx, config);
     chartInitialized = true;
 
-    // ================= Date Picker =================
-    const prevBtn = document.getElementById('prevDay');
-    const nextBtn = document.getElementById('nextDay');
-    const currentDayEl = document.getElementById('currentDay');
-    let currentDate = new Date();
-
-    function formatDate(date){
-      const d=String(date.getDate()).padStart(2,'0');
-      const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-      const m = monthNames[date.getMonth()];     
-      const y=date.getFullYear();
-      return `${d} - ${m} - ${y}`;
-    }
-    currentDayEl.textContent = formatDate(currentDate);
-
-    async function fetchDailyData(date){
-      const dateStr = date.toISOString().split('T')[0];
-      try{
-        const res = await fetch(`https://api-kx4r63rdjq-an.a.run.app/daily-energy/px_dh?date=${dateStr}`);
-        const json = await res.json();
-        return json.data;
-      }catch(err){console.error(err); return [];}
-    }
-
-    async function updateChart(date){
-      const values = await fetchDailyData(date);
-      const chartData = new Array(1440).fill(null);
-      values.forEach(item=>{
-        const t = new Date(item.timestamp);
-        const idx = t.getUTCHours()*60 + t.getUTCMinutes();
-        chartData[idx] = item.power;
-      });
-      let maxVal=null, maxIdx=null, sum=0, count=0;
-      chartData.forEach((v,i)=>{
-        if(v!==null){ if(maxVal===null||v>maxVal){ maxVal=v; maxIdx=i; } sum+=v; count++; }
-      });
-      const avgVal = count>0?sum/count:null;
-
-      chart.data.datasets=[
-        {label:'Power', data:chartData, borderColor:'#8B4513', backgroundColor:gradient, fill:true, borderWidth:0.5, tension:0.3, pointRadius:0.1},
-        {label:'Max', data:new Array(1440).fill(null).map((_,i)=>i===maxIdx?maxVal:null), borderColor:'#ff9999', pointRadius:5, pointBackgroundColor:'#ff9999', fill:false, showLine:false},
-        {label:'Average', data:new Array(1440).fill(avgVal), borderColor:'#000', borderDash:[5,5], fill:false, pointRadius:0,  borderWidth: 1}
-      ];
-      chart.update();
-    }
-
-    function changeDay(delta){ currentDate.setDate(currentDate.getDate()+delta); currentDayEl.textContent=formatDate(currentDate); updateChart(currentDate); }
-    prevBtn.addEventListener('click', ()=>changeDay(-1));
-    nextBtn.addEventListener('click', ()=>changeDay(1));
-    updateChart(currentDate);
+    // โหลดข้อมูลวันปัจจุบันทันทีหลัง chart พร้อม
+    await updateChartData(currentDate);
   }
 
-  // Lazy load chart เมื่อ scroll ใกล้
-  const chartContainer = document.querySelector('.Realtime_Container');
-  if (chartContainer) {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          initializeChart();
-          observer.disconnect();
-        }
-      });
-    }, { rootMargin: '200px' });
+  // Initialize Date Picker และ Chart ทันที
+  const prevBtn = document.getElementById('prevDay');
+  const nextBtn = document.getElementById('nextDay');
+  const currentDayEl = document.getElementById('currentDay');
+
+  if (currentDayEl) {
+    currentDayEl.textContent = formatDateDisplay(currentDate);
+  }
+
+  function handleDateChange(delta) {
+    console.log('🔥 Date change:', delta);
+    currentDate.setDate(currentDate.getDate() + delta);
+    if (currentDayEl) {
+      currentDayEl.textContent = formatDateDisplay(currentDate);
+    }
+    if (chartInitialized && chart) {
+      updateChartData(currentDate);
+    }
+  }
+
+  // ใช้หลายวิธีในการจับ event
+  if (prevBtn) {
+    console.log('✅ Prev button found', prevBtn);
     
-    observer.observe(chartContainer);
+    // Method 1: onclick property
+    prevBtn.onclick = function(e) {
+      e.preventDefault();
+      console.log('🎯 Prev ONCLICK');
+      handleDateChange(-1);
+    };
+    
+    // Method 2: addEventListener click
+    prevBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log('🎯 Prev CLICK');
+      handleDateChange(-1);
+    }, true); // useCapture = true
+    
+    // Method 3: mousedown
+    prevBtn.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      console.log('🎯 Prev MOUSEDOWN');
+      handleDateChange(-1);
+    });
+    
+    // Method 4: touchstart for mobile
+    prevBtn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      console.log('🎯 Prev TOUCH');
+      handleDateChange(-1);
+    });
+  } else {
+    console.error('❌ prevDay button NOT found!');
+  }
+  
+  if (nextBtn) {
+    console.log('✅ Next button found', nextBtn);
+    
+    // Method 1: onclick property
+    nextBtn.onclick = function(e) {
+      e.preventDefault();
+      console.log('🎯 Next ONCLICK');
+      handleDateChange(1);
+    };
+    
+    // Method 2: addEventListener click
+    nextBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log('🎯 Next CLICK');
+      handleDateChange(1);
+    }, true); // useCapture = true
+    
+    // Method 3: mousedown
+    nextBtn.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      console.log('🎯 Next MOUSEDOWN');
+      handleDateChange(1);
+    });
+    
+    // Method 4: touchstart for mobile
+    nextBtn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      console.log('🎯 Next TOUCH');
+      handleDateChange(1);
+    });
+  } else {
+    console.error('❌ nextDay button NOT found!');
   }
 
-  // ================= FullCalendar (Lazy Load) =================
+  // โหลด Chart ทันที
+  initializeChart();
+
+  // ================= FullCalendar (Load ทันที - ไม่มี Lazy Load) =================
   let calendarInitialized = false;
   let calendar = null;
 
@@ -380,12 +460,9 @@ document.addEventListener('DOMContentLoaded', async function() {
           const bill = json.electricity_bill ?? 0;
           const units = bill / pricePerUnit;
 
-          if (popupBillEl) popupBillEl.textContent = bill.toFixed(2) + ' THB';
-          if (popupUnitEl) popupUnitEl.textContent = units.toFixed(2) + ' Unit';
-
-          if (isToday(info.dateStr) && popupBillEl && popupUnitEl) {
-            popupBillEl.parentNode.insertBefore(popupBillEl, popupUnitEl);
-          }
+          // แสดงผลแบบคงที่: THB ก่อน แล้วค่อย Unit
+          if (popupBillEl) popupBillEl.textContent = `${bill.toFixed(2)} THB`;
+          if (popupUnitEl) popupUnitEl.textContent = `${units.toFixed(2)} Unit`;
 
         } catch (err) {
           console.error('Error fetching daily bill:', err);
@@ -413,23 +490,22 @@ document.addEventListener('DOMContentLoaded', async function() {
     calendarInitialized = true;
   }
 
-  // ================= ปิด popup =================
-  const datePopup = document.getElementById('DatePopup');
-  const closeBtn = document.getElementById('closeDatePopup');
-  if (closeBtn) {
-    closeBtn.addEventListener('click', () => {
-      if (datePopup) {
-        datePopup.classList.remove('active');
-        datePopup.style.display = 'none';
+  // โหลด Calendar ทันที
+  initializeCalendar();
+
+  // Calendar Popup
+  const calendarIcon = document.querySelector("#Calendar_icon img");
+  const popup = document.getElementById("calendarPopup");
+  if (calendarIcon && popup) {
+    calendarIcon.addEventListener("click", function() { 
+      popup.classList.add("active");
+      // Calendar โหลดแล้ว แค่ resize
+      if (calendar) {
+        calendar.updateSize();
       }
     });
-  }
-  if (datePopup) {
-    datePopup.addEventListener('click', (e) => {
-      if (e.target === datePopup) {
-        datePopup.classList.remove('active');
-        datePopup.style.display = 'none';
-      }
+    popup.addEventListener("click", function(e) { 
+      if (e.target === popup) popup.classList.remove("active"); 
     });
   }
 
@@ -487,21 +563,6 @@ document.addEventListener('DOMContentLoaded', async function() {
 
   fetchCurrentWeatherSukhothai();
   setInterval(fetchCurrentWeatherSukhothai, 1800000);
-
-  // ================= Calendar Popup =================
-  const calendarIcon = document.querySelector("#Calendar_icon img");
-  const popup = document.getElementById("calendarPopup");
-  if (calendarIcon && popup) {
-    calendarIcon.addEventListener("click", function() { 
-      popup.classList.add("active");
-      initializeCalendar().then(() => {
-        if (calendar) calendar.updateSize();
-      });
-    });
-    popup.addEventListener("click", function(e) { 
-      if (e.target === popup) popup.classList.remove("active"); 
-    });
-  }
 
   // ================= Kwang Solar Popup =================
   const kwangIcon = document.getElementById("Kwang_icon");
@@ -1146,4 +1207,3 @@ document.getElementById("kwangMonthReport").textContent =
   }
 
 });
-

@@ -17,7 +17,7 @@
   <!-- iOS Safari full screen fix -->
   <meta name="apple-mobile-web-app-title" content="Momay">
   <!-- ใส่ CSS versioned แทนตัวเดิม -->
-  <link rel="stylesheet" href="style.css?v=">
+  <link rel="stylesheet" href="style.css?v=1.8">
 </head>
 
 <body>
@@ -211,13 +211,11 @@
 
 <div class="Realtime_Container">
   <!-- Vintage Date Picker -->
-  <div id="PickDate">
-    <span id="prevDay">&lt;</span>
-    <span id="currentDay"></span>
-    <span id="nextDay">&gt;</span>
-    
-  </div>
-
+<div id="PickDate">
+  <button id="prevDay" type="button">&lt;</button>
+  <span id="currentDay"></span>
+  <button id="nextDay" type="button">&gt;</button>
+</div>
   <!-- Chart.js Canvas -->
   <canvas id="EnergyChart"></canvas>
 </div>
@@ -294,7 +292,7 @@ if ('serviceWorker' in navigator) {
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
-<script src="script.js?v=1.6" defer></script>
+<script src="script.js?v=1.8" defer></script>
 
 
 </body>
