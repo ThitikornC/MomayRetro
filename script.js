@@ -842,6 +842,8 @@ async function loadNotifications() {
 }
 
 // แสดง notifications ใน popup
+// แทนที่ส่วน renderNotifications() ใน frontend script
+
 function renderNotifications() {
   if (!notificationItems) return;
   
@@ -849,7 +851,7 @@ function renderNotifications() {
     notificationItems.innerHTML = `
       <div style="text-align:center; padding:30px; color:#999;">
         <p style="font-size:24px; margin-bottom:10px;">🔔</p>
-        <p> Notificaction </p>
+        <p>No Notifications</p>
       </div>
     `;
     return;
@@ -857,15 +859,15 @@ function renderNotifications() {
   
   notificationItems.innerHTML = '';
   
-  // Header - แค่ชื่อ "การแจ้งเตือน"
+  // Header
   const header = document.createElement('div');
   header.style.cssText = `
-  padding: 15px;
-  border-bottom: 2px solid #f0f0f0;
-  background-image: url('./images/noise.png');
-  background-size: cover;       /* ปรับขนาดให้เต็มหน้าจอ */
-  background-position: center;  /* กึ่งกลางรูป */
-  background-repeat: no-repeat; /* ไม่ทำซ้ำรูป */
+    padding: 15px;
+    border-bottom: 2px solid #f0f0f0;
+    background-image: url('./images/noise.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     text-align: center;
   `;
   header.innerHTML = '<strong style="font-size:16px; color:#fff;">Notification</strong>';
@@ -883,25 +885,18 @@ function renderNotifications() {
       background: ${notif.read ? '#fff' : '#f8f9ff'};
       transition: background 0.2s;
       cursor: pointer;
-         border-radius: 5px; 
+      border-radius: 5px; 
     `;
 
-
-// ใช้ getUTC...() แทน getHours() ตามเครื่อง
-const time = new Date(notif.timestamp); // ตัว API ส่ง UTC
-
-const day = String(time.getUTCDate()).padStart(2, '0');
-const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-const month = monthNames[time.getUTCMonth()];
-const year = time.getUTCFullYear();
-const hours = String(time.getUTCHours()).padStart(2, '0');
-const minutes = String(time.getUTCMinutes()).padStart(2, '0');
-
-const timeStr = `${day} ${month} ${year} ${hours}:${minutes}`;
-console.log(timeStr); // "15 Oct 2025 07:04"
-
-
-    
+    // Format timestamp
+    const time = new Date(notif.timestamp);
+    const day = String(time.getUTCDate()).padStart(2, '0');
+    const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    const month = monthNames[time.getUTCMonth()];
+    const year = time.getUTCFullYear();
+    const hours = String(time.getUTCHours()).padStart(2, '0');
+    const minutes = String(time.getUTCMinutes()).padStart(2, '0');
+    const timeStr = `${day} ${month} ${year} ${hours}:${minutes}`;
     
     // สร้าง content ตาม type
     let detailsHTML = '';
@@ -932,19 +927,42 @@ console.log(timeStr); // "15 Oct 2025 07:04"
           </div>
         </div>
       `;
+    } else if (notif.type === 'daily_bill' && notif.energy_kwh !== undefined) {
+      const units = notif.energy_kwh || 0;
+      const bill = notif.electricity_bill || 0;
+      const date = notif.date || '-';
+      
+      detailsHTML = `
+        <div style="background:#d4edda; padding:10px; border-radius:5px; margin-top:5px;">
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; font-size:13px;">
+            <div>
+              <div style="color:#666; margin-bottom:3px;">Date:</div>
+              <strong style="color:#155724;">${date}</strong>
+            </div>
+            <div>
+              <div style="color:#666; margin-bottom:3px;">Energy:</div>
+              <strong style="color:#155724;">${units.toFixed(2)} Unit</strong>
+            </div>
+          </div>
+          <div style="margin-top:8px; padding-top:8px; border-top:1px solid #c3e6cb;">
+            <div style="color:#666; font-size:12px;">Total Bill:</div>
+            <strong style="color:#155724; font-size:16px;">${bill.toFixed(2)} THB</strong>
+          </div>
+          ${notif.samples ? `<div style="font-size:11px; color:#999; margin-top:5px;">${notif.samples} samples</div>` : ''}
+        </div>
+      `;
     }
     
     div.innerHTML = `
       <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:5px;">
         <div style="display:flex; align-items:center; gap:5px;">
-        
           <strong style="color:#333; font-size:14px;">${notif.title}</strong>
         </div>
         ${!notif.read ? '<span style="width:8px; height:8px; background:#667eea; border-radius:50%; display:block;"></span>' : ''}
       </div>
-      <p style="color:#666; font-size:13px; margin:5px 0 5px 23px;">${notif.body}</p>
+      <p style="color:#666; font-size:13px; margin:5px 0 5px 0;">${notif.body}</p>
       ${detailsHTML}
-      <div style="margin-top:8px; margin-left:23px;">
+      <div style="margin-top:8px;">
         <small style="color:#999; font-size:11px;">${timeStr}</small>
       </div>
     `;
@@ -966,8 +984,6 @@ console.log(timeStr); // "15 Oct 2025 07:04"
     
     notificationItems.appendChild(div);
   });
-  
-  // ไม่มี footer actions
 }
 
 // แสดง error
@@ -1079,6 +1095,120 @@ if ('serviceWorker' in navigator) {
     
     // สั่น bell icon
     shakeBellIcon();
+    
+    // โหลด notifications ใหม่
+    loadNotifications();
+  });
+}
+
+
+// เพิ่มใน frontend script (หลังจากส่วน bell icon shake)
+
+// ================= Shake Calendar & Kwang Icons =================
+
+// ฟังก์ชันสั่น Calendar icon
+function shakeCalendarIcon() {
+  const calendarIcon = document.querySelector("#Calendar_icon img");
+  if (!calendarIcon) return;
+  
+  calendarIcon.style.animation = 'shake 0.5s';
+  calendarIcon.style.animationIterationCount = '3';
+  
+  setTimeout(() => {
+    calendarIcon.style.animation = '';
+  }, 1500);
+}
+
+// ฟังก์ชันสั่น Kwang icon
+function shakeKwangIcon() {
+  const kwangIcon = document.querySelector("#Kwang_icon img");
+  if (!kwangIcon) return;
+  
+  kwangIcon.style.animation = 'shake 0.5s';
+  kwangIcon.style.animationIterationCount = '3';
+  
+  setTimeout(() => {
+    kwangIcon.style.animation = '';
+  }, 1500);
+}
+
+// เรียกใช้ทดสอบ (สั่นทุก 10 วินาที)
+// setInterval(() => {
+//   shakeCalendarIcon();
+//   setTimeout(() => shakeKwangIcon(), 500); // สั่นทีละอัน
+// }, 10000);
+
+// หรือสั่นเมื่อมี event เฉพาะ เช่น:
+// - Calendar icon สั่นเมื่อมี daily_diff notification
+// - Kwang icon สั่นเมื่อมี daily_bill notification
+
+// อัปเดตฟังก์ชัน updateBadge เพื่อสั่น icon ตาม type
+function updateBadgeWithShake(count, latestType) {
+  if (!bellBadge || !bellIcon) return;
+  
+  // ซ่อน badge เสมอ
+  bellBadge.style.display = 'none';
+  
+  // ถ้ามี notification ใหม่ ให้สั่น icon ตาม type
+  if (count > 0) {
+    shakeBellIcon(); // Bell icon สั่นเสมอ
+    
+    // สั่น icon เฉพาะตาม type
+    if (latestType === 'daily_diff') {
+      setTimeout(() => shakeCalendarIcon(), 300);
+    } else if (latestType === 'daily_bill') {
+      setTimeout(() => shakeKwangIcon(), 300);
+    }
+  }
+}
+
+// อัปเดตฟังก์ชัน loadNotifications เพื่อส่ง type ล่าสุด
+async function loadNotifications() {
+  try {
+    const res = await fetch(`${API_BASE}/api/notifications/all?limit=50`);
+    const data = await res.json();
+    
+    if (data.success) {
+      notifications = data.data || [];
+      
+      // หา notification ล่าสุดที่ยังไม่อ่าน
+      const latestUnread = notifications.find(n => !n.read);
+      const latestType = latestUnread ? latestUnread.type : null;
+      
+      updateBadgeWithShake(data.unreadCount || 0, latestType);
+      renderNotifications();
+    }
+    
+  } catch (err) {
+    console.error('Load notifications failed:', err);
+    notifications = [];
+    renderError();
+  }
+}
+
+// Service Worker message listener (อัปเดตเพื่อสั่น icon ตาม type)
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.addEventListener('message', (event) => {
+    const { title, body, type } = event.data;
+    
+    // แสดง browser notification
+    if (Notification.permission === 'granted') {
+      new Notification(title, {
+        body: body,
+        icon: '/icons/icon-192.png',
+        badge: '/icons/icon-72.png'
+      });
+    }
+    
+    // สั่น bell icon
+    shakeBellIcon();
+    
+    // สั่น icon ตาม type
+    if (type === 'daily_diff') {
+      setTimeout(() => shakeCalendarIcon(), 300);
+    } else if (type === 'daily_bill') {
+      setTimeout(() => shakeKwangIcon(), 300);
+    }
     
     // โหลด notifications ใหม่
     loadNotifications();
