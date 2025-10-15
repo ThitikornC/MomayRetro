@@ -791,15 +791,15 @@ if (kwangMonthEl)
 
   showDailyPopup();
 
-  // ================= Simple Notification System =================
+// ================= Notification System (Updated) =================
 const API_BASE = 'https://momaybackend02-production.up.railway.app';
 const bellIcon = document.getElementById('Bell_icon');
 const bellBadge = document.getElementById('bellBadge');
 const notificationPopup = document.getElementById('notificationPopup');
 const notificationItems = document.getElementById('notificationItems');
 
-// เก็บ notifications ใน memory
 let notifications = [];
+let currentFilter = 'all'; // 'all', 'peak', 'daily_diff', 'test'
 
 // เปิด/ปิด popup
 if (bellIcon && notificationPopup) {
@@ -808,7 +808,7 @@ if (bellIcon && notificationPopup) {
     notificationPopup.style.display = isHidden ? 'block' : 'none';
     
     if (isHidden) {
-      renderNotifications();
+      loadNotifications();
     }
   });
 }
@@ -822,23 +822,22 @@ document.addEventListener('click', (e) => {
   }
 });
 
-// โหลด notifications จาก server
+// โหลด notifications จาก API
 async function loadNotifications() {
   try {
-    const res = await fetch(`${API_BASE}/api/notifications?limit=50`);
+    const res = await fetch(`${API_BASE}/api/notifications/all?limit=50`);
     const data = await res.json();
     
-    // เรียงจากใหม่ไปเก่า
-    notifications = data.sort((a, b) => 
-      new Date(b.timestamp) - new Date(a.timestamp)
-    );
-    
-    updateBadge();
-    renderNotifications();
+    if (data.success) {
+      notifications = data.data || [];
+      updateBadge(data.unreadCount || 0);
+      renderNotifications();
+    }
     
   } catch (err) {
     console.error('Load notifications failed:', err);
     notifications = [];
+    renderError();
   }
 }
 
@@ -850,7 +849,7 @@ function renderNotifications() {
     notificationItems.innerHTML = `
       <div style="text-align:center; padding:30px; color:#999;">
         <p style="font-size:24px; margin-bottom:10px;">🔔</p>
-        <p>ไม่มีการแจ้งเตือน</p>
+        <p> Notificaction </p>
       </div>
     `;
     return;
@@ -858,39 +857,104 @@ function renderNotifications() {
   
   notificationItems.innerHTML = '';
   
-  notifications.forEach((notif, index) => {
+  // Header - แค่ชื่อ "การแจ้งเตือน"
+  const header = document.createElement('div');
+  header.style.cssText = `
+  padding: 15px;
+  border-bottom: 2px solid #f0f0f0;
+  background-image: url('./images/noise.png');
+  background-size: cover;       /* ปรับขนาดให้เต็มหน้าจอ */
+  background-position: center;  /* กึ่งกลางรูป */
+  background-repeat: no-repeat; /* ไม่ทำซ้ำรูป */
+    text-align: center;
+  `;
+  header.innerHTML = '<strong style="font-size:16px; color:#fff;">Notification</strong>';
+  
+  notificationItems.appendChild(header);
+  
+  // แสดง notifications
+  notifications.forEach(notif => {
     const div = document.createElement('div');
     div.className = 'notification-item';
     div.style.cssText = `
       padding: 15px;
+      margin-bottom: 1px;
       border-bottom: 1px solid #f0f0f0;
       background: ${notif.read ? '#fff' : '#f8f9ff'};
       transition: background 0.2s;
+      cursor: pointer;
+         border-radius: 5px; 
     `;
+
+
+// ใช้ getUTC...() แทน getHours() ตามเครื่อง
+const time = new Date(notif.timestamp); // ตัว API ส่ง UTC
+
+const day = String(time.getUTCDate()).padStart(2, '0');
+const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const month = monthNames[time.getUTCMonth()];
+const year = time.getUTCFullYear();
+const hours = String(time.getUTCHours()).padStart(2, '0');
+const minutes = String(time.getUTCMinutes()).padStart(2, '0');
+
+const timeStr = `${day} ${month} ${year} ${hours}:${minutes}`;
+console.log(timeStr); // "15 Oct 2025 07:04"
+
+
     
-    const time = new Date(notif.timestamp);
-    const timeStr = time.toLocaleString('th-TH', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    
+    // สร้าง content ตาม type
+    let detailsHTML = '';
+    
+    if (notif.type === 'peak' && notif.power) {
+      detailsHTML = `
+        <div style="background:#fff3cd; padding:8px; border-radius:5px; margin-top:5px;">
+          <strong style="color:#856404;">Peak Power: ${notif.power.toFixed(2)} kW</strong>
+        </div>
+      `;
+    } else if (notif.type === 'daily_diff' && notif.diff) {
+      const isIncrease = notif.diff.electricity_bill < 0;
+      const color = isIncrease ? '#d9534f' : '#5cb85c';
+      const arrow = isIncrease ? '↑' : '↓';
+      
+      detailsHTML = `
+        <div style="background:#f0f0f0; padding:8px; border-radius:5px; margin-top:5px; font-size:12px;">
+          <div style="margin-bottom:5px;">
+            <span style="color:#666;">Yesterday:</span> 
+            <strong>${notif.yesterday?.energy_kwh.toFixed(2) || '-'} Unit</strong>
+          </div>
+          <div style="margin-bottom:5px;">
+            <span style="color:#666;">Day Before:</span> 
+            <strong>${notif.dayBefore?.energy_kwh.toFixed(2) || '-'} Unit</strong>
+          </div>
+          <div style="color:${color}; font-weight:bold;">
+            ${arrow} ${Math.abs(notif.diff.electricity_bill).toFixed(2)} THB
+          </div>
+        </div>
+      `;
+    }
     
     div.innerHTML = `
       <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:5px;">
-        <strong style="color:#333; font-size:14px;">${notif.title}</strong>
-        <button class="delete-btn" data-index="${index}" 
-                style="background:none; border:none; color:#999; cursor:pointer; font-size:18px; padding:0; width:20px; height:20px;">
-          ×
-        </button>
+        <div style="display:flex; align-items:center; gap:5px;">
+        
+          <strong style="color:#333; font-size:14px;">${notif.title}</strong>
+        </div>
+        ${!notif.read ? '<span style="width:8px; height:8px; background:#667eea; border-radius:50%; display:block;"></span>' : ''}
       </div>
-      <p style="color:#666; font-size:13px; margin:5px 0;">${notif.message}</p>
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+      <p style="color:#666; font-size:13px; margin:5px 0 5px 23px;">${notif.body}</p>
+      ${detailsHTML}
+      <div style="margin-top:8px; margin-left:23px;">
         <small style="color:#999; font-size:11px;">${timeStr}</small>
-        ${!notif.read ? '<span style="color:#667eea; font-size:11px; font-weight:600;">● ใหม่</span>' : ''}
       </div>
     `;
+    
+    // Click เพื่อ mark as read
+    div.addEventListener('click', async () => {
+      if (!notif.read) {
+        await markAsRead(notif.type, notif._id);
+      }
+    });
     
     div.addEventListener('mouseenter', () => {
       div.style.background = '#f5f5f5';
@@ -903,60 +967,121 @@ function renderNotifications() {
     notificationItems.appendChild(div);
   });
   
-  // ปุ่มลบ
-  document.querySelectorAll('.delete-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const index = parseInt(btn.dataset.index);
-      deleteNotification(index);
+  // ไม่มี footer actions
+}
+
+// แสดง error
+function renderError() {
+  if (!notificationItems) return;
+  
+  notificationItems.innerHTML = `
+    <div style="text-align:center; padding:30px; color:#d9534f;">
+      <p style="font-size:24px; margin-bottom:10px;">⚠️</p>
+      <p>เกิดข้อผิดพลาดในการโหลดข้อมูล</p>
+      <button onclick="loadNotifications()" style="margin-top:10px; padding:8px 16px; background:#667eea; color:white; border:none; border-radius:5px; cursor:pointer;">
+        ลองใหม่
+      </button>
+    </div>
+  `;
+}
+
+// Mark as read (single)
+async function markAsRead(type, id) {
+  try {
+    const res = await fetch(`${API_BASE}/api/notifications/mark-read`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type, ids: [id] })
     });
-  });
-}
-
-// ลบ notification
-function deleteNotification(index) {
-  notifications.splice(index, 1);
-  updateBadge();
-  renderNotifications();
-}
-
-// อัปเดต badge
-function updateBadge() {
-  if (!bellBadge) return;
-  
-  const unreadCount = notifications.filter(n => !n.read).length;
-  bellBadge.textContent = unreadCount;
-  bellBadge.style.display = unreadCount > 0 ? 'block' : 'none';
-}
-
-// เพิ่ม notification ใหม่จาก server (real-time)
-function addNotification(title, message) {
-  const newNotif = {
-    title: title,
-    message: message,
-    timestamp: new Date().toISOString(),
-    read: false,
-    _id: Date.now().toString()
-  };
-  
-  notifications.unshift(newNotif); // เพิ่มที่ด้านบน
-  updateBadge();
-  
-  // แสดง browser notification
-  if (Notification.permission === 'granted') {
-    new Notification(title, {
-      body: message,
-      icon: '/icons/icon-192.png',
-      badge: '/icons/icon-72.png'
-    });
+    
+    if (res.ok) {
+      // อัปเดต local state
+      const notif = notifications.find(n => n._id === id);
+      if (notif) notif.read = true;
+      
+      // Re-render
+      await loadNotifications();
+    }
+  } catch (err) {
+    console.error('Mark as read failed:', err);
   }
 }
 
-// Service Worker message listener
+// Mark all as read
+async function markAllAsRead() {
+  try {
+    const res = await fetch(`${API_BASE}/api/notifications/mark-all-read`, {
+      method: 'PATCH'
+    });
+    
+    if (res.ok) {
+      await loadNotifications();
+    }
+  } catch (err) {
+    console.error('Mark all as read failed:', err);
+  }
+}
+
+// อัปเดต badge และสั่น bell icon
+function updateBadge(count) {
+  if (!bellBadge || !bellIcon) return;
+  
+  // ซ่อน badge เสมอ
+  bellBadge.style.display = 'none';
+  
+  // ถ้ามี notification ใหม่ ให้สั่น bell icon
+  if (count > 0) {
+    shakeBellIcon();
+  }
+}
+
+// ฟังก์ชันสั่น bell icon
+function shakeBellIcon() {
+  if (!bellIcon) return;
+  
+  // เพิ่ม CSS animation
+  bellIcon.style.animation = 'shake 0.5s';
+  bellIcon.style.animationIterationCount = '3';
+  
+  // ลบ animation หลังจากเสร็จ
+  setTimeout(() => {
+    bellIcon.style.animation = '';
+  }, 1500);
+}
+
+// เพิ่ม CSS keyframes สำหรับ shake animation
+if (!document.getElementById('bell-shake-style')) {
+  const style = document.createElement('style');
+  style.id = 'bell-shake-style';
+  style.textContent = `
+    @keyframes shake {
+      0%, 100% { transform: rotate(0deg); }
+      10%, 30%, 50%, 70%, 90% { transform: rotate(-10deg); }
+      20%, 40%, 60%, 80% { transform: rotate(10deg); }
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+// Service Worker message listener (สำหรับ real-time notification)
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.addEventListener('message', (event) => {
     const { title, body } = event.data;
-    addNotification(title, body);
+    
+    // แสดง browser notification
+    if (Notification.permission === 'granted') {
+      new Notification(title, {
+        body: body,
+        icon: '/icons/icon-192.png',
+        badge: '/icons/icon-72.png'
+      });
+    }
+    
+    // สั่น bell icon
+    shakeBellIcon();
+    
+    // โหลด notifications ใหม่
+    loadNotifications();
   });
 }
 
@@ -965,6 +1090,11 @@ loadNotifications();
 
 // Refresh ทุก 30 วินาที
 setInterval(loadNotifications, 30000);
+
+// ขอ permission สำหรับ notification
+if ('Notification' in window && Notification.permission === 'default') {
+  Notification.requestPermission();
+}
 
 // ขอ permission สำหรับ notification
 if ('Notification' in window && Notification.permission === 'default') {

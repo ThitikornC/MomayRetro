@@ -1400,27 +1400,41 @@ font-size: 14px;
 
 /* Popup notification */
 #notificationPopup {
-  display: none;
-  position: absolute;
-  top: 40px; /* ปรับตาม layout */
-  right: 0;
-  width: 300px;
-  max-height: 400px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* ✅ กึ่งกลางทั้งแนวนอนและแนวตั้ง */
+  width: 350px;
+  max-height: 500px;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  background-image: url('./images/BG.png');
+  background-size: cover;       /* ปรับขนาดให้เต็มหน้าจอ */
+  background-position: center;  /* กึ่งกลางรูป */
+  background-repeat: no-repeat; /* ไม่ทำซ้ำรูป */
   overflow-y: auto;
-  background: white;
-  border: 1px solid #ccc;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-  z-index: 999;
-  padding: 10px;
+  z-index: 1000;
+  display: none;
+ 
 }
-.notification-item {
-  border-bottom: 1px solid #eee;
-  padding: 5px;
+#notificationItems::-webkit-scrollbar {
+  display: none;
 }
-.notification-item.unread {
-  background-color: #f5f5f5;
+#notificationItems {
+  max-height: 450px;
+  overflow-y: auto;
+   scrollbar-width: none;
+     -webkit-overflow-scrolling: touch;
+
 }
 
+.notification-item {
+  transition: all 0.2s ease;
+}
+
+.notification-item:hover {
+  transform: translateX(-2px);
+}
 #reportWrapper {
     width: 794px;          /* ขนาด A4 กว้าง */
     min-height: 1123px;    /* ขนาด A4 สูง */
