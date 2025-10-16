@@ -1075,9 +1075,28 @@ if (!document.getElementById('bell-shake-style')) {
       10%, 30%, 50%, 70%, 90% { transform: rotate(-10deg); }
       20%, 40%, 60%, 80% { transform: rotate(10deg); }
     }
+    
+    @keyframes shake-loop {
+      0%, 100% { transform: rotate(0deg); }
+      10% { transform: rotate(-15deg); }
+      20% { transform: rotate(15deg); }
+      30% { transform: rotate(-15deg); }
+      40% { transform: rotate(15deg); }
+      50% { transform: rotate(0deg); }
+    }
   `;
   document.head.appendChild(style);
 }
+function startLoopShake() {
+  setInterval(() => {
+    shakeBellIcon();
+    setTimeout(() => shakeCalendarIcon(), 500);
+    setTimeout(() => shakeKwangIcon(), 1000);
+  }, 10000); // สั่นทุก 10 วินาที
+}
+
+// เริ่มสั่น loop
+startLoopShake();
 
 // Service Worker message listener (สำหรับ real-time notification)
 if ('serviceWorker' in navigator) {
@@ -1146,18 +1165,19 @@ function shakeKwangIcon() {
 function updateBadgeWithShake(count, latestType) {
   if (!bellBadge || !bellIcon) return;
   
-  // ซ่อน badge เสมอ
   bellBadge.style.display = 'none';
   
-  // ถ้ามี notification ใหม่ ให้สั่น icon ตาม type
   if (count > 0) {
-    shakeBellIcon(); // Bell icon สั่นเสมอ
+    shakeBellIcon();
     
-    // สั่น icon เฉพาะตาม type
     if (latestType === 'daily_diff') {
       setTimeout(() => shakeCalendarIcon(), 300);
     } else if (latestType === 'daily_bill') {
       setTimeout(() => shakeKwangIcon(), 300);
+    } else if (latestType === 'peak') {
+      // สั่นทั้ง 3 icon เมื่อเป็น peak notification
+      setTimeout(() => shakeCalendarIcon(), 300);
+      setTimeout(() => shakeKwangIcon(), 600);
     }
   }
 }
@@ -1191,7 +1211,6 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.addEventListener('message', (event) => {
     const { title, body, type } = event.data;
     
-    // แสดง browser notification
     if (Notification.permission === 'granted') {
       new Notification(title, {
         body: body,
@@ -1200,17 +1219,18 @@ if ('serviceWorker' in navigator) {
       });
     }
     
-    // สั่น bell icon
     shakeBellIcon();
     
-    // สั่น icon ตาม type
     if (type === 'daily_diff') {
       setTimeout(() => shakeCalendarIcon(), 300);
     } else if (type === 'daily_bill') {
       setTimeout(() => shakeKwangIcon(), 300);
+    } else if (type === 'peak') {
+      // สั่นทั้ง 3 icon เมื่อเป็น peak notification
+      setTimeout(() => shakeCalendarIcon(), 300);
+      setTimeout(() => shakeKwangIcon(), 600);
     }
     
-    // โหลด notifications ใหม่
     loadNotifications();
   });
 }
