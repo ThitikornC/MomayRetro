@@ -2023,6 +2023,16 @@ font-size: 14px;
   html {
     zoom: 1.8;                /* ✅ ใช้ zoom แทน transform */
   }
+  #maincon_info {
+  position: relative; /* หรือ relative ขึ้นกับว่าต้องการวางแบบไหน */
+  top: -290px;          /* ระยะจากด้านบน */
+  right: 68%;         /* ระยะจากด้านซ้าย */
+  z-index: 10;        /* วางเหนือ element อื่น */
+  display:none;
+  opacity: 0;              /* สำหรับ animation fade */
+  transition: opacity 0.4s ease; /* ความลื่นของ fade */
+}
+
 }
 @media screen and (max-width: 411px) {
   
@@ -2168,13 +2178,4 @@ font-size: 14px;
   background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
   background-size: 200% 100%;
   animation: loading 1.5s infinite;
-}
-#maincon_info {
-  position: relative; /* หรือ relative ขึ้นกับว่าต้องการวางแบบไหน */
-  top: -290px;          /* ระยะจากด้านบน */
-  right: 68%;         /* ระยะจากด้านซ้าย */
-  z-index: 10;        /* วางเหนือ element อื่น */
-  display:none;
-  opacity: 0;              /* สำหรับ animation fade */
-  transition: opacity 0.4s ease; /* ความลื่นของ fade */
 }
