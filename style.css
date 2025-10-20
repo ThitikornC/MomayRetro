@@ -246,7 +246,7 @@ body {
 #Date_icon {
   
     position: relative; 
-  width: 168px;
+  width: 175px;
   height: 20px;
   background-color: #fffefe;
   top: 0px;
@@ -868,7 +868,7 @@ font-size: 14px;
   font-weight: bold;
   margin-top: -5px;
   position: relative;      /* ⬅️ เพิ่มบรรทัดนี้ */
-  left: 10px;            /* ⬅️ เพิ่มบรรทัดนี้ (ปรับค่าตามต้องการ) */
+  left: -10px;            /* ⬅️ เพิ่มบรรทัดนี้ (ปรับค่าตามต้องการ) */
 }
 
 #weather-city {
