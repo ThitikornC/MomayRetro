@@ -2169,3 +2169,12 @@ font-size: 14px;
   background-size: 200% 100%;
   animation: loading 1.5s infinite;
 }
+#maincon_info {
+  position: relative; /* หรือ relative ขึ้นกับว่าต้องการวางแบบไหน */
+  top: -290px;          /* ระยะจากด้านบน */
+  right: 68%;         /* ระยะจากด้านซ้าย */
+  z-index: 10;        /* วางเหนือ element อื่น */
+  display:none;
+  opacity: 0;              /* สำหรับ animation fade */
+  transition: opacity 0.4s ease; /* ความลื่นของ fade */
+}
