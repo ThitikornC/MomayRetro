@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', async function() {
       const dd = String(today.getDate()).padStart(2, '0');
       const localDate = `${yyyy}-${mm}-${dd}`;
 
-      const res = await fetch('https://api-kx4r63rdjq-an.a.run.app/daily-energy/px_dh?date=' + localDate);
+      const res = await fetch('https://api-kx4r63rdjq-an.a.run.app/daily-energy/px_pm3250?date=' + localDate);
       const json = await res.json();
       const data = json.data;
       const latest = data.length ? data[data.length - 1].power : 0;
@@ -150,7 +150,7 @@ document.addEventListener('DOMContentLoaded', async function() {
       }
 
       const today = new Date().toISOString().split('T')[0];
-      const url = `https://momaybackend02-production.up.railway.app/daily-bill?date=${today}`;
+      const url = `https://momaybackendhospital-production.up.railway.app/daily-bill?date=${today}`;
       const res = await fetch(url);
       const json = await res.json();
 
@@ -191,7 +191,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   async function fetchDailyData(date){
     const dateStr = date.toISOString().split('T')[0];
     try{
-      const res = await fetch(`https://api-kx4r63rdjq-an.a.run.app/daily-energy/px_dh?date=${dateStr}`);
+      const res = await fetch(`https://api-kx4r63rdjq-an.a.run.app/daily-energy/px_pm3250?date=${dateStr}`);
       const json = await res.json();
       return json.data;
     }catch(err){console.error(err); return [];}
@@ -454,7 +454,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
         try {
           const pricePerUnit = 4.4;
-          const url = `https://momaybackend02-production.up.railway.app/daily-bill?date=${info.dateStr}`;
+          const url = `https://momaybackendhospital-production.up.railway.app/daily-bill?date=${info.dateStr}`;
           const res = await fetch(url);
           const json = await res.json();
           const bill = json.electricity_bill ?? 0;
@@ -472,7 +472,7 @@ document.addEventListener('DOMContentLoaded', async function() {
       },
       events: async function(fetchInfo, successCallback, failureCallback) {
         try {
-          const res = await fetch(`https://momaybackend02-production.up.railway.app/calendar`);
+          const res = await fetch(`https://momaybackendhospital-production.up.railway.app/calendar`);
           const data = await res.json();
           const start = new Date(fetchInfo.startStr);
           const end = new Date(fetchInfo.endStr);
@@ -653,7 +653,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
   async function fetchKwangData(date) {
     try {
-      const res = await fetch(`https://momaybackend02-production.up.railway.app/solar-size?date=${date}`);
+      const res = await fetch(`https://momaybackendhospital-production.up.railway.app/solar-size?date=${date}`);
       const json = await res.json();
 
       if (kwangPowerEl) kwangPowerEl.textContent = (json.dayEnergy ?? 0).toFixed(2) + " Unit";
@@ -693,7 +693,7 @@ if (kwangMonthEl)
 
   async function fetchDailyDiff() {
     try {
-      const res = await fetch('https://momaybackend02-production.up.railway.app/daily-diff');
+      const res = await fetch('https://momaybackendhospital-production.up.railway.app/daily-diff');
       const json = await res.json();
       return json;
     } catch (err) {
@@ -792,7 +792,7 @@ if (kwangMonthEl)
   showDailyPopup();
 
 // ================= Notification System (Updated) =================
-const API_BASE = 'https://momaybackend02-production.up.railway.app';
+const API_BASE = 'https://momaybackendhospital-production.up.railway.app';
 const bellIcon = document.getElementById('Bell_icon');
 const bellBadge = document.getElementById('bellBadge');
 const notificationPopup = document.getElementById('notificationPopup');
@@ -1267,11 +1267,11 @@ if ('Notification' in window && Notification.permission === 'default') {
         const year = yearStr;
         const apiDate = `${year}-${month}-${day}`;
 
-        const res = await fetch(`https://momaybackend02-production.up.railway.app/solar-size?date=${apiDate}`);
+        const res = await fetch(`https://momaybackendhospital-production.up.railway.app/solar-size?date=${apiDate}`);
         if (!res.ok) throw new Error("Network response was not ok");
         const json = await res.json();
 
-        const energyRes = await fetch(`https://api-kx4r63rdjq-an.a.run.app/daily-energy/px_dh?date=${apiDate}`);
+        const energyRes = await fetch(`https://api-kx4r63rdjq-an.a.run.app/daily-energy/px_pm3250?date=${apiDate}`);
         const energyJson = await energyRes.json();
         const energyData = energyJson.data || [];
 
