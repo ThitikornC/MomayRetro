@@ -2031,8 +2031,48 @@ font-size: 14px;
   display:none;
   opacity: 0;              /* สำหรับ animation fade */
   transition: opacity 0.4s ease; /* ความลื่นของ fade */
+  
 }
 
+.ClientName {
+  font-size: 22px;
+  font-weight: bold;
+  white-space: nowrap; 
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.6); 
+  margin-left: 0;       /* เลื่อนไปซ้าย */
+  margin-right: auto;   /* กึ่งกลางหรือขยับขวาได้ */
+  position: relative;   /* หรือ absolute ถ้าต้องการวางทับ */
+  top: 0;               /* ลบ top ที่ไม่จำเป็น */
+}
+.Date_install{
+  font-size: 18px;
+  font-weight: bold;
+  top: 23%;            /* ปรับตำแหน่งแนวตั้ง */
+  right: 80% ;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.6); 
+}
+.ClientNo {
+  font-size: 18px;
+  font-weight: bold;
+  top: 23%;            /* ปรับตำแหน่งแนวตั้ง */
+  right: 50% ;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.6); 
+}
+#DailyBill {
+       /* ลอยอิสระไม่ขึ้นกับกล่องแม่ */
+  top: 50%;                  /* กึ่งกลางแนวตั้ง */
+  left: 30%;                 /* กึ่งกลางแนวนอน */  text-align: center;
+  font-size: 30px;
+  font-weight: bold;
+    text-shadow: 1px 2px 4px rgba(0,0,0,0.6); /* เพิ่มเงา */
+}
+.unit {
+  font-size: 25px;
+  font-weight: bold;
+  top: 50%;                  /* กึ่งกลางแนวตั้ง */
+  left: 50%; 
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.6); /* เพิ่มเงา */
+}
 }
 @media screen and (max-width: 411px) {
   
