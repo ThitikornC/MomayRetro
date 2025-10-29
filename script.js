@@ -416,98 +416,136 @@ document.addEventListener('DOMContentLoaded', async function() {
   // โหลด Chart ทันที
   initializeChart();
 
-  // ================= FullCalendar (Load ทันที - ไม่มี Lazy Load) =================
-  let calendarInitialized = false;
-  let calendar = null;
+ // ================= FullCalendar (Load All at Start) ================
+let calendarInitialized = false;
+let calendar = null;
+let allEvents = []; // เก็บข้อมูลทั้งหมด
+let latestDate = null; // เก็บวันล่าสุดสำหรับ update
 
-  function isToday(dateStr) {
-    const now = new Date();
-    const yyyy = now.getFullYear();
-    const mm = String(now.getMonth() + 1).padStart(2, '0');
-    const dd = String(now.getDate()).padStart(2, '0');
-    const today = `${yyyy}-${mm}-${dd}`;
-    return dateStr === today;
+async function loadAllEvents() {
+  try {
+    const res = await fetch('https://momaybackendhospital-production.up.railway.app/calendar');
+    allEvents = await res.json();
+    if (allEvents.length) {
+      // วันล่าสุด
+      latestDate = allEvents[allEvents.length - 1].start;
+    }
+  } catch (err) {
+    console.error('Error loading all events:', err);
   }
+}
 
-  async function initializeCalendar() {
-    if (calendarInitialized) return;
-    
-    const calendarEl = document.getElementById('calendar');
-    if (!calendarEl) return;
+// ฟิลเตอร์ events ตามเดือน
+function getEventsForMonth(start, end) {
+  return allEvents.filter(e => {
+    const d = new Date(e.start);
+    return d >= start && d < end;
+  }).map(e => ({
+    ...e,
+    textColor: 'black',
+    backgroundColor: 'transparent',
+    borderColor: 'transparent'
+  }));
+}
 
-    calendar = new FullCalendar.Calendar(calendarEl, {
-      initialView: 'dayGridMonth',
-      locale: 'en',
-      headerToolbar: { left: 'prev', center: 'title', right: 'next' },
-      height: 600,
-      dateClick: async function(info) {
-        const datePopup = document.getElementById('DatePopup');
-        const popupDateEl = datePopup?.querySelector('.popup-date');
-        const popupBillEl = document.getElementById('popup-bill');
-        const popupUnitEl = document.getElementById('popup-unit');
+async function initializeCalendar() {
+  if (calendarInitialized) return;
 
-        if (datePopup) {
-          datePopup.style.display = 'flex';
-          datePopup.classList.add('active');
-        }
-        if (popupDateEl) popupDateEl.textContent = info.dateStr;
+  await loadAllEvents(); // โหลดข้อมูลทั้งหมดตอนเริ่มเว็บ
 
-        try {
-          const pricePerUnit = 4.4;
-          const url = `https://momaybackendhospital-production.up.railway.app/daily-bill?date=${info.dateStr}`;
-          const res = await fetch(url);
-          const json = await res.json();
-          const bill = json.electricity_bill ?? 0;
-          const units = bill / pricePerUnit;
+  const calendarEl = document.getElementById('calendar');
+  if (!calendarEl) return;
 
-          // แสดงผลแบบคงที่: THB ก่อน แล้วค่อย Unit
-          if (popupBillEl) popupBillEl.textContent = `${bill.toFixed(2)} THB`;
-          if (popupUnitEl) popupUnitEl.textContent = `${units.toFixed(2)} Unit`;
+  calendar = new FullCalendar.Calendar(calendarEl, {
+    initialView: 'dayGridMonth',
+    locale: 'en',
+    headerToolbar: { left: 'prev', center: 'title', right: 'next' },
+    height: 600,
 
-        } catch (err) {
-          console.error('Error fetching daily bill:', err);
-          if (popupBillEl) popupBillEl.textContent = 'Error';
-          if (popupUnitEl) popupUnitEl.textContent = '';
-        }
-      },
-      events: async function(fetchInfo, successCallback, failureCallback) {
-        try {
-          const res = await fetch(`https://momaybackendhospital-production.up.railway.app/calendar`);
-          const data = await res.json();
-          const start = new Date(fetchInfo.startStr);
-          const end = new Date(fetchInfo.endStr);
-          const filtered = data.filter(item => {
-            const d = new Date(item.start);
-            return d >= start && d < end;
-          });
-          const styled = filtered.map(event => ({ ...event, textColor: 'black', backgroundColor: 'transparent', borderColor: 'transparent' }));
-          successCallback(styled);
-        } catch (err) { console.error("Error fetching calendar:", err); failureCallback(err); }
+    // โหลด events จาก cache
+    events: function(fetchInfo, successCallback) {
+      successCallback(getEventsForMonth(new Date(fetchInfo.startStr), new Date(fetchInfo.endStr)));
+    },
+
+    // คลิกวันที่
+    dateClick: async function(info) {
+      const datePopup = document.getElementById('DatePopup');
+      const popupDateEl = datePopup?.querySelector('.popup-date');
+      const popupBillEl = document.getElementById('popup-bill');
+      const popupUnitEl = document.getElementById('popup-unit');
+
+      if (datePopup) {
+        datePopup.style.display = 'flex';
+        datePopup.classList.add('active');
       }
-    });
-    
-    calendar.render();
-    calendarInitialized = true;
-  }
+      if (popupDateEl) popupDateEl.textContent = info.dateStr;
 
-  // โหลด Calendar ทันที
-  initializeCalendar();
+      try {
+        const pricePerUnit = 4.4;
+        const url = `https://momaybackendhospital-production.up.railway.app/daily-bill?date=${info.dateStr}`;
+        const res = await fetch(url);
+        const json = await res.json();
+        const bill = json.electricity_bill ?? 0;
+        const units = bill / pricePerUnit;
 
-  // Calendar Popup
-  const calendarIcon = document.querySelector("#Calendar_icon img");
-  const popup = document.getElementById("calendarPopup");
-  if (calendarIcon && popup) {
-    calendarIcon.addEventListener("click", function() { 
-      popup.classList.add("active");
-      // Calendar โหลดแล้ว แค่ resize
-      if (calendar) {
-        calendar.updateSize();
+        if (popupBillEl) popupBillEl.textContent = `${bill.toFixed(2)} THB`;
+        if (popupUnitEl) popupUnitEl.textContent = `${units.toFixed(2)} Unit`;
+      } catch (err) {
+        console.error('Error fetching daily bill:', err);
+        if (popupBillEl) popupBillEl.textContent = 'Error';
+        if (popupUnitEl) popupUnitEl.textContent = '';
       }
-    });
-    popup.addEventListener("click", function(e) { 
-      if (e.target === popup) popup.classList.remove("active"); 
-    });
-  }
+    },
+
+    // update วันล่าสุดเมื่อมีการเปลี่ยนแปลง
+    datesSet: function() {
+      const today = new Date().toISOString().slice(0,10);
+      fetch(`https://momaybackendhospital-production.up.railway.app/calendar`)
+        .then(res => res.json())
+        .then(data => {
+          const latestToday = data.filter(e => e.start === today);
+          if (latestToday.length) {
+            // ลบข้อมูลเก่าของวันนี้
+// ลบ event เก่าของวันนี้ทั้งหมด
+allEvents = allEvents.filter(e => !e.start.startsWith(today)).concat(latestToday);
+
+            // update calendar เฉพาะวันนี้
+            if (calendar) {
+              calendar.getEvents().forEach(ev => {
+                if (ev.startStr === today) ev.remove();
+              });
+              latestToday.forEach(ev => calendar.addEvent({
+                ...ev,
+                textColor: 'black',
+                backgroundColor: 'transparent',
+                borderColor: 'transparent'
+              }));
+            }
+          }
+        }).catch(err => console.error(err));
+    }
+  });
+
+  calendar.render();
+  calendarInitialized = true;
+}
+
+// โหลด Calendar ทันที
+initializeCalendar();
+
+// Calendar Popup
+const calendarIcon = document.querySelector("#Calendar_icon img");
+const popup = document.getElementById("calendarPopup");
+if (calendarIcon && popup) {
+  calendarIcon.addEventListener("click", function() { 
+    popup.classList.add("active");
+    if (calendar) calendar.updateSize();
+  });
+  popup.addEventListener("click", function(e) { 
+    if (e.target === popup) popup.classList.remove("active"); 
+  });
+}
+
 
   // ================= Weather Sukhothai (Optimized) =================
   async function fetchCurrentWeatherSukhothai() {

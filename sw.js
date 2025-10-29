@@ -1,5 +1,5 @@
 // ================= Cache / Offline =================
-const CACHE_NAME = 'momay-cache-vB1.9';
+const CACHE_NAME = 'momay-cache-vB1.10';
 const PRECACHE_URLS = [
   '/',
   '/index.html',
