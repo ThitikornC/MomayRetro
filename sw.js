@@ -1,10 +1,10 @@
 // ================= Cache / Offline =================
-const CACHE_NAME = 'momay-cache-vB1.11';
+const CACHE_NAME = 'momay-cache-vB1.12';
 const PRECACHE_URLS = [
   '/',
   '/index.html',
-  '/style.css?v=1.11',
-  '/script.js?v=1.11',
+  '/style.css?v=1.12',
+  '/script.js?v=1.12',
   '/manifest.json',
   '/icons/icon-192.png',
   '/icons/icon-512.png'

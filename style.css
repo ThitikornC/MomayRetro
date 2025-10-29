@@ -2062,16 +2062,263 @@ font-size: 14px;
        /* ลอยอิสระไม่ขึ้นกับกล่องแม่ */
   top: 50%;                  /* กึ่งกลางแนวตั้ง */
   left: 30%;                 /* กึ่งกลางแนวนอน */  text-align: center;
-  font-size: 30px;
+  font-size: 18px;
   font-weight: bold;
     text-shadow: 1px 2px 4px rgba(0,0,0,0.6); /* เพิ่มเงา */
 }
 .unit {
-  font-size: 25px;
+  font-size: 16px;
   font-weight: bold;
   top: 50%;                  /* กึ่งกลางแนวตั้ง */
   left: 50%; 
     text-shadow: 2px 2px 4px rgba(0,0,0,0.6); /* เพิ่มเงา */
+}
+
+#weather-city {
+  font-size: 12px;
+  color: #000000;
+    margin-top: 0px;
+    display:none;
+}
+
+#weather-icon {
+  font-size: 16px;
+  margin-top: 1px;
+  padding: 0;
+}
+
+#weather-temp {
+  font-size: 9px;
+  color: #000;
+    margin-top: 0px;
+}
+#Date {
+  /* ป้องกันการขึ้นบรรทัดใหม่ */
+font-size: 14px !important;
+  font-size: 10px;
+  color: #000000;
+    margin: 0px;
+    
+}
+
+.Bar_name {
+  margin: 0;       
+  padding: 0;      
+  width: 60px;
+  font-size: 18px;     
+  color: #000000; 
+}
+
+.Meter h1 {
+font-size: 18px;
+margin: 0;
+text-shadow: 1px 2px 4px rgba(0,0,0,0.6);
+color: #000000;
+}
+
+.popupValue2 {
+  font-size: 20px;
+  font-weight: bold;
+  color: #2c1810;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  padding: 8px 14px;
+  box-shadow: inset 0 0 5px rgba(0,0,0,0.15);
+}
+.popupValue1 {
+  font-size: 20px;
+}
+#kwangPower{
+    font-size: 20px;
+}
+#kwangCapacity{
+    font-size: 20px;
+}
+
+#dayBeforeDate{
+    font-size: 20px;
+  
+}
+#yesterdayDate{
+    font-size: 20px;
+    
+}
+.daily-dates-arc {
+  display: flex;           /* จัดเรียงเป็นบรรทัดเดียว */
+  justify-content: center; /* จัดตรงกลางแนวนอน */
+  align-items: center;     /* จัดกลางแนวตั้ง */
+  gap: 110px;               /* ระยะห่างระหว่างสองวันที่ */
+  margin-top: 10px;        /* ขยับลงจากด้านบน */
+  margin-bottom: 10px; 
+}
+
+#dailyDiffValue {
+  font-size: 22px;
+  font-weight: bold;
+  color: #2c1810;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  padding: 8px 14px;
+  box-shadow: inset 0 0 5px rgba(0,0,0,0.15);
+  margin-top: 15px; /* เพิ่มระยะห่างจากวงกลม */
+}
+#dailyDayBefore, #dailyYesterday {
+  color: #fff7da;
+  font-weight: bold;
+  text-align: center;
+  font-size: 12px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+  #calendar {
+  width: 1000px;       /* ล็อกความกว้าง */
+  height: 800px;       /* ล็อกความสูง */
+  margin: 20px auto;
+  background-size: cover;        /* ขยายเต็มพื้นที่ */
+  background-position: center;   /* จัดกึ่งกลาง */
+  background-repeat: no-repeat;  /* ไม่ทำซ้ำ */
+  background-image: url("./images/BG.png");
+  border-radius: 16px;
+  padding: -0px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  overflow: hidden;    /* ป้องกัน scroll เกิน */
+}
+
+/* ===== ส่วน header (ปุ่ม + title) ===== */
+.fc .fc-toolbar-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #000000;
+  width: 250px;
+  height: 25px;
+  border-radius: 6px;
+  background-image: url("./images/noise.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  display: flex;               /* เพิ่ม flex */
+  justify-content: center;     /* กึ่งกลางแนวนอน */
+  align-items: center; 
+  margin: 5px;
+}
+
+.fc .fc-toolbar-prev {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #090909;
+}
+
+.fc .fc-button {
+  background: #2563eb;  
+  border: none;
+  color: #fff;
+  font-weight: bold;
+  padding: 6px 12px;
+  border-radius: 8px;
+  transition: 0.2s;
+}
+
+
+.fc .fc-button:hover {
+  background: #1d4ed8;
+}
+
+/* ปุ่ม Today */
+.fc .fc-button-primary {
+  background: #c3b279;
+  color: #000;
+}
+
+.fc .fc-button-primary:hover {
+  background: #963305;
+}
+
+/* ===== ตารางวัน ===== */
+.fc-theme-standard td, 
+.fc-theme-standard th {
+  border: 1px solid #e5e7eb;
+}
+.fc-event {
+  background-color: transparent !important;
+  border-color: transparent !important;
+  color: black !important;
+  display: flex !important;
+  justify-content: center !important; /* กึ่งกลางแนวนอน */
+  align-items: flex-start !important; /* ชิดบน */
+  padding: 0 !important;
+}
+.fc-event .fc-event-title {
+  font-size: 14px;       /* ขนาดตัวอักษร */
+  line-height: 1.2;
+  margin-top: 2px;       /* ปรับให้ขยับลงเล็กน้อยจากบน */
+  text-align: center;    /* กึ่งกลางแนวนอน */
+}
+
+/* ===== วันปัจจุบัน ===== */
+.fc .fc-day-today {
+  background: #fef3c7 !important;
+}
+
+/* ===== กิจกรรม (events) ===== */
+.fc-event {
+  border-radius: 8px;
+  padding: 2px 0px;
+  font-size: 2rem;
+  font-weight: bold;
+  border: none;
+}
+
+.fc-event:hover {
+  filter: brightness(0.9);
+  cursor: pointer;
+  transform: scale(1.02);
+  transition: 0.2s;
+}
+
+/* ===== ช่องวัน ===== */
+.fc-daygrid-day {
+  min-height: 120px;   /* ความสูงขั้นต่ำ */
+  max-height: 120px;   /* ล็อกความสูง */
+  width: 10px;        /* ความกว้างของแต่ละวัน */
+  padding: 4px;        /* ระยะห่างภายในช่อง */
+  box-sizing: border-box;
+  background-image: url("./images/noise.png");
+  background-size: cover;        /* ขยายเต็มพื้นที่ */
+  background-position: center;   /* จัดกึ่งกลาง */
+  background-repeat: no-repeat;  /* ไม่ทำซ้ำ */
+}
+
+/* ปรับพื้นที่ภายในวัน (frame) */
+.fc-daygrid-day-frame {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ปรับเลขวัน ให้อยู่บนสุด */
+.fc-daygrid-day-number {
+  font-size: 1rem;
+  font-weight: bold;
+  margin-bottom: 4px;
+  margin-right: 62px;
+  color: #090a0a;
+}
+
+/* เพิ่มช่องว่างสำหรับ event */
+.fc-daygrid-event-harness {
+  margin-top: auto; /* ทำให้ event อยู่ด้านล่างเลขวัน */
+}
+.fc .fc-col-header-cell-cushion {
+  font-size: 1rem;           /* ขนาดตัวอักษร */
+  font-weight: bold;          /* ความหนา */
+  color: #fafbfc;             /* สีตัวอักษร */
+  font-family: 'Cinzel', serif; /* ฟอนต์ */
+  text-transform: uppercase;  /* แปลงเป็นตัวพิมพ์ใหญ่ */
+  background-size: cover;        /* ขยายเต็มพื้นที่ */
+  background-position: center;   /* จัดกึ่งกลาง */
+  background-repeat: no-repeat;  /* ไม่ทำซ้ำ */
+  background-image: url("./images/noise.png");
 }
 }
 @media screen and (max-width: 411px) {
