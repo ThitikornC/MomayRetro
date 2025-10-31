@@ -14,9 +14,9 @@ document.addEventListener('DOMContentLoaded', async function() {
   // ================= Constants =================
   const V = 400;
   const root3 = Math.sqrt(3);
-  const floor1_maxA = 250;
+  const floor1_maxA = 400;
   const floor1_maxKW = root3 * V * floor1_maxA / 1000;
-  const total_maxA = 250;
+  const total_maxA = 400;
   const total_maxKW = root3 * V * total_maxA / 1000;
 
   // ================= Cache Management =================
