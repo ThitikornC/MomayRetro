@@ -416,133 +416,114 @@ document.addEventListener('DOMContentLoaded', async function() {
   // โหลด Chart ทันที
   initializeChart();
 
- // ================= FullCalendar (Load All at Start) ================
-let calendarInitialized = false;
+// ================= FullCalendar (Cache Monthly API) ================
 let calendar = null;
-let allEvents = []; // เก็บข้อมูลทั้งหมด
-let latestDate = null; // เก็บวันล่าสุดสำหรับ update
+let eventCache = {}; // key: "YYYY-MM" => events array
 
-async function loadAllEvents() {
+async function fetchEvents(year, month) {
+  const key = `${year}-${String(month).padStart(2, "0")}`;
+
+  if (eventCache[key]) return eventCache[key]; // ใช้แคช
+
   try {
-    const res = await fetch('https://momaybackendhospital-production.up.railway.app/calendar');
-    allEvents = await res.json();
-    if (allEvents.length) {
-      // วันล่าสุด
-      latestDate = allEvents[allEvents.length - 1].start;
-    }
+    const url = `https://momaybackendhospital-production.up.railway.app/calendar?year=${year}&month=${month}`;
+    const res = await fetch(url);
+    const data = await res.json();
+
+    eventCache[key] = data.map(e => ({
+      ...e,
+      textColor: 'black',
+      backgroundColor: 'transparent',
+      borderColor: 'transparent'
+    }));
+
+    return eventCache[key];
   } catch (err) {
-    console.error('Error loading all events:', err);
+    console.error("Error loading events:", err);
+    eventCache[key] = [];
+    return [];
   }
 }
 
-// ฟิลเตอร์ events ตามเดือน
-function getEventsForMonth(start, end) {
-  return allEvents.filter(e => {
-    const d = new Date(e.start);
-    return d >= start && d < end;
-  }).map(e => ({
-    ...e,
-    textColor: 'black',
-    backgroundColor: 'transparent',
-    borderColor: 'transparent'
-  }));
+async function preloadInitialMonths() {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1;
+
+  // เดือนปัจจุบัน
+  await fetchEvents(currentYear, currentMonth);
+
+  // เดือนก่อนหน้า
+  let prevYear = currentYear;
+  let prevMonth = currentMonth - 1;
+  if (prevMonth === 0) { prevMonth = 12; prevYear--; }
+
+  await fetchEvents(prevYear, prevMonth);
 }
 
 async function initializeCalendar() {
-  if (calendarInitialized) return;
-
-  await loadAllEvents(); // โหลดข้อมูลทั้งหมดตอนเริ่มเว็บ
-
-  const calendarEl = document.getElementById('calendar');
+  const calendarEl = document.getElementById("calendar");
   if (!calendarEl) return;
 
-  calendar = new FullCalendar.Calendar(calendarEl, {
-    initialView: 'dayGridMonth',
-    locale: 'en',
-    headerToolbar: { left: 'prev', center: 'title', right: 'next' },
-    height: 600,
+  await preloadInitialMonths(); // ✅ โหลดล่วงหน้าก่อน render
 
-    // โหลด events จาก cache
-    events: function(fetchInfo, successCallback) {
-      successCallback(getEventsForMonth(new Date(fetchInfo.startStr), new Date(fetchInfo.endStr)));
+  calendar = new FullCalendar.Calendar(calendarEl, {
+    initialView: "dayGridMonth",
+    locale: "en",
+    height: 600,
+    headerToolbar: { left: "prev", center: "title", right: "next" },
+
+    events: async function(fetchInfo, successCallback) {
+      const year = fetchInfo.start.getFullYear();
+      const month = fetchInfo.start.getMonth() + 1;
+
+      const events = await fetchEvents(year, month);
+      successCallback(events);
     },
 
-    // คลิกวันที่
     dateClick: async function(info) {
-      const datePopup = document.getElementById('DatePopup');
-      const popupDateEl = datePopup?.querySelector('.popup-date');
-      const popupBillEl = document.getElementById('popup-bill');
-      const popupUnitEl = document.getElementById('popup-unit');
+      const pricePerUnit = 4.4;
+      const datePopup = document.getElementById("DatePopup");
+      const popupDateEl = datePopup?.querySelector(".popup-date");
+      const popupBillEl = document.getElementById("popup-bill");
+      const popupUnitEl = document.getElementById("popup-unit");
 
-      if (datePopup) {
-        datePopup.style.display = 'flex';
-        datePopup.classList.add('active');
-      }
-      if (popupDateEl) popupDateEl.textContent = info.dateStr;
+      datePopup.style.display = "flex";
+      datePopup.classList.add("active");
+      popupDateEl.textContent = info.dateStr;
 
       try {
-        const pricePerUnit = 4.4;
-        const url = `https://momaybackendhospital-production.up.railway.app/daily-bill?date=${info.dateStr}`;
-        const res = await fetch(url);
+        const res = await fetch(`https://momaybackendhospital-production.up.railway.app/daily-bill?date=${info.dateStr}`);
         const json = await res.json();
         const bill = json.electricity_bill ?? 0;
-        const units = bill / pricePerUnit;
+        const unit = bill / pricePerUnit;
 
-        if (popupBillEl) popupBillEl.textContent = `${bill.toFixed(2)} THB`;
-        if (popupUnitEl) popupUnitEl.textContent = `${units.toFixed(2)} Unit`;
+        popupBillEl.textContent = `${bill.toFixed(2)} THB`;
+        popupUnitEl.textContent = `${unit.toFixed(2)} Unit`;
       } catch (err) {
-        console.error('Error fetching daily bill:', err);
-        if (popupBillEl) popupBillEl.textContent = 'Error';
-        if (popupUnitEl) popupUnitEl.textContent = '';
+        popupBillEl.textContent = "Error";
+        popupUnitEl.textContent = "";
       }
-    },
-
-    // update วันล่าสุดเมื่อมีการเปลี่ยนแปลง
-    datesSet: function() {
-      const today = new Date().toISOString().slice(0,10);
-      fetch(`https://momaybackendhospital-production.up.railway.app/calendar`)
-        .then(res => res.json())
-        .then(data => {
-          const latestToday = data.filter(e => e.start === today);
-          if (latestToday.length) {
-            // ลบข้อมูลเก่าของวันนี้
-// ลบ event เก่าของวันนี้ทั้งหมด
-allEvents = allEvents.filter(e => !e.start.startsWith(today)).concat(latestToday);
-
-            // update calendar เฉพาะวันนี้
-            if (calendar) {
-              calendar.getEvents().forEach(ev => {
-                if (ev.startStr === today) ev.remove();
-              });
-              latestToday.forEach(ev => calendar.addEvent({
-                ...ev,
-                textColor: 'black',
-                backgroundColor: 'transparent',
-                borderColor: 'transparent'
-              }));
-            }
-          }
-        }).catch(err => console.error(err));
     }
   });
 
   calendar.render();
-  calendarInitialized = true;
 }
 
-// โหลด Calendar ทันที
 initializeCalendar();
+
 
 // Calendar Popup
 const calendarIcon = document.querySelector("#Calendar_icon img");
 const popup = document.getElementById("calendarPopup");
+
 if (calendarIcon && popup) {
-  calendarIcon.addEventListener("click", function() { 
+  calendarIcon.addEventListener("click", () => {
     popup.classList.add("active");
-    if (calendar) calendar.updateSize();
+    calendar?.updateSize();
   });
-  popup.addEventListener("click", function(e) { 
-    if (e.target === popup) popup.classList.remove("active"); 
+  popup.addEventListener("click", e => {
+    if (e.target === popup) popup.classList.remove("active");
   });
 }
 
