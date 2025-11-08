@@ -857,11 +857,13 @@ font-size: 14px;
   cursor: pointer;
   user-select: none;
   color: #fff;
+  z-index: 100;
 }
 
 /* ตัว "<" และ ">" แยกออกมาให้ขยับเล็กน้อย */
 #PickDate span {
   margin: 0 8px;
+   z-index: 100;
 }
 
 .popup-stats > div {
@@ -2566,6 +2568,9 @@ color: #000000;
     padding-right: -1px;
   }
 
+#Date_icon {
+  width: 80%;   /* แทน 357px ให้เต็มประมาณ 80% ของ container */
+}
 
   .Top_Container,
 .Main_Container {
