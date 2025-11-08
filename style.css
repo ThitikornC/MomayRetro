@@ -44,12 +44,7 @@ body::after {
   background: radial-gradient(circle at 30% 40%, #ebd09e, #251f03);
 }
 
-/* Animation ให้ background ลอยขึ้นลง */
-@keyframes floatBg {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(30px); }
-  100% { transform: translateY(0px); }
-}
+
 
 
 /* ================= Top Container ================= */
