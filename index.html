@@ -17,20 +17,24 @@
   <!-- iOS Safari full screen fix -->
   <meta name="apple-mobile-web-app-title" content="Momay">
   <!-- ใส่ CSS versioned แทนตัวเดิม -->
-  <link rel="stylesheet" href="style.css?v=1.15">
+  <link rel="stylesheet" href="style.css?v=2">
 </head>
 
 <body>
   
 <!---->
 <div id="Date_icon">
-   <!-- <h1 class="Todayinfo">To Day</h1>-->
- <div id="weather">
-  <span id="weather-city"></span>
-  <span id="Date"></span>|
-  <span id="weather-temp"></span>|
-  <span id="weather-icon"></span>
+  <div class="marquee">
+    <div id="weather">
+      <span id="weather-city"></span>
+      <span id="Date"></span> |
+      <span id="weather-temp"></span> |
+      <span id="weather-icon"></span>
+    </div>
+  </div>
 </div>
+
+
    
 </div>
 
@@ -291,7 +295,7 @@ if ('serviceWorker' in navigator) {
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
-<script src="script.js?v=1.15" defer></script>
+<script src="script.js?v=2" defer></script>
 
 
 </body>

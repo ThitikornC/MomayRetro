@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
 /* ================= Body ================= */
 @keyframes shake {
@@ -7,7 +7,7 @@
   20%, 40%, 60%, 80% { transform: rotate(10deg); }
 }
 body {
-  font-family: 'Cinzel', serif;
+  font-family: 'Roboto', serif;
   display: flex;
   flex-direction: column;
   justify-content: center; /* กึ่งกลางแนวตั้ง */
@@ -15,14 +15,42 @@ body {
   min-height: 100vh;
   margin: 10px;
   margin-top: 40px;
-  padding: 0px;
-
-  /* Background image */
-  background-image: url('./images/BG.png');
-  background-size: cover;       /* ปรับขนาดให้เต็มหน้าจอ */
-  background-position: center;  /* กึ่งกลางรูป */
-  background-repeat: no-repeat; /* ไม่ทำซ้ำรูป */
+  padding: 0;
+  position: relative;      /* สำหรับ pseudo-element */
+  overflow-x: hidden;
+  z-index: 1;              /* ให้เนื้อหาอยู่เหนือ pseudo-element */
 }
+
+/* Gradient floating background */
+body::before,
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;              /* อยู่ด้านหลังเนื้อหา */
+  animation: floatBg 30s linear infinite;
+}
+
+/* Linear gradient พื้นหลังหลัก */
+body::before {
+  background: linear-gradient(to bottom, #ebd09e 0%, #251f03 100%);
+}
+
+/* Radial gradient effect */
+body::after {
+  background: radial-gradient(circle at 30% 40%, #ebd09e, #251f03);
+}
+
+/* Animation ให้ background ลอยขึ้นลง */
+@keyframes floatBg {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(30px); }
+  100% { transform: translateY(0px); }
+}
+
 
 /* ================= Top Container ================= */
 .Top_Container {
@@ -36,101 +64,161 @@ body {
 }
 
 /* ================= กล่อง Client และ Electrical ================= */
-.ClientName_Container{
-    width: 180px;
-  height: 85px;
-  font-size: 12px;
-  font-weight: bold;
+.ClientName_Container {
+  width: 180px;   /* ขนาดกรอบเดิม */
+  height: 85px;   /* ขนาดกรอบเดิม */
+  font-size: 16px;
+  font-weight: 700;  /* หนา */
   text-align: center;
   box-sizing: border-box;
   color: #000000;
-  border-radius: 10px;
-  padding: 15px;
+
+  /* Gradient background */
+  background: linear-gradient(
+    180deg,
+    #f8f6f0 0%,
+    #fffef8 45%,
+    #fff8e8 55%,
+    #f5f0e5 100%
+  );
+
+  /* ขอบโค้ง + ความหนาและสีใหม่ */
+  border-radius: 10px;      /* ขอบโค้งเดิม */
+  border: 6px solid #74640a; /* ความหนาและสีใหม่ */
+
+  /* เงาและ shadow */
+  box-shadow: 
+    1px 1px 0 #000,
+    -8px 6px #3b3305,
+    0 0 20px rgba(255, 230, 160, 0.55);
+
+  /* ข้อความเงา */
+  text-shadow: 
+    0 1px 0 rgba(255, 255, 255, 0.3),
+    0 -1px 0 rgba(0, 0, 0, 0.1);
+
+  /* Layout */
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
+  padding: 15px; 
   margin-left: 2px;
 
-  /* PNG background */
-  background-image: url('./images/noise.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-
-  /* เงา */
-  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-
+  /* Animation / Transition */
+  position: relative;
+  transform: translateZ(0);
+  transition: all 0.3s ease;
 }
+
+
 .ElectricalBill_Container {
-  width: 180px;
-  height: 85px;
+  width: 180px;   /* ขนาดกรอบเดิม */
+  height: 85px;   /* ขนาดกรอบเดิม */
   font-size: 12px;
-  font-weight: bold;
+  font-weight: 700;  /* หนาขึ้น */
   text-align: center;
   box-sizing: border-box;
   color: #000000;
-  border-radius: 10px;
-  padding: 15px;
+
+  /* Gradient background แทน PNG */
+  background: linear-gradient(
+    180deg,
+    #f8f6f0 0%,
+    #fffef8 45%,
+    #fff8e8 55%,
+    #f5f0e5 100%
+  );
+
+  /* ขอบโค้งเดิม แต่เพิ่มความหนาและสีใหม่ */
+  border-radius: 10px;      /* ขอบโค้งเดิม */
+  border: 6px solid #74640a; /* ความหนาและสีใหม่ */
+
+  /* เงาและ shadow */
+  box-shadow: 
+    1px 1px 0 #000,
+    -8px 6px #3b3305,
+    0 0 20px rgba(255, 230, 160, 0.55);
+
+  /* ข้อความเงา */
+  text-shadow: 
+    0 1px 0 rgba(255, 255, 255, 0.3),
+    0 -1px 0 rgba(0, 0, 0, 0.1);
+
+  /* Layout */
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  padding: 15px;
+  margin-left: 2px;
 
-  /* PNG background */
-  background-image: url('./images/noise.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-
-  /* เงา */
-  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+  /* Animation / Transition */
+  position: relative;
+  transform: translateZ(0);
+  transition: all 0.3s ease;
 }
+
 
 /* ================= Main Container ================= */
 .Main_Container {
-   width: 375px;
+  width: 375px;
   height: 289px;
   font-size: 12px;
-  font-weight: bold;
+  font-weight: 700;
   text-align: center;
   box-sizing: border-box;
   color: #fff;
+
+  /* Gradient background แทน PNG */
+  background: linear-gradient(
+    180deg,
+    #f8f6f0 0%,
+    #fffef8 45%,
+    #fff8e8 55%,
+    #f5f0e5 100%
+  );
+
+  /* Border + shadow ด้านนอก */
   border-radius: 10px;
-  padding: 15px 15px 5px 15px;
-  position: relative;
-  overflow: visible;
+  border: 6px solid #74640a;
+  box-shadow: 
+    1px 1px 0 #000,
+    -8px 6px #3b3305,
+    0 0 20px rgba(255, 230, 160, 0.55);
+
+  /* ข้อความเงา */
+  text-shadow: 
+    0 1px 0 rgba(255, 255, 255, 0.3),
+    0 -1px 0 rgba(0, 0, 0, 0.1);
 
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  padding: 15px 15px 5px 15px;
+  position: relative;
+
+  /* ไม่จำกัด overflow เพื่อให้ shadow ด้านนอกเห็น */
+  overflow: visible;
 
   margin-bottom: 10px;
-
-  background-image: url('./images/mainBG_1.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  
-
-  /* ลบ animation ออก */
-  /* animation: glow 2s infinite alternate ease-in-out; */
-
-  /* เพิ่ม transition ให้ smooth */
   transition: all 0.5s ease;
 }
 
+/* Glow effect ขยายภายใน container */
 .glow {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 200%;
-  height: 200%;
+  width: 120%;   /* ขยายภายใน ไม่ล้น */
+  height: 120%;
   transform: translate(-50%, -50%);
   border-radius: 50%;
   pointer-events: none;
-  box-shadow: 0 0 50px 20px rgba(245, 169, 5, 0.999); /* เริ่มเขียว */
+
+  /* สี glow เหมือนเดิม */
+  box-shadow: 0 0 50px 20px rgba(245, 169, 5, 0.999); 
   animation: pulseGreen 2s infinite alternate ease-in-out;
 }
 
@@ -146,18 +234,44 @@ body {
   100% { box-shadow: 0 0 40px 10px rgba(184, 37, 0, 0.4); }
 }
 
+
 .Main_Container, .glow {
   transition: all 0.5s ease;
 }
-.Floor_Container{
-  width: 300px;
-  height: 80px;
+.Floor_Container {
+  width: 300px;   /* ขนาดเดิม */
+  height: 80px;   /* ขนาดเดิม */
   font-size: 12px;
-  font-weight: bold;
+  font-weight: 700;  /* หนาขึ้น */
   text-align: center;
   box-sizing: border-box;
   color: #fff;
+
+  /* Gradient background แทน PNG */
+  background: linear-gradient(
+    180deg,
+    #f8f6f0 0%,
+    #fffef8 45%,
+    #fff8e8 55%,
+    #f5f0e5 100%
+  );
+
+  /* ขอบโค้ง + ความหนาและสี */
   border-radius: 10px;
+  border: 6px solid #74640a;
+
+  /* เงาและ shadow */
+  box-shadow: 
+    1px 1px 0 #000,
+    -8px 6px #3b3305,
+    0 0 20px rgba(255, 230, 160, 0.55);
+
+  /* ข้อความเงา */
+  text-shadow: 
+    0 1px 0 rgba(255, 255, 255, 0.3),
+    0 -1px 0 rgba(0, 0, 0, 0.1);
+
+  /* Layout */
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -165,45 +279,63 @@ body {
   margin-bottom: 10px;
   position: relative;
   overflow: visible;
-   margin-bottom: 10px;
+  padding: 15px;
 
-
-  /* PNG background */
-  background-image: url('./images/mainBG.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-
-  /* เงา */
-  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+  /* Animation / Transition */
+  transform: translateZ(0);
+  transition: all 0.3s ease;
 }
+
 
 
 /* ================= Realtime Container ================= */
 .Realtime_Container {
-  width: 375px;
-  height: 218px;
+  width: 375px;   /* ขนาดเดิม */
+  height: 218px;  /* ขนาดเดิม */
   font-size: 12px;
-  font-weight: bold;
+  font-weight: 700;  /* หนาขึ้น */
   text-align: center;
   box-sizing: border-box;
   color: #fff;
+
+  /* Gradient background แทน PNG */
+  background: linear-gradient(
+    180deg,
+    #f8f6f0 0%,
+    #fffef8 45%,
+    #fff8e8 55%,
+    #f5f0e5 100%
+  );
+
+  /* ขอบโค้ง + ความหนาและสี */
   border-radius: 10px;
+  border: 6px solid #74640a;
+
+  /* เงาและ shadow */
+  box-shadow: 
+    1px 1px 0 #000,
+    -8px 6px #3b3305,
+    0 0 20px rgba(255, 230, 160, 0.55);
+
+  /* ข้อความเงา */
+  text-shadow: 
+    0 1px 0 rgba(255, 255, 255, 0.3),
+    0 -1px 0 rgba(0, 0, 0, 0.1);
+
+  /* Layout */
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   margin-bottom: 0px;
+  padding: 15px;
 
-  /* PNG background */
-  background-image: url('./images/mainBG.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-
-  /* เงา */
-  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+  /* Animation / Transition */
+  position: relative;
+  transform: translateZ(0);
+  transition: all 0.3s ease;
 }
+
 
 /* ================= Bottom Info ================= */
 .Bottom_info {
@@ -244,24 +376,62 @@ body {
 
 /* วันที่ซ้าย */
 #Date_icon {
-  
-    position: relative; 
-  width: 175px;
+  position: relative;
+  width: 357px;
   height: 20px;
-  background-color: #fffefe;
-  top: 0px;
-  flex-direction: row;      /* เรียงแนวนอน */
-  align-items: flex-start;      /* จัดกึ่งกลางแนวตั้ง */
-  justify-content: flex-start; /* ชิดซ้าย */
-  gap: 0px;                /* เว้นระยะระหว่าง Date, Today, Weather */
-  flex-wrap: nowrap;         /* ไม่ให้ wrap */
-  border-radius: 8pX;
-  padding-top: 10px;        /* ระยะด้านบนของ container */
-  margin-left: -196px;
-  padding-left: 5px;
-  background-image: url('./images/noise.png');
+
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 0px;
+  flex-wrap: nowrap;
+
+  background: linear-gradient(
+    180deg,
+    #f8f6f0 0%,
+    #fffef8 45%,
+    #fff8e8 55%,
+    #f5f0e5 100%
+  );
+
+  border-radius: 10px;
+  border: 6px solid #74640a;
+
+  box-shadow: 
+    1px 1px 0 #000,
+    -8px 6px #201b02,
+    0 0 20px rgba(26, 20, 4, 0.55);
+
+  text-shadow: 
+    0 1px 0 rgba(255, 255, 255, 0.3),
+    0 -1px 0 rgba(0, 0, 0, 0.1);
+
+  padding-top: 10px;
+  padding-left: 15px;
+  margin-left: -0px;
   margin-bottom: 10px;
+
+  transform: translateZ(0);
+  transition: all 0.3s ease;
+
+  overflow: hidden; /* ✅ เพิ่มเพื่อซ่อนส่วนเกิน */
 }
+
+/* ✅ ตัววิ่ง */
+#Date_icon .marquee {
+  display: inline-block;
+  white-space: nowrap;
+  animation: marquee 12s linear infinite;
+}
+
+/* ✅ Animation */
+@keyframes marquee {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-200%); }
+}
+
+
 #Date_icon h2, 
 #Date_icon h1,
 #weather {
@@ -495,7 +665,7 @@ font-size: 14px;
   width: 19px;
   height: 200px;
   background-color: rgb(255, 247, 247); /* พื้นขาว */
-  /*box-shadow: inset 2px 5px 1px rgba(73, 72, 72, 0.6);*/
+  box-shadow: inset 2px 5px 1px rgba(73, 72, 72, 0.6);
   border-radius: 6px;
   overflow: hidden;
   z-index: 1;
@@ -649,7 +819,7 @@ font-size: 14px;
 .Realtime_kW {
   position: absolute;
   right: 10px;
-  bottom: 15px;   /* ✅ วางห่างจากขอบล่าง 20px */
+  bottom: 10px;   /* ✅ วางห่างจากขอบล่าง 20px */
   width: 70px;
   height: 50px;
   border-radius: 10px;
@@ -2466,4 +2636,17 @@ color: #000000;
   background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
   background-size: 200% 100%;
   animation: loading 1.5s infinite;
+}
+.neon-btn {
+  background: linear-gradient(180deg, #f8f6f0 0%, #fffef8 45%, #fff8e8 55%, #f5f0e5 100%);
+  color: #000000;
+  border: 6px solid #74640a;
+  border-radius: 9999px;
+  box-shadow: 1px 1px 0 #000, -8px 6px #3b3305, 0 0 20px rgba(255,230,160,0.55);
+  font-weight: 700;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3), 0 -1px 0 rgba(0, 0, 0, 0.1);
+  position: relative;
+  padding: 16px 40px;
+  transform: translateZ(0);
+  transition: all 0.3s ease;
 }
