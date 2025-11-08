@@ -978,7 +978,7 @@ font-size: 14px;
        /* ลอยอิสระไม่ขึ้นกับกล่องแม่ */
   top: 50%;                  /* กึ่งกลางแนวตั้ง */
   left: 30%;                 /* กึ่งกลางแนวนอน */  text-align: center;
-  font-size: 24px;
+  font-size: 20px;
   font-weight: bold;
     text-shadow: 1px 2px 4px rgba(0,0,0,0.6); /* เพิ่มเงา */
 }
@@ -2930,7 +2930,8 @@ color: #000000;
   z-index: 10;        /* วางเหนือ element อื่น */
 }
 }
-
+@media screen and (max-width: 375px) {
+}
 @media screen and (max-width: 375px) {
   
 
@@ -2975,7 +2976,7 @@ color: #000000;
        /* ลอยอิสระไม่ขึ้นกับกล่องแม่ */
   top: 50%;                  /* กึ่งกลางแนวตั้ง */
   left: 30%;                 /* กึ่งกลางแนวนอน */  text-align: center;
-  font-size: 18px;
+  font-size: 12px;
   font-weight: bold;
     text-shadow: 1px 2px 4px rgba(0,0,0,0.6); /* เพิ่มเงา */
 }
