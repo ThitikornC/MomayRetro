@@ -2575,11 +2575,7 @@ color: #000000;
   padding-left: 0px;
   padding-right: 0px;
 }
-#Date_icon {
-    margin-right: -20pX;       /* หรือเล็กๆ เช่น 5px */
-    padding-left: 2px;    /* เว้นด้านซ้ายแทน */
-    width: 145px;
-}
+
 
 .ClientName_Container{
     width: 160px;
