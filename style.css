@@ -1188,7 +1188,7 @@ font-size: 14px;
 }
 .fc-event-title {
   white-space: pre-line; /* ใช้ \n ให้ขึ้นบรรทัดใหม่ */
-  font-size: 12px;       /* ปรับขนาดตัวอักษรตามต้องการ */
+  font-size: 10px;       /* ปรับขนาดตัวอักษรตามต้องการ */
   line-height: 1.2;
 }
 /* ===== ปรับ container ปฏิทิน ===== */
@@ -1338,12 +1338,14 @@ font-size: 14px;
   justify-content: center !important; /* กึ่งกลางแนวนอน */
   align-items: flex-start !important; /* ชิดบน */
   padding: 0 !important;
+  z-index: 9999;
 }
 .fc-event .fc-event-title {
-  font-size: 14px;       /* ขนาดตัวอักษร */
+  font-size: 10px;       /* ขนาดตัวอักษร */
   line-height: 1.2;
   margin-top: 2px;       /* ปรับให้ขยับลงเล็กน้อยจากบน */
   text-align: center;    /* กึ่งกลางแนวนอน */
+   z-index: 9999;
 }
 
 /* ===== วันปัจจุบัน ===== */
@@ -1415,6 +1417,19 @@ font-size: 14px;
 .fc-daygrid-event-harness {
   margin-top: auto; /* ทำให้ event อยู่ด้านล่างเลขวัน */
 }
+/* ✅ บังคับให้ Event แสดงข้อความ */
+.fc-daygrid-event .fc-event-title,
+.fc-event .fc-event-title,
+.fc-event-main {
+  display: block !important;
+  white-space: normal !important; /* ตัดบรรทัดได้ */
+  color: #000000 !important;
+  font-size: 12px !important;
+  font-weight: bold !important;
+  text-align: center !important;
+  line-height: 1.2 !important;
+}
+
 .fc .fc-col-header-cell-cushion {
     width: 90px;     /* เท่ากับ td ของวันจริง */
   font-size: 1rem;               /* ขนาดตัวอักษร */

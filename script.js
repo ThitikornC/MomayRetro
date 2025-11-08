@@ -297,8 +297,6 @@ document.addEventListener('DOMContentLoaded', async function() {
               text: 'Time (HH:MM)',
               color: '#000',
               font: { size: 1, weight: 'bold' },
-               align: 'start',  // ขยับไปทางซ้าย
-  padding: { left: 0, right: 0, top: 10, bottom: 0 } 
             }
           },
           y: {
@@ -432,12 +430,13 @@ async function fetchEvents(year, month) {
     const res = await fetch(url);
     const data = await res.json();
 
-    eventCache[key] = data.map(e => ({
-      ...e,
-      textColor: 'black',
-      backgroundColor: 'transparent',
-      borderColor: 'transparent'
-    }));
+ eventCache[key] = data.map(e => ({
+  ...e,
+  textColor: '#000000',     // ✅ ใช้สีดำเข้ม
+  backgroundColor: '',      // ✅ ลบการ override สีพื้นหลัง
+  borderColor: '',          // ✅ ลบการ override ขอบ
+}));
+
 
     return eventCache[key];
   } catch (err) {
