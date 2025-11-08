@@ -866,7 +866,7 @@ function renderNotifications() {
   
   if (notifications.length === 0) {
     notificationItems.innerHTML = `
-      <div style="text-align:center; padding:30px; color:#999;">
+      <div style="text-align:center; padding:30px; color:#0000;">
         <p style="font-size:24px; margin-bottom:10px;">🔔</p>
         <p>No Notifications</p>
       </div>
