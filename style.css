@@ -62,7 +62,7 @@ body::after {
 .ClientName_Container {
   width: 180px;   /* ขนาดกรอบเดิม */
   height: 85px;   /* ขนาดกรอบเดิม */
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 700;  /* หนา */
   text-align: center;
   box-sizing: border-box;
@@ -286,7 +286,7 @@ body::after {
 /* ================= Realtime Container ================= */
 .Realtime_Container {
   width: 375px;   /* ขนาดเดิม */
-  height: 500px;  /* ขนาดเดิม */
+  height: 250px;  /* ขนาดเดิม */
   font-size: 12px;
   font-weight: 700;  /* หนาขึ้น */
   text-align: center;
@@ -433,7 +433,6 @@ body::after {
 #weather {
   margin: 0;
   padding: 0;
-
   display: flex;           /* เปิด Flexbox */
   justify-content: center; /* จัดกึ่งกลางแนวนอน */
   align-items: center;     /* ถ้าต้องการกึ่งกลางแนวตั้งด้วย */
@@ -493,7 +492,6 @@ body::after {
 #Date {
   /* ป้องกันการขึ้นบรรทัดใหม่ */
 font-size: 14px;
-  font-size: 10px;
   color: #000000;
     margin: 0px;
     
@@ -892,24 +890,19 @@ font-size: 14px;
 
 
 /* ================= Chart ================= */
-.Realtime_Container {
-  width: 365px;
-  height: 220px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-  padding: 10px;
-  position: relative; /* เพื่อให้ canvas อยู่ภายใน container */
-}
+
 
 .Realtime_Container canvas {
-  width: 300px !important;
-  height: 200px !important;
-  margin-top: 40px; /* ขยับลงมา 50px */
+  width: 300px ;
+  height: 150px ;
+  margin-top: 40px;   /* ขยับลงจากด้านบน */
+  padding-bottom: 20px; /* เพิ่ม margin ด้านล่าง */
 }
 
+
 #PickDate {
-  font-family: 'Cinzel', serif;
-  font-size: 14px;
+  font-family: 'Roboto', serif;
+  font-size: 18px;
   text-align: center;
   position: relative;
   top: 20px;      /* ขยับลง 20px จากตำแหน่งปกติ */
@@ -1025,14 +1018,14 @@ font-size: 14px;
   top: 0;               /* ลบ top ที่ไม่จำเป็น */
 }
 .Date_install{
-  font-size: 10px;
+  font-size: 12px;
   font-weight: bold;
   top: 23%;            /* ปรับตำแหน่งแนวตั้ง */
   right: 80% ;
   text-shadow: 2px 2px 4px rgba(0,0,0,0.6); 
 }
 .ClientNo {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: bold;
   top: 23%;            /* ปรับตำแหน่งแนวตั้ง */
   right: 50% ;
@@ -1102,29 +1095,57 @@ font-size: 14px;
   filter: brightness(1.1);
 }
 
-#currentDay {
-  color: #000;
-  font-weight: bold;
+#currentDay, #prevDay, #nextDay {
+  color: #2c1810;       
+  font-weight: bold;     
+  font-size: 14px;       /* ลดฟอนต์ลงครึ่งหนึ่ง */
+  text-align: center;
+
+  /* Gradient แบบ Meter */
+  background: linear-gradient(
+    180deg,
+    #f8f6f0 0%,
+    #fffef8 45%,
+    #fff8e8 55%,
+    #f5f0e5 100%
+  );
+
+  border: 6px solid #74640a; 
+  border-radius: 10px;       
+  
+  box-shadow:
+    inset 0 0 5px rgba(0,0,0,0.15),
+    1px 1px 0 #000,
+    -4px 3px #3b3305,
+    0 0 12px rgba(255, 230, 160, 0.55);
+
+  text-shadow:
+    0 1px 0 rgba(255,255,255,0.3),
+    0 -1px 0 rgba(0,0,0,0.1);
+
+  padding: 4px 10px;      /* ลด padding บน-ล่าง เหลือ 4px, ซ้าย-ขวา 10px */
+  cursor: pointer;
+  pointer-events: auto;
+  z-index: 999;
+  position: relative;
+
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-#prevDay, #nextDay {
-  color: #000 !important;
-  background: none !important;
-  border: none !important;
-  font-size: 20px;
-  cursor: pointer;
-  
-  /* เพิ่มเฉพาะนี้เพื่อให้คลิกได้ */
-  pointer-events: auto !important;
-  z-index: 999 !important;
-  position: relative;
-  padding: 10px;
+#currentDay:hover, #prevDay:hover, #nextDay:hover {
+  transform: scale(1.05);
+  box-shadow:
+    inset 0 0 8px rgba(0,0,0,0.2),
+    1px 1px 0 #000,
+    -4px 3px #3b3305,
+    0 0 15px rgba(255, 230, 160, 0.55);
 }
+
 
 /* เพิ่ม z-index ให้ container */
 #PickDate {
   position: relative;
-  z-index: 999;
+  z-index: 9999;
   pointer-events: auto;
 }
 
@@ -1142,20 +1163,20 @@ font-size: 14px;
 }
 
 #weather-city {
-  font-size: 10px;
+  font-size: 14px;
   color: #000000;
     margin-top: 0px;
     display:none;
 }
 
 #weather-icon {
-  font-size: 12px;
-  margin-top: 3px;
+  font-size: 20px;
+  margin-top: 0px;
   padding: 0;
 }
 
 #weather-temp {
-  font-size: 10px;
+  font-size: 14px;
   color: #000;
     margin-top: 0px;
 }
@@ -2656,7 +2677,7 @@ font-size: 14px;
 }
 #Date {
   /* ป้องกันการขึ้นบรรทัดใหม่ */
-font-size: 14px !important;
+font-size: 14px ;
   font-size: 10px;
   color: #000000;
     margin: 0px;

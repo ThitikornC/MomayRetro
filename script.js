@@ -296,7 +296,9 @@ document.addEventListener('DOMContentLoaded', async function() {
               display: true,
               text: 'Time (HH:MM)',
               color: '#000',
-              font: { size: 14, weight: 'bold' },
+              font: { size: 1, weight: 'bold' },
+               align: 'start',  // ขยับไปทางซ้าย
+  padding: { left: 0, right: 0, top: 10, bottom: 0 } 
             }
           },
           y: {
