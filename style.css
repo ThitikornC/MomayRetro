@@ -502,8 +502,8 @@ font-size: 14px;
   display: flex;
   flex-direction: row;
   gap: 2px;         /* ระยะห่างระหว่างไอคอน */
-  margin-left: 200px; /* ลดค่าจาก 60px → 20px เพื่อดันซ้าย */
-  margin-bottom: 210px; 
+  margin-left: 180px; /* ลดค่าจาก 60px → 20px เพื่อดันซ้าย */
+  margin-bottom: 10px; 
 }
 
 
