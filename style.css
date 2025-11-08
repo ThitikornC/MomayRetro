@@ -1186,40 +1186,30 @@ font-size: 14px;
   width: 90%;
   height: 400px;
 }
-.fc-event-title {
-  white-space: pre-line; /* ใช้ \n ให้ขึ้นบรรทัดใหม่ */
-  font-size: 10px;       /* ปรับขนาดตัวอักษรตามต้องการ */
-  line-height: 1.2;
-}
-/* ===== ปรับ container ปฏิทิน ===== */
-/* ===== ตัว container ปฏิทิน ===== */
+/* ===== Calendar Container ===== */
 #calendar {
-  width: 1000px;       /* ล็อกความกว้าง */
-  height: 800px;       /* ล็อกความสูง */
+  width: 1000px;
+  height: 800px;
   margin: 20px auto;
-  
-  /* Gradient background แทน BG.png */
-  background: linear-gradient(to bottom, #ebd09e 0%, #251f03 100%);
-  
-  border-radius: 16px;
   padding: 20px;
+  border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  overflow: hidden;    /* ป้องกัน scroll เกิน */
-  
-  /* ถ้าไม่ใช้รูปแล้ว ไม่ต้องมี background-image / background-size / repeat / position */
+  overflow: hidden;
+  background: linear-gradient(to bottom, #ebd09e 0%, #251f03 100%);
 }
 
-
-/* ===== ส่วน header (ปุ่ม + title) ===== */
+/* ===== Header Title ===== */
 .fc .fc-toolbar-title {
   font-size: 1.5rem;
   font-weight: bold;
-  color: #000000;
+  color: #000;
   width: 250px;
   height: 50px;
   border-radius: 6px;
-  
-  /* ใช้ gradient แบบ .Meter */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 5px;
   background: linear-gradient(
     180deg,
     #f8f6f0 0%,
@@ -1227,39 +1217,11 @@ font-size: 14px;
     #fff8e8 55%,
     #f5f0e5 100%
   );
-  
-  /* overlay texture (ถ้ายังอยากมี noise) */
-  background-image: 
-    linear-gradient(
-      180deg,
-      #f8f6f0 0%,
-      #fffef8 45%,
-      #fff8e8 55%,
-      #f5f0e5 100%
-    ),
-    url("./images/noise.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-
-  display: flex;               /* flex layout */
-  justify-content: center;     /* กึ่งกลางแนวนอน */
-  align-items: center;         /* กึ่งกลางแนวตั้ง */
-  margin: 5px;
-  
-  /* optional: เพิ่ม shadow ให้เหมือน Meter */
-  box-shadow:
-    1px 1px 0 #000,
-    -8px 6px #3b3305,
-    0 0 20px rgba(255, 230, 160, 0.55);
-  
-  text-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.3),
-    0 -1px 0 rgba(0, 0, 0, 0.1);
+  box-shadow: 1px 1px 0 #000, -8px 6px #3b3305, 0 0 20px rgba(255, 230, 160, 0.55);
+  text-shadow: 0 1px 0 rgba(255,255,255,0.3), 0 -1px 0 rgba(0,0,0,0.1);
 }
 
-
-/* ปุ่มทั่วไป */
+/* ===== Buttons ===== */
 .fc .fc-button {
   background: linear-gradient(
     180deg,
@@ -1268,24 +1230,17 @@ font-size: 14px;
     #fff8e8 55%,
     #f5f0e5 100%
   );
-  border: 2px solid #74640a;  /* ขอบเข้มแบบ Meter */
+  border: 2px solid #74640a;
   border-radius: 8px;
   color: #000;
   font-weight: bold;
   padding: 6px 12px;
-  transition: all 0.3s ease;
-  box-shadow:
-    1px 1px 0 #000,
-    -4px 3px #3b3305,
-    0 0 12px rgba(255, 230, 160, 0.55);
-  text-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.3),
-    0 -1px 0 rgba(0, 0, 0, 0.1);
   cursor: pointer;
+  box-shadow: 1px 1px 0 #000, -4px 3px #3b3305, 0 0 12px rgba(255, 230, 160, 0.55);
+  text-shadow: 0 1px 0 rgba(255,255,255,0.3), 0 -1px 0 rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
 }
 
-
-/* ปุ่ม Today / Primary */
 .fc .fc-button-primary {
   background: linear-gradient(
     180deg,
@@ -1299,19 +1254,12 @@ font-size: 14px;
   font-weight: bold;
   padding: 6px 12px;
   border-radius: 8px;
-  box-shadow:
-    1px 1px 0 #000,
-    -4px 3px #3b3305,
-    0 0 12px rgba(255, 230, 160, 0.55);
-  text-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.3),
-    0 -1px 0 rgba(0, 0, 0, 0.1);
   cursor: pointer;
+  box-shadow: 1px 1px 0 #000, -4px 3px #3b3305, 0 0 12px rgba(255, 230, 160, 0.55);
+  text-shadow: 0 1px 0 rgba(255,255,255,0.3), 0 -1px 0 rgba(0,0,0,0.1);
 }
 
-
-
-/* ปุ่ม Prev / Next */
+/* Prev / Next Buttons */
 .fc .fc-toolbar-prev,
 .fc .fc-toolbar-next {
   font-size: 1.5rem;
@@ -1319,81 +1267,32 @@ font-size: 14px;
   color: #090909;
 }
 
-
-/* ===== ตารางวัน ===== */
+/* ===== Table Day Cells ===== */
 .fc-theme-standard td, 
 .fc-theme-standard th {
   border: 1px solid #101011;
 }
-.fc-event {
-  background-color: transparent !important;
-  border-color: transparent !important;
-  color: black !important;
-  display: flex !important;
-  justify-content: center !important; /* กึ่งกลางแนวนอน */
-  align-items: flex-start !important; /* ชิดบน */
-  padding: 0 !important;
-  z-index: 9999;
-}
-.fc-event .fc-event-title {
-  font-size: 10px;       /* ขนาดตัวอักษร */
-  line-height: 1.2;
-  margin-top: 2px;       /* ปรับให้ขยับลงเล็กน้อยจากบน */
-  text-align: center;    /* กึ่งกลางแนวนอน */
-   z-index: 9999;
-}
 
-/* ===== วันปัจจุบัน ===== */
-.fc .fc-day-today {
-  background: #fef3c7 !important;
-}
-
-/* ===== กิจกรรม (events) ===== */
-
-
-.fc-event:hover {
-  filter: brightness(0.9);
-  cursor: pointer;
-  transform: scale(1.02);
-  transition: 0.2s;
-}
-
-/* ===== ช่องวัน ===== */
 .fc-daygrid-day {
-  min-height: 120px;   /* ความสูงขั้นต่ำ */
-  max-height: 120px;   /* ล็อกความสูง */
-  width: 100px;        /* ความกว้างของแต่ละวัน */
-  padding: 5px;        /* ระยะห่างภายในช่อง */
+  min-height: 120px;
+  max-height: 120px;
+  width: 100px;
+  padding: 5px;
   box-sizing: border-box;
-
-  /* Gradient background แบบ Meter */
-  background: linear-gradient(
-    180deg,
-    #f8f6f0 0%,
-    #fffef8 45%,
-    #fff8e8 55%,
-    #f5f0e5 100%
-  );
-
-  border-radius: 0; /* ไม่มีขอบโค้ง */
-
-  /* เงา inset ดำอย่างเดียว */
+  background: linear-gradient(180deg,#f8f6f0 0%,#fffef8 45%,#fff8e8 55%,#f5f0e5 100%);
+  border-radius: 0;
   box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
-
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
 }
 
-
-/* ปรับพื้นที่ภายในวัน (frame) */
 .fc-daygrid-day-frame {
   height: 100%;
   display: flex;
   flex-direction: column;
 }
 
-/* ปรับเลขวัน ให้อยู่บนสุด */
 .fc-daygrid-day-number {
   font-size: 1rem;
   font-weight: bold;
@@ -1402,59 +1301,66 @@ font-size: 14px;
   color: #090a0a;
 }
 
-/* เพิ่มช่องว่างสำหรับ event */
+/* ===== Event Harness ===== */
 .fc-daygrid-event-harness {
   margin-top: auto; /* ทำให้ event อยู่ด้านล่างเลขวัน */
 }
-/* ✅ บังคับให้ Event แสดงข้อความ */
-.fc-daygrid-event .fc-event-title,
-.fc-event .fc-event-title,
-.fc-event-main {
-  display: block !important;
-  white-space: normal !important; /* ตัดบรรทัดได้ */
-  color: #000000 !important;
+
+/* ===== Events ===== */
+.fc-event {
+  background-color: #ffe066 !important;
+  border-color: #ffc107 !important;
+  color: #000 !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: flex-start !important;
+  padding: 2px !important;
+  z-index: 9999;
   font-size: 12px !important;
   font-weight: bold !important;
-  text-align: center !important;
   line-height: 1.2 !important;
+  white-space: normal !important;
+  text-align: center !important;
 }
 
+.fc-event .fc-event-title {
+  font-size: 12px !important;
+  line-height: 1.2 !important;
+  margin: 2px 0 !important;
+  text-align: center !important;
+  white-space: normal !important;
+}
+
+.fc-event:hover {
+  filter: brightness(0.9);
+  cursor: pointer;
+  transform: scale(1.02);
+  transition: 0.2s;
+}
+
+/* ===== Today ===== */
+.fc .fc-day-today {
+  background: #fef3c7 !important;
+}
+
+/* ===== Column Header ===== */
 .fc .fc-col-header-cell-cushion {
-    width: 90px;     /* เท่ากับ td ของวันจริง */
-  font-size: 1rem;               /* ขนาดตัวอักษร */
-  font-weight: bold;              /* ความหนา */
-  color: #000000;                 /* เปลี่ยนสีให้เข้ากับ gradient */
-  font-family: 'Cinzel', serif;  /* ฟอนต์ */
-  text-transform: uppercase;      /* ตัวพิมพ์ใหญ่ */
-  margin-left: 5px;
-  margin-bottom: 10px;
-  margin-top: 10px;
-  /* Gradient background แบบ Meter */
+  width: 90px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #000;
+  font-family: 'Cinzel', serif;
+  text-transform: uppercase;
+  margin: 10px 0 10px 5px;
   background: linear-gradient(
-    180deg,
-    #f8f6f0 0%,
-    #fffef8 45%,
-    #fff8e8 55%,
-    #f5f0e5 100%
+    180deg,#f8f6f0 0%,#fffef8 45%,#fff8e8 55%,#f5f0e5 100%
   );
-
-  border-radius: 6px; /* ขอบโค้งเล็กๆ */
-  
-
-  box-shadow: 
-    1px 1px 0 #000,
-    -4px 3px #3b3305,
-    0 0 12px rgba(255, 230, 160, 0.55);
-
-  text-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.3),
-    0 -1px 0 rgba(0, 0, 0, 0.1);
-
-  display: flex;               /* จัด flex */
-  justify-content: center;     /* กึ่งกลางแนวนอน */
-  align-items: center;         /* กึ่งกลางแนวตั้ง */
-  
-  /* ลบ background เก่า */
+  border-radius: 6px;
+  box-shadow: 1px 1px 0 #000, -4px 3px #3b3305, 0 0 12px rgba(255, 230, 160, 0.55);
+  text-shadow: 0 1px 0 rgba(255,255,255,0.3),0 -1px 0 rgba(0,0,0,0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
