@@ -1186,7 +1186,24 @@ font-size: 14px;
   width: 90%;
   height: 400px;
 }
-/* ===== Calendar Container ===== */
+/* ===== Calendar Popup ===== */
+#calendarPopup {
+  display: none; /* ซ่อนก่อน */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+}
+
+#calendarPopup.active {
+  display: flex; /* โชว์ popup */
+}
+
 #calendar {
   width: 1000px;
   height: 800px;
@@ -1196,6 +1213,41 @@ font-size: 14px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   overflow: hidden;
   background: linear-gradient(to bottom, #ebd09e 0%, #251f03 100%);
+}
+
+/* ===== Popup Content ===== */
+#DatePopup {
+  display: none;          
+  position: fixed;        
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center; 
+  align-items: center;     
+  z-index: 1000;           
+}
+
+#popupContent {
+  background: #fff;
+  padding: 20px 30px;
+  border-radius: 10px;
+  max-width: 400px;
+  width: 80%;
+  max-height: 80%;
+  overflow-y: auto;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 24px;
+  cursor: pointer;
 }
 
 /* ===== Header Title ===== */
@@ -1222,7 +1274,7 @@ font-size: 14px;
 }
 
 /* ===== Buttons ===== */
-.fc .fc-button {
+.fc .fc-button, .fc .fc-button-primary {
   background: linear-gradient(
     180deg,
     #f8f6f0 0%,
@@ -1241,25 +1293,6 @@ font-size: 14px;
   transition: all 0.3s ease;
 }
 
-.fc .fc-button-primary {
-  background: linear-gradient(
-    180deg,
-    #f8f6f0 0%,
-    #fffef8 45%,
-    #fff8e8 55%,
-    #f5f0e5 100%
-  );
-  border: 2px solid #74640a;
-  color: #000;
-  font-weight: bold;
-  padding: 6px 12px;
-  border-radius: 8px;
-  cursor: pointer;
-  box-shadow: 1px 1px 0 #000, -4px 3px #3b3305, 0 0 12px rgba(255, 230, 160, 0.55);
-  text-shadow: 0 1px 0 rgba(255,255,255,0.3), 0 -1px 0 rgba(0,0,0,0.1);
-}
-
-/* Prev / Next Buttons */
 .fc .fc-toolbar-prev,
 .fc .fc-toolbar-next {
   font-size: 1.5rem;
@@ -1282,9 +1315,6 @@ font-size: 14px;
   background: linear-gradient(180deg,#f8f6f0 0%,#fffef8 45%,#fff8e8 55%,#f5f0e5 100%);
   border-radius: 0;
   box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
 }
 
 .fc-daygrid-day-frame {
@@ -1303,12 +1333,12 @@ font-size: 14px;
 
 /* ===== Event Harness ===== */
 .fc-daygrid-event-harness {
-  margin-top: auto; /* ทำให้ event อยู่ด้านล่างเลขวัน */
+  margin-top: auto;
 }
 
 /* ===== Events ===== */
 .fc-event {
-  background-color: #ffe066 !important;  /* แสดงพื้นหลังเหลือง */
+  background-color: #ffe066 !important;
   border-color: #ffc107 !important;
   color: #000 !important;
   display: flex !important;
@@ -1320,6 +1350,7 @@ font-size: 14px;
   line-height: 1.2 !important;
   white-space: normal !important;
   text-align: center !important;
+  border-radius: 8px;
 }
 
 .fc-event .fc-event-title {
@@ -1360,9 +1391,6 @@ font-size: 14px;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
 }
 
 /* =================diff================= */
