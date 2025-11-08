@@ -1308,14 +1308,13 @@ font-size: 14px;
 
 /* ===== Events ===== */
 .fc-event {
-  background-color: #ffe066 !important;
+  background-color: #ffe066 !important;  /* แสดงพื้นหลังเหลือง */
   border-color: #ffc107 !important;
   color: #000 !important;
   display: flex !important;
   justify-content: center !important;
   align-items: flex-start !important;
   padding: 2px !important;
-  z-index: 9999;
   font-size: 12px !important;
   font-weight: bold !important;
   line-height: 1.2 !important;

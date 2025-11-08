@@ -430,14 +430,12 @@ async function fetchEvents(year, month) {
     const res = await fetch(url);
     const data = await res.json();
 
- eventCache[key] = data.map((e) => ({
-      ...e,
-      title: e.title || e.name || "Event", // แน่ใจว่า title มีค่า
-      display: "block", // บังคับให้แสดงข้อความ
-      textColor: "#000000", // ข้อความสีดำ
-      backgroundColor: "#FFC107", // พื้นหลังสีเหลือง (ที่เห็นได้)
-      borderColor: "#FF9800", // ขอบสีส้ม
-    }))
+ eventCache[key] = data.map(e => ({
+  ...e,
+  textColor: '#000000',     // ✅ ใช้สีดำเข้ม
+  backgroundColor: '',      // ✅ ลบการ override สีพื้นหลัง
+  borderColor: '',          // ✅ ลบการ override ขอบ
+}));
 
 
     return eventCache[key];
