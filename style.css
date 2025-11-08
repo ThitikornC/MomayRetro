@@ -1313,18 +1313,29 @@ font-size: 14px;
 
 /* ===== Events ===== */
 .fc-event {
-  color: #000 !important;
-  display: flex !important;
-  justify-content: center !important;
-  align-items: flex-start !important;
-  padding: 2px !important;
-  font-size: 12px !important;
-  font-weight: bold !important;
-  line-height: 1.2 !important;
-  white-space: normal !important;
-  text-align: center !important;
-  border-radius: 8px;
+  background: linear-gradient(
+    180deg,
+    #f8f6f0 0%,
+    #fffef8 45%,
+    #fff8e8 55%,
+    #f5f0e5 100%
+  ) !important;
+  border: 6px solid #74640a !important;
+  border-radius: 10px !important;
+  padding: 8px 14px !important;
+  box-shadow:
+    inset 0 0 5px rgba(0,0,0,0.15),
+    1px 1px 0 #000,
+    -4px 3px #3b3305,
+    0 0 12px rgba(255, 230, 160, 0.55) !important;
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.3),
+    0 -1px 0 rgba(0, 0, 0, 0.1) !important;
+  margin-top: 10px;
+  text-align: center;
+  color: #000 !important; /* ตัวอักษรดำ */
 }
+
 
 .fc-event .fc-event-title {
   font-size: 12px !important;
