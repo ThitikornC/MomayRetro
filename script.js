@@ -877,15 +877,27 @@ function renderNotifications() {
   
   // Header
   const header = document.createElement('div');
-  header.style.cssText = `
-    padding: 15px;
-    border-bottom: 2px solid #f0f0f0;
-    background-image: url('./images/noise.png');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    text-align: center;
-  `;
+header.style.cssText = `
+  padding: 15px;
+  border: 6px solid #74640a;         /* ขอบเข้มแบบ Meter */
+  border-radius: 10px;               /* ขอบมน */
+  background: linear-gradient(
+    180deg,
+    #f8f6f0 0%,
+    #fffef8 45%,
+    #fff8e8 55%,
+    #f5f0e5 100%
+  );                                  /* Gradient แทน background-image */
+  box-shadow:
+    inset 0 0 5px rgba(0,0,0,0.15),
+    1px 1px 0 #000,
+    -4px 3px #3b3305,
+    0 0 12px rgba(255, 230, 160, 0.55); /* เงา inset + เงาขอบนอก */
+  text-align: center;
+  font-weight: bold;
+  color: #2c1810;
+`;
+
   header.innerHTML = '<strong style="font-size:16px; color:#fff;">Notification</strong>';
   
   notificationItems.appendChild(header);

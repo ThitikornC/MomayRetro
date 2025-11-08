@@ -1050,14 +1050,58 @@ font-size: 14px;
 #kwangCurrentDay {
   color: #000;
   font-weight: bold;
+  background: linear-gradient(
+    180deg,
+    #f8f6f0 0%,
+    #fffef8 45%,
+    #fff8e8 55%,
+    #f5f0e5 100%
+  );
+  border: 3px solid #74640a;
+  border-radius: 10px;
+  padding: 4px 8px;
+  text-align: center;
+  box-shadow:
+    1px 1px 0 #000,
+    -4px 3px #3b3305,
+    0 0 12px rgba(255, 230, 160, 0.55);
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.3),
+    0 -1px 0 rgba(0, 0, 0, 0.1);
+  
+  margin: 0 5px; /* เว้นซ้ายขวา 5px */
 }
+
 #kwangPrevDay, #kwangNextDay {
-  color: #000 !important;
-  background: none !important;
-  border: none !important;
-  font-size: 20px;
+  color: #000;
+  background: linear-gradient(
+    180deg,
+    #f8f6f0 0%,
+    #fffef8 45%,
+    #fff8e8 55%,
+    #f5f0e5 100%
+  );
+  border: 3px solid #74640a;
+  border-radius: 10px;
+  padding: 4px 8px;
+  font-size: 18px;
   cursor: pointer;
+  box-shadow:
+    1px 1px 0 #000,
+    -4px 3px #3b3305,
+    0 0 12px rgba(255, 230, 160, 0.55);
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.3),
+    0 -1px 0 rgba(0, 0, 0, 0.1);
+  transition: 0.2s ease;
+
+  margin: 0 5px; /* เว้นซ้ายขวา 5px */
 }
+
+#kwangPrevDay:hover, #kwangNextDay:hover, #kwangCurrentDay:hover {
+  filter: brightness(1.1);
+}
+
 #currentDay {
   color: #000;
   font-weight: bold;
@@ -1405,126 +1449,249 @@ font-size: 14px;
 
 /* popup กลางจอ */
 
+/* ================= Kwang Circle ================= */
 .kwangcircle-container {
   width: 140px;
   height: 140px;
-  background: radial-gradient(circle at 30% 30%, #d4a352, #8b5a2b 80%);
-  border: 3px solid #5e3d11;
   border-radius: 50%;
-  box-shadow: inset 0 0 10px rgba(255,255,255,0.4), 0 5px 10px rgba(0,0,0,0.2);
+
+  /* Gradient แบบ Meter */
+  background: radial-gradient(
+    circle at 30% 30%, 
+    #f8f6f0,
+    #fffef8 45%, 
+    #fff8e8 55%, 
+    #f5f0e5 100%
+  );
+
+  border: 3px solid #74640a;  /* ขอบเข้มแบบ Meter */
+
+  /* เงา inset + เงาขอบนอก */
+  box-shadow: 
+    inset 0 0 5px rgba(0,0,0,0.15),   /* เงาด้านใน */
+    1px 1px 0 #000,                    /* เงาเส้นขอบด้านบนซ้าย */
+    -4px 3px #3b3305,                  /* เงาเส้นขอบด้านล่างขวา */
+    0 0 12px rgba(255, 230, 160, 0.55); /* เงา glow ขอบนอก */
+
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  color: #fff7da;
+
+  color: #2c1810;  
   font-weight: bold;
   text-align: center;
   font-size: 14px;
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.3),
+    0 -1px 0 rgba(0, 0, 0, 0.1);
+
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  margin-top: 20px;
+  margin-top: 15px;
+  cursor: pointer;
 }
+
+.kwangcircle-container:hover {
+  transform: scale(1.05);
+  box-shadow: 
+    inset 0 0 8px rgba(0,0,0,0.2),
+    4px 4px 0 #000,
+    -5px 5px #3b3305,
+    0 0 15px rgba(255, 230, 160, 0.6);
+}
+
+
 /* ================= Daily Popup ================= */
 #dailyPopup.show {
   display: flex; /* แสดง popup */
 }
+
 #dailyPopup {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-image: url("./images/noise.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-color: #f7e3b0; /* สีพื้นทองอ่อน */
-  border: 3px solid #5a3b0a; /* ขอบทองเข้ม */
+
+  /* Gradient แบบ Meter */
+  background: linear-gradient(
+    180deg,
+    #f8f6f0 0%,
+    #fffef8 45%,
+    #fff8e8 55%,
+    #f5f0e5 100%
+  );
+
+  border: 3px solid #74640a;
   border-radius: 12px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.25); /* ลดความซับซ้อน */
-  padding: 30px 35px; 
+
+  box-shadow: 1px 1px 0 #000, -4px 3px #3b3305, 0 0 12px rgba(255, 230, 160, 0.55);
+
+  padding: 25px 30px;
   max-width: 310px;
   width: 90%;
-  text-align: center;
-  display: none; /* ซ่อนตอนเริ่มต้น */
+  display: none;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 15px;
   font-family: "Prompt", sans-serif;
+  text-align: center;
   z-index: 1001;
-  overflow: visible; /* ให้ element ภายในไม่ถูกตัด */
+  overflow: visible;
 }
 
-
-/* หัวข้อ */
 #dailyPopup h3 {
-  margin: 10px 0 10px 0; /* top 10px, bottom 20px */
+  margin: 10px 0;
   font-size: 20px;
   font-weight: 700;
   color: #4a2b07;
   text-shadow: 0 1px 2px rgba(255, 255, 255, 0.6);
 }
 
-/* container วงกลม */
+/* ================= Circle Container ================= */
 .circle-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 20px; /* ระยะห่างระหว่าง Day Before กับ Yesterday */
+  gap: 15px; /* ระยะห่างระหว่างวงกลม */
 }
 
-/* วงกลมแบบเหรียญ */
+/* ================= วงกลม Day Before / Yesterday ================= */
 #dailyDayBefore, #dailyYesterday {
   width: 140px;
   height: 140px;
-  background: radial-gradient(circle at 30% 30%, #d4a352, #8b5a2b 80%);
-  border: 3px solid #5e3d11;
-  border-radius: 50%;
-  box-shadow: inset 0 0 10px rgba(255,255,255,0.4), 0 5px 10px rgba(0,0,0,0.2);
+
+  /* Gradient แบบ .popupValue1 */
+  background: linear-gradient(
+    180deg,
+    #f8f6f0 0%,
+    #fffef8 45%,
+    #fff8e8 55%,
+    #f5f0e5 100%
+  );
+
+  border: 6px solid #74640a; /* ขอบเข้มแบบ Meter */
+  border-radius: 50%;         /* เป็นวงกลม */
+
+  /* เงา inset + shadow แบบ .popupValue1 */
+  box-shadow:
+    inset 0 0 5px rgba(0,0,0,0.15),
+    1px 1px 0 #000,
+    -4px 3px #3b3305,
+    0 0 12px rgba(255, 230, 160, 0.55);
+
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  color: #fff7da;
+
+  /* ข้อความ */
+  color: #2c1810;
   font-weight: bold;
   text-align: center;
   font-size: 14px;
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.3),
+    0 -1px 0 rgba(0, 0, 0, 0.1);
+
+  margin-top: 10px; /* เว้นระยะจากบน */
+  cursor: pointer;
+
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 #dailyDayBefore:hover, #dailyYesterday:hover {
   transform: scale(1.05);
-  box-shadow: inset 0 0 15px rgba(255,255,255,0.5), 0 8px 15px rgba(0,0,0,0.3);
+  box-shadow:
+    inset 0 0 5px rgba(0,0,0,0.2),
+    1px 1px 0 #000,
+    -4px 3px #3b3305,
+    0 0 15px rgba(255, 230, 160, 0.6);
 }
 
-/* ค่าผลต่าง */
+
+/* ================= ค่าผลต่าง ================= */
 #dailyDiffValue {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: bold;
   color: #2c1810;
-  background-color: rgba(255, 255, 255, 0.3);
+
+  /* Gradient แบบ Meter */
+  background: linear-gradient(
+    180deg,
+    #f8f6f0 0%,
+    #fffef8 45%,
+    #fff8e8 55%,
+    #f5f0e5 100%
+  );
+
+  border: 3px solid #74640a;
   border-radius: 8px;
-  padding: 8px 14px;
-  box-shadow: inset 0 0 5px rgba(0,0,0,0.15);
-  margin-top: 15px; /* เพิ่มระยะห่างจากวงกลม */
+  padding: 6px 12px;
+
+  /* เงา inset + shadow แบบ Meter */
+  box-shadow:
+    inset 0 0 5px rgba(0,0,0,0.15),
+    1px 1px 0 #000,
+    -4px 3px #3b3305,
+    0 0 12px rgba(255, 230, 160, 0.55);
+
+  margin-top: 10px;
+  text-align: center;
 }
+
+
+
 
 .popupValue1 {
   font-size: 14px;
   font-weight: bold;
   color: #2c1810;
-  background-color: rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
+  background: linear-gradient(
+    180deg,
+    #f8f6f0 0%,
+    #fffef8 45%,
+    #fff8e8 55%,
+    #f5f0e5 100%
+  );
+  border: 6px solid #74640a;
+  border-radius: 10px;
   padding: 8px 14px;
-  box-shadow: inset 0 0 5px rgba(0,0,0,0.15);
-  margin-top: 15px; /* เพิ่มระยะห่างจากวงกลม */
+  box-shadow:
+    inset 0 0 5px rgba(0,0,0,0.15),
+    1px 1px 0 #000,
+    -4px 3px #3b3305,
+    0 0 12px rgba(255, 230, 160, 0.55);
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.3),
+    0 -1px 0 rgba(0, 0, 0, 0.1);
+  margin-top: 10px; /* เว้นระยะพอเหมาะ */
+  text-align: center;
 }
+
 .popupValue2 {
   font-size: 14px;
   font-weight: bold;
   color: #2c1810;
-  background-color: rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
+  background: linear-gradient(
+    180deg,
+    #f8f6f0 0%,
+    #fffef8 45%,
+    #fff8e8 55%,
+    #f5f0e5 100%
+  );
+  border: 6px solid #74640a;
+  border-radius: 10px;
   padding: 8px 14px;
-  box-shadow: inset 0 0 5px rgba(0,0,0,0.15);
+  box-shadow:
+    inset 0 0 5px rgba(0,0,0,0.15),
+    1px 1px 0 #000,
+    -4px 3px #3b3305,
+    0 0 12px rgba(255, 230, 160, 0.55);
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.3),
+    0 -1px 0 rgba(0, 0, 0, 0.1);
+  margin-top: 10px; /* เว้นระยะเท่ากัน */
+  text-align: center;
 }
 
 /* ปุ่ม */
@@ -1564,12 +1731,14 @@ font-size: 14px;
   position: absolute;
   top: -2px;
   right: -16px;
+  z-index: 0; /* อยู่หลัง element อื่นที่มี z-index สูงกว่า */
 }
+
 .daily-dates-arc {
   display: flex;           /* จัดเรียงเป็นบรรทัดเดียว */
   justify-content: center; /* จัดตรงกลางแนวนอน */
   align-items: center;     /* จัดกลางแนวตั้ง */
-  gap: 75px;               /* ระยะห่างระหว่างสองวันที่ */
+  gap: 50px;               /* ระยะห่างระหว่างสองวันที่ */
   margin-top: 10px;        /* ขยับลงจากด้านบน */
   margin-bottom: 10px; 
 }
@@ -1578,7 +1747,30 @@ font-size: 14px;
   font-weight: bold;
   font-size: 14px;
   text-align: center;
+
+  /* Gradient แบบ Meter */
+  background: linear-gradient(
+    180deg,
+    #f8f6f0 0%,
+    #fffef8 45%,
+    #fff8e8 55%,
+    #f5f0e5 100%
+  );
+
+  border: 3px solid #74640a; /* ขอบเข้มแบบ Meter */
+  border-radius: 8px;
+  padding: 6px 12px;
+
+  /* เงา inset + outer shadow แบบ Meter */
+  box-shadow:
+    inset 0 0 5px rgba(0,0,0,0.15),
+    1px 1px 0 #000,
+    -4px 3px #3b3305,
+    0 0 12px rgba(255, 230, 160, 0.55);
+
+  color: #2c1810;
 }
+
 
 
 
@@ -1588,8 +1780,8 @@ font-size: 14px;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  
-  /* ใช้ gradient แทน background-color */
+
+  /* Gradient แบบ Meter */
   background: linear-gradient(
     180deg,
     #f8f6f0 0%,
@@ -1597,32 +1789,38 @@ font-size: 14px;
     #fff8e8 55%,
     #f5f0e5 100%
   );
-  
-  /* overlay noise ถ้าต้องการยังคงใช้ image */
-  background-image: url("./images/noise.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  
-  border: 6px solid #74640a; /* ปรับให้เข้ากับธีม Meter */
-  border-radius: 12px;
-  box-shadow: 
+
+  /* ขอบ + radius เหมือน Meter */
+  border-radius: 10px;
+  border: 6px solid #74640a;
+
+  /* เงาเหมือน Meter */
+  box-shadow:
     1px 1px 0 #000,
     -8px 6px #3b3305,
     0 0 20px rgba(255, 230, 160, 0.55);
-  
-  padding: 30px 35px;
+
+  /* Text */
+  color: #000;
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.3),
+    0 -1px 0 rgba(0, 0, 0, 0.1);
+
+  padding: 20px 25px;
   max-width: 310px;
   width: 90%;
   text-align: center;
-  display: none;
+
+  display: none; /* เริ่มต้นซ่อน */
   flex-direction: column;
   align-items: center;
-  gap: 20px;
-  font-family: "Prompt", sans-serif;
+  gap: 15px;
+
+  font-family: "Roboto", sans-serif;
   z-index: 1001;
   overflow: visible;
 }
+
 
 .kwangcircle-wrapper {
   display: flex;           /* เรียงลูกในแนวนอน */
@@ -2518,12 +2716,50 @@ color: #000000;
   margin-top: 15px; /* เพิ่มระยะห่างจากวงกลม */
 }
 #dailyDayBefore, #dailyYesterday {
-  color: #fff7da;
+  width: 140px;
+  height: 140px;
+
+  /* Gradient แบบ .Meter */
+  background: linear-gradient(
+    180deg,
+    #f8f6f0 0%,
+    #fffef8 45%,
+    #fff8e8 55%,
+    #f5f0e5 100%
+  );
+
+  border: 6px solid #74640a;  /* ขอบเข้มแบบ Meter */
+  border-radius: 50%;          /* ทำเป็นวงกลม */
+
+  /* เงาแบบ Meter */
+  box-shadow: 
+    1px 1px 0 #000,
+    -8px 6px #3b3305,
+    0 0 20px rgba(255, 230, 160, 0.55);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  /* ข้อความเหมือน Meter */
+  color: #2c1810;
   font-weight: bold;
   text-align: center;
   font-size: 12px;
+
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
+
+#dailyDayBefore:hover, #dailyYesterday:hover {
+  transform: scale(1.05);
+  box-shadow: 
+    1px 1px 0 #000,
+    -8px 6px #3b3305,
+    0 0 20px rgba(255, 230, 160, 0.55);
+}
+
+
 
   #calendar {
   width: 1000px;       /* ล็อกความกว้าง */
