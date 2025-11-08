@@ -2743,7 +2743,6 @@ color: #000000;
 }
 
 .fc .fc-button {
-  background: #2563eb;  
   border: none;
   color: #fff;
   font-weight: bold;
@@ -2753,9 +2752,7 @@ color: #000000;
 }
 
 
-.fc .fc-button:hover {
-  background: #1d4ed8;
-}
+
 
 /* ปุ่ม Today */
 .fc .fc-button-primary {
