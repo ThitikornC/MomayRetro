@@ -1227,6 +1227,7 @@ font-size: 14px;
 
 /* ===== Header Title ===== */
 .fc .fc-toolbar-title {
+  
   font-size: 1.5rem;
   font-weight: bold;
   color: #000;
@@ -1351,7 +1352,7 @@ font-size: 14px;
   color: #000;
   font-family: 'Cinzel', serif;
   text-transform: uppercase;
-  margin: 10px 0 10px 5px;
+  margin: 10px 0 10px 25px;
   background: linear-gradient(
     180deg,#f8f6f0 0%,#fffef8 45%,#fff8e8 55%,#f5f0e5 100%
   );
@@ -1361,6 +1362,7 @@ font-size: 14px;
   display: flex;
   justify-content: center;
   align-items: center;
+  
 }
 
 /* =================diff================= */
@@ -2842,13 +2844,13 @@ color: #000000;
   background-image: url("./images/noise.png");
 }
 }
-@media screen and (max-width: 411px) {
+@media screen and (max-width: 450px) {
   
   /* Container ปฏิทิน */
   #calendar {
     width: 100%;      /* เต็มความกว้างหน้าจอ */
     max-width: 320px; /* จำกัดสูงสุด */
-    height: 70%;
+    height: 100%;
      max-height: 500px;
     padding: 9px;
   
@@ -2875,16 +2877,15 @@ color: #000000;
 
   /* ตารางวัน */
   .fc-daygrid-day {
-    min-height: 20px !important;
-    max-height: 20px !important;
-    width: auto !important;
-    padding: 2px !important;
+    max-height: 10px !important;
+    width: 40px !important;
+    padding: 0px !important;
   }
 
   /* ตัวเลขวัน */
   .fc-daygrid-day-number {
     font-size: 0.5rem !important;
-    margin-right: 0 !important;
+    margin-right: -100 !important;
     margin-bottom: 2px !important;
   }
 
@@ -2898,11 +2899,26 @@ color: #000000;
     line-height: 1.1 !important;
   }
 
-  /* Header column (Sun, Mon, ...) */
-  .fc .fc-col-header-cell-cushion {
-    font-size: 0.7rem !important;
-    padding: 2px !important;
-  }
+.fc .fc-col-header-cell-cushion {
+  width: 39px; /* ลดความกว้างลงจาก 90px */
+  height: 20px; /* เพิ่มหรือลดตามต้องการ */
+  font-size: 0.6rem; /* ลดขนาดตัวอักษร */
+  font-weight: bold;
+  color: #030303;
+  font-family: 'Cinzel', serif;
+  text-transform: uppercase;
+  margin: 0px 0px 0px 2px; /* ลด margin */
+  background: linear-gradient(
+    180deg,#f8f6f0 0%,#fffef8 45%,#fff8e8 55%,#f5f0e5 100%
+  );
+  border-radius: 4px; /* ลดมุมขอบ */
+  box-shadow: 1px 1px 0 #000, -2px 2px #3b3305, 0 0 8px rgba(255, 230, 160, 0.55); /* ลดเงา */
+  text-shadow: 0 1px 0 rgba(255,255,255,0.3), 0 -1px 0 rgba(0,0,0,0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 
   /* Day today highlight */
   .fc .fc-day-today {
@@ -2916,10 +2932,7 @@ color: #000000;
 }
 
 @media screen and (max-width: 375px) {
-  body {
-    padding-left: 18px;
-    padding-right: -1px;
-  }
+  
 
 #Date_icon {
   width: 94%;   /* แทน 357px ให้เต็มประมาณ 80% ของ container */
