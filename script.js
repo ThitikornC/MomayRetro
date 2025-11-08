@@ -900,7 +900,7 @@ header.style.cssText = `
 `;
 
 
-  header.innerHTML = '<strong style="font-size:16px; color:#fff;">Notification</strong>';
+  header.innerHTML = '<strong style="font-size:16px; color:#0000;">Notification</strong>';
   
   notificationItems.appendChild(header);
   
