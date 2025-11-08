@@ -423,20 +423,19 @@ let eventCache = {}; // key: "YYYY-MM" => events array
 async function fetchEvents(year, month) {
   const key = `${year}-${String(month).padStart(2, "0")}`;
 
-  if (eventCache[key]) return eventCache[key];
+  if (eventCache[key]) return eventCache[key]; // ใช้แคช
 
   try {
     const url = `https://momaybackendhospital-production.up.railway.app/calendar?year=${year}&month=${month}`;
     const res = await fetch(url);
     const data = await res.json();
 
- eventCache[key] = data.map(e => ({
-  ...e,
-  textColor: '#000000',     // ✅ ใช้สีดำเข้ม
-  backgroundColor: '',      // ✅ ลบการ override สีพื้นหลัง
-  borderColor: '',          // ✅ ลบการ override ขอบ
-}));
-
+    eventCache[key] = data.map(e => ({
+      ...e,
+      textColor: 'black',
+      backgroundColor: 'transparent',
+      borderColor: 'transparent'
+    }));
 
     return eventCache[key];
   } catch (err) {
@@ -451,8 +450,10 @@ async function preloadInitialMonths() {
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth() + 1;
 
+  // เดือนปัจจุบัน
   await fetchEvents(currentYear, currentMonth);
 
+  // เดือนก่อนหน้า
   let prevYear = currentYear;
   let prevMonth = currentMonth - 1;
   if (prevMonth === 0) { prevMonth = 12; prevYear--; }
@@ -464,7 +465,7 @@ async function initializeCalendar() {
   const calendarEl = document.getElementById("calendar");
   if (!calendarEl) return;
 
-  await preloadInitialMonths();
+  await preloadInitialMonths(); // ✅ โหลดล่วงหน้าก่อน render
 
   calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: "dayGridMonth",
@@ -473,8 +474,8 @@ async function initializeCalendar() {
     headerToolbar: { left: "prev", center: "title", right: "next" },
 
     events: async function(fetchInfo, successCallback) {
-      const year = fetchInfo.view.currentStart.getFullYear();
-      const month = fetchInfo.view.currentStart.getMonth() + 1;
+      const year = fetchInfo.start.getFullYear();
+      const month = fetchInfo.start.getMonth() + 1;
 
       const events = await fetchEvents(year, month);
       successCallback(events);
@@ -510,6 +511,7 @@ async function initializeCalendar() {
 }
 
 initializeCalendar();
+
 
 // Calendar Popup
 const calendarIcon = document.querySelector("#Calendar_icon img");

@@ -2538,6 +2538,8 @@ font-size: 14px;
   
 }
 
+
+
 /* ✅ ขยายเฉพาะ iPad (แนวนอนและแนวตั้ง) */
 @media screen and (min-width: 768px) and (max-width: 1024px) {
   html {
