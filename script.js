@@ -895,8 +895,10 @@ header.style.cssText = `
     0 0 12px rgba(255, 230, 160, 0.55); /* เงา inset + เงาขอบนอก */
   text-align: center;
   font-weight: bold;
-  color: #2c1810;
+  color: #2c1810;                     /* สีดำแบบ Meter */
+  font-family: 'Roboto', sans-serif;  /* ใช้ Roboto */
 `;
+
 
   header.innerHTML = '<strong style="font-size:16px; color:#fff;">Notification</strong>';
   

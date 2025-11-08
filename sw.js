@@ -3,8 +3,8 @@ const CACHE_NAME = 'momay-cache-vB2';
 const PRECACHE_URLS = [
   '/',
   '/index.html',
-  '/style.css?v=2.3',
-  '/script.js?v=2.3',
+  '/style.css?v=2.4',
+  '/script.js?v=2.4',
   '/manifest.json',
   '/icons/icon-192.png',
   '/icons/icon-512.png'
