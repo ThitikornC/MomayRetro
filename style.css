@@ -2938,7 +2938,7 @@ color: #000000;
   width: 94%;   /* แทน 357px ให้เต็มประมาณ 80% ของ container */
 }
 
-  .Top_Container,
+.Top_Container,
 .Main_Container {
   width: 100%;
   max-width: 400px;   /* ปรับตาม layout */
@@ -2947,7 +2947,38 @@ color: #000000;
   padding-right: 0px;
 }
 
-
+.ClientName {
+  font-size: 10.5px;
+  font-weight: bold;
+  white-space: nowrap; 
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.6); 
+  margin-left: 0;       /* เลื่อนไปซ้าย */
+  margin-right: auto;   /* กึ่งกลางหรือขยับขวาได้ */
+  position: relative;   /* หรือ absolute ถ้าต้องการวางทับ */
+  top: 0;               /* ลบ top ที่ไม่จำเป็น */
+}
+.Date_install{
+  font-size: 10.5px;
+  font-weight: bold;
+  top: 23%;            /* ปรับตำแหน่งแนวตั้ง */
+  right: 80% ;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.6); 
+}
+.ClientNo {
+  font-size: 10.5px;
+  font-weight: bold;
+  top: 23%;            /* ปรับตำแหน่งแนวตั้ง */
+  right: 50% ;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.6); 
+}
+#DailyBill {
+       /* ลอยอิสระไม่ขึ้นกับกล่องแม่ */
+  top: 50%;                  /* กึ่งกลางแนวตั้ง */
+  left: 30%;                 /* กึ่งกลางแนวนอน */  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+    text-shadow: 1px 2px 4px rgba(0,0,0,0.6); /* เพิ่มเงา */
+}
 .ClientName_Container{
     width: 160px;
   height: 85px;
@@ -2985,7 +3016,7 @@ color: #000000;
   margin-top: 2px; 
 }
 #weather {
-  left: 2px;  
+  bottom: 3px;  
 }
 
   #maincon_info {
