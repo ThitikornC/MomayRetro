@@ -106,40 +106,62 @@ document.addEventListener('DOMContentLoaded', async function() {
   plugins: [
     {
       // Plugin เพิ่มสไตล์แบบ meter
+    plugins: [
+  {
     id: "meterStyle",
-beforeDraw(chart) {
-  const { width, height, ctx } = chart;
-  ctx.save();
+    beforeDraw(chart) {
+      const { width, height, ctx } = chart;
+      ctx.save();
 
-  const centerX = width / 2;
-  const centerY = height / 2;
-  const radius = Math.min(width, height) / 2;
+      const centerX = width / 2;
+      const centerY = height / 2;
 
-  // Gradient แบบ .meter
-  const gradient = ctx.createLinearGradient(0, 0, 0, height);
-  gradient.addColorStop(0, "#f8f6f0");
-  gradient.addColorStop(0.45, "#fffef8");
-  gradient.addColorStop(0.55, "#fff8e8");
-  gradient.addColorStop(1, "#f5f0e5");
+      // กำหนด radius ให้เหลือ space สำหรับ border
+      const radius = Math.min(width, height) / 2 - 6; // 6 คือ borderWidth
 
-  // วาดวงกลมพื้นหลัง ปรับ radius ให้เหลือ space สำหรับ border
-  const borderWidth = 6;
-  ctx.beginPath();
-  ctx.arc(centerX, centerY, radius - borderWidth / 2, 0, 2 * Math.PI);
-  ctx.fillStyle = gradient;
-  ctx.fill();
+      // Gradient แบบ .meter
+      const gradient = ctx.createLinearGradient(0, 0, 0, height);
+      gradient.addColorStop(0, "#f8f6f0");
+      gradient.addColorStop(0.45, "#fffef8");
+      gradient.addColorStop(0.55, "#fff8e8");
+      gradient.addColorStop(1, "#f5f0e5");
 
-  // วาดขอบวงกลม
-  ctx.lineWidth = borderWidth;
-  ctx.strokeStyle = "#74640a";
-  ctx.stroke();
+      // วาดวงกลมพื้นหลัง
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+      ctx.fillStyle = gradient;
+      ctx.fill();
 
-  // เงาเบา ๆ
-  ctx.shadowColor = "rgba(0,0,0,0.15)";
-  ctx.shadowBlur = 4;
+      // วาดขอบ
+      ctx.lineWidth = 6;
+      ctx.strokeStyle = "#74640a";
+      ctx.shadowColor = "rgba(0,0,0,0.3)"; // เงา
+      ctx.shadowBlur = 8;
+      ctx.stroke();
 
-  ctx.restore();
-},
+      ctx.restore();
+    },
+  },
+  {
+    id: "textCenter",
+    beforeDatasetsDraw(chart) {
+      const { width, height, ctx } = chart;
+      ctx.save();
+
+      const fontSize = (height / 200).toFixed(2);
+      ctx.font = `bold ${fontSize * 16}px sans-serif`;
+      ctx.textBaseline = "middle";
+      ctx.textAlign = "center";
+      ctx.fillStyle = "#000";
+
+      const totalPercent = chart.data.datasets[0].data[0];
+      const text = `${Math.round(totalPercent)}%`;
+      ctx.fillText(text, width / 2, height / 2);
+
+      ctx.restore();
+    },
+  },
+],
 
     },
     {
