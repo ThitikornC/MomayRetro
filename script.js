@@ -1,3 +1,4 @@
+
 document.addEventListener('DOMContentLoaded', async function() {
 
   // ================= Date =================
@@ -28,102 +29,97 @@ document.addEventListener('DOMContentLoaded', async function() {
   };
 
   const CACHE_DURATION = {
-    power: 500, // 1 วินาที
-    dailyBill: 10000, // 30 วินาที
-    weather: 300000 // 30 นาที
+    power: 500, // 0.5 วินาที
+    dailyBill: 10000, // 10 วินาที
+    weather: 300000 // 5 นาที
   };
 
   function isCacheValid(key, duration) {
     return cache.lastFetch[key] && (Date.now() - cache.lastFetch[key] < duration);
   }
 
-function initializeTotalDonut() {
-  const totalBarContainer = document.getElementById("Total_Bar");
-  if (!totalBarContainer) return;
+  function initializeTotalDonut() {
+    const totalBarContainer = document.getElementById("Total_Bar");
+    if (!totalBarContainer) return;
 
-  // เคลียร์ HTML และสร้าง canvas
-  totalBarContainer.innerHTML = '<canvas id="totalDonutCanvas"></canvas>';
-  const canvas = document.getElementById("totalDonutCanvas");
+    totalBarContainer.innerHTML = '<canvas id="totalDonutCanvas"></canvas>';
+    const canvas = document.getElementById("totalDonutCanvas");
 
-  // ตั้งขนาด canvas ให้ตรงกับ container
-  canvas.width = totalBarContainer.offsetWidth;
-  canvas.height = totalBarContainer.offsetHeight;
+    canvas.width = totalBarContainer.offsetWidth;
+    canvas.height = totalBarContainer.offsetHeight;
 
-  const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d");
 
-  totalDonutChart = new Chart(ctx, {
-    type: "doughnut",
-    data: {
-      labels: ["Current Power", "Remaining Capacity"],
-      datasets: [
-        {
-          data: [0.01, 99.99], // แทน 0 ด้วย 0.01 เพื่อให้ segment แรกปรากฏ
-          backgroundColor: ["#FBBF32", "#f8f6f0"], // สี segment
-          borderColor: ["#FBBF32", "#f8f6f0"],     // ขอบ segment
+    totalDonutChart = new Chart(ctx, {
+      type: "doughnut",
+      data: {
+        labels: ["Current Power", "Remaining Capacity"],
+        datasets: [{
+          data: [0.01, 99.99],
+          backgroundColor: ["#FBBF32", "#f8f6f0"],
+          borderColor: ["#FBBF32", "#f8f6f0"],
           borderWidth: 2,
-          cutout: "70%", // ขนาดวงด้านใน
-        },
-      ],
-    },
-    options: {
-      responsive: false,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          enabled: true,
-          backgroundColor: "rgba(0,0,0,0.8)",
-          titleColor: "#fff",
-          bodyColor: "#fff",
-          cornerRadius: 8,
-          callbacks: {
-            label: (context) => `${Math.round(context.parsed)}%`,
+          cutout: "70%",
+        }],
+      },
+      options: {
+        responsive: false,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            enabled: true,
+            backgroundColor: "rgba(0,0,0,0.8)",
+            titleColor: "#fff",
+            bodyColor: "#fff",
+            cornerRadius: 8,
+            callbacks: {
+              label: (context) => `${Math.round(context.parsed)}%`,
+            },
           },
         },
       },
-    },
-    plugins: [
-      {
-        id: "drawInnerCircle",
-        beforeDraw(chart) {
-          const { ctx, width, height } = chart;
-          const centerX = width / 2;
-          const centerY = height / 2;
-          const innerRadius = chart.getDatasetMeta(0).data[0].innerRadius;
+      plugins: [
+        {
+          id: "drawInnerCircle",
+          beforeDraw(chart) {
+            const { ctx, width, height } = chart;
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const innerRadius = chart.getDatasetMeta(0).data[0].innerRadius;
 
-          ctx.save();
-          // วาดวงด้านในแบบ radial gradient
-          const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, innerRadius);
-          gradient.addColorStop(0, "#fffef8"); // สีตรงกลาง
-          gradient.addColorStop(1, "#f8f6f0"); // สีขอบ
-          ctx.fillStyle = gradient;
-          ctx.beginPath();
-          ctx.arc(centerX, centerY, innerRadius, 0, 2 * Math.PI);
-          ctx.fill();
-          ctx.restore();
+            ctx.save();
+            const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, innerRadius);
+            gradient.addColorStop(0, "#fffef8");
+            gradient.addColorStop(1, "#f8f6f0");
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, innerRadius, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.restore();
+          },
         },
-      },
-      {
-        id: "textCenter",
-        beforeDatasetsDraw(chart) {
-          const { width, height, ctx } = chart;
-          ctx.save();
-          const fontSize = Math.floor(height / 8);
-          ctx.font = `bold ${fontSize}px sans-serif`;
-          ctx.textBaseline = "middle";
-          ctx.textAlign = "center";
-          ctx.fillStyle = "#2c1810";
+        {
+          id: "textCenter",
+          beforeDatasetsDraw(chart) {
+            const { width, height, ctx } = chart;
+            ctx.save();
+            const fontSize = Math.floor(height / 8);
+            ctx.font = `bold ${fontSize}px sans-serif`;
+            ctx.textBaseline = "middle";
+            ctx.textAlign = "center";
+            ctx.fillStyle = "#2c1810";
 
-          const totalPercent = chart.data.datasets[0].data[0];
-          ctx.fillText(`${Math.round(totalPercent)}%`, width / 2, height / 2);
-          ctx.restore();
+            const totalPercent = chart.data.datasets[0].data[0];
+            ctx.fillText(`${Math.round(totalPercent)}%`, width / 2, height / 2);
+            ctx.restore();
+          },
         },
-      },
-    ],
-  });
-}
+      ],
+    });
+  }
 
-  // ================= Progress bars (Optimized) =================
+  // ================= Progress bars =================
   const floor1Bar = document.querySelector('#floor1 .progress-bar');
   const totalBar = document.querySelector('#Total_Bar .progress-bar');
   const glow = document.querySelector('.glow');
@@ -135,7 +131,6 @@ function initializeTotalDonut() {
 
   async function updateBarsAndKW() {
     try {
-      // ใช้ cache ถ้ายังไม่หมดอายุ
       if (isCacheValid('power', CACHE_DURATION.power) && cache.powerData) {
         renderPowerData(cache.powerData);
         return;
@@ -163,7 +158,6 @@ function initializeTotalDonut() {
   }
 
   function renderPowerData(latest) {
-    // Floor 1 Bar
     const floor1Percent = Math.min((latest / floor1_maxKW) * 100, 100);
     if(floor1Bar){
       floor1Bar.style.width = `${floor1Percent}%`;
@@ -173,18 +167,16 @@ function initializeTotalDonut() {
       floor1Text.textContent = `${Math.round(floor1Percent)}%`;
     }
 
-     const totalPercent = Math.min((latest / total_maxKW) * 100, 100)
+    const totalPercent = Math.min((latest / total_maxKW) * 100, 100)
 
     if (totalDonutChart) {
-      // อัปเดตข้อมูล donut chart
       totalDonutChart.data.datasets[0].data = [totalPercent, 100 - totalPercent]
 
-      // เปลี่ยนสีตามเปอร์เซ็นต์
       const barColor = totalPercent <= 50 ? "#FBBF32" : "#b82500"
       totalDonutChart.data.datasets[0].backgroundColor = [barColor, "#e0e0e0"]
       totalDonutChart.data.datasets[0].borderColor = [barColor, "#e0e0e0"]
 
-      totalDonutChart.update("none") // อัปเดตแบบไม่มี animation
+      totalDonutChart.update("none")
     }
 
     if (mainContainer && glowEl) {
@@ -197,27 +189,26 @@ function initializeTotalDonut() {
       }
     }
 
-    // Glow
     if(glow){
       const intensity = totalPercent / 100;
       const glowAlpha = 0.3 + intensity * 0.7;
       const glowSize = 100 + intensity * 50;
-      glow.style.transition = 'all 0.5s ease';
+      glow.style.transition = 'none';
       glow.style.background = `radial-gradient(circle, rgba(255,200,50,${glowAlpha}) 0%, rgba(255,200,50,0) 70%)`;
       glow.style.width = `${glowSize}%`;
       glow.style.height = `${glowSize}%`;
     }
 
-    // Realtime kW
     if(realtimeKWEl){
       realtimeKWEl.textContent = latest.toFixed(2) + ' kW';
     }
   }
+
   initializeTotalDonut()
   updateBarsAndKW();
-  setInterval(updateBarsAndKW, 1000);
+  setInterval(updateBarsAndKW, 500);
 
-  // ================= Daily Bill (Optimized) =================
+  // ================= Daily Bill =================
   const dailyBillEl = document.getElementById('DailyBill');
   const unitEl = document.querySelector('.unit');
   const pricePerUnit = 4.4;
@@ -253,12 +244,15 @@ function initializeTotalDonut() {
   }
 
   fetchDailyBill();
-  setInterval(fetchDailyBill, 30000); // เปลี่ยนเป็น 30 วินาที
+  setInterval(fetchDailyBill, 10000);
 
-// ================= Chart.js (Load ทันที - ไม่มี Lazy Load) =================
+ // ================= Chart.js (ไม่มี scrollbar + cache) =================
 let chartInitialized = false;
 let chart = null;
 let currentDate = new Date();
+
+// Cache ข้อมูลตามวัน
+const dailyDataCache = {};
 
 // ฟังก์ชัน format วันที่
 function formatDateDisplay(date){
@@ -272,10 +266,16 @@ function formatDateDisplay(date){
 // ฟังก์ชัน fetch ข้อมูล
 async function fetchDailyData(date){
   const dateStr = date.toISOString().split('T')[0];
+  
+  // ใช้ cache ถ้ามี
+  if(dailyDataCache[dateStr]) return dailyDataCache[dateStr];
+
   try {
     const res = await fetch(`https://api-kx4r63rdjq-an.a.run.app/daily-energy/px_pm3250?date=${dateStr}`);
     const json = await res.json();
-    return json.data;
+    const data = json.data ?? [];
+    dailyDataCache[dateStr] = data; // เก็บ cache
+    return data;
   } catch(err){
     console.error(err);
     return [];
@@ -301,13 +301,11 @@ async function updateChartData(date){
   chartData.forEach((v,i)=>{
     if(v!==null){
       if(maxVal===null||v>maxVal){ maxVal=v; maxIdx=i; }
-      sum += v;
-      count++;
+      sum += v; count++;
     }
   });
   const avgVal = count>0 ? sum/count : null;
 
-  // update chart dataset
   chart.data.datasets[0].data = chartData;
   chart.data.datasets[1].data = new Array(1440).fill(null).map((_,i)=>i===maxIdx?maxVal:null);
   chart.data.datasets[2].data = new Array(1440).fill(avgVal);
@@ -315,8 +313,8 @@ async function updateChartData(date){
   chart.update('none'); // อัปเดตแบบไม่มี animation
 }
 
-// ฟังก์ชัน initialize chart
-async function initializeChart() {
+// ================= Initialize Chart =================
+function initializeChart() {
   if (chartInitialized) return;
 
   const canvas = document.getElementById('EnergyChart');
@@ -329,15 +327,15 @@ async function initializeChart() {
     return `${hour}:${min}`;
   });
 
-  // สร้าง gradient
+  // Gradient
   const gradient = ctx.createLinearGradient(0,0,0,400);
   gradient.addColorStop(0,'rgba(139,69,19,0.4)');
   gradient.addColorStop(0.5,'rgba(210,180,140,0.3)');
   gradient.addColorStop(1,'rgba(245,222,179,0.1)');
 
-  // สร้าง chart ด้วย 1440 จุด (แสดงทันที)
+  // สร้าง chart ทันทีด้วย data ว่าง
   const data = { 
-    labels, 
+    labels,
     datasets:[
       {label:'Power', data:new Array(1440).fill(null), borderColor:'#8B4513', backgroundColor: gradient, fill:true, borderWidth:0.5, tension:0.3, pointRadius:0},
       {label:'Max', data:new Array(1440).fill(null), borderColor:'#ff9999', pointRadius:5, pointBackgroundColor:'#ff9999', fill:false, showLine:false},
@@ -352,62 +350,14 @@ async function initializeChart() {
       responsive: true,
       maintainAspectRatio: false,
       animation: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          enabled: true,
-          backgroundColor: 'rgba(0,0,0,0.8)',
-          titleColor: '#fff',
-          bodyColor: '#fff',
-          cornerRadius: 8,
-          displayColors: false,
-          callbacks: {
-            title: function(items){ return items[0].label; },
-            label: function(item){
-              const datasetLabel = item.dataset.label;
-              const value = item.raw;
-              if(datasetLabel==='Max') return `Max: ${value?.toFixed(2)} kW`;
-              else if(datasetLabel==='Average') return `Average: ${value?.toFixed(2)} kW`;
-              else if(datasetLabel==='Power') return value!==null ? `Power: ${value.toFixed(2)} kW` : '-';
-            }
-          }
-        }
-      },
+      plugins: { legend: { display: false } },
       scales: {
-        x: {
-          type: 'category',
-          grid: { display: false },
-          ticks: {
-            autoSkip: false,
-            color: '#000',
-            maxRotation: 0,
-            minRotation: 0,
-            callback: function(v){
-              const l = this.getLabelForValue(v);
-              if(!l) return '';
-              const [h,m] = l.split(':');
-              return m==='00' && parseInt(h)%3===0 ? l : '';
-            }
-          },
-          title: {
-            display: true,
-            text: 'Time (HH:MM)',
-            color: '#000',
-            font: { size: 14, weight: 'bold' },
-          }
+        x:{ 
+          type:'category', 
+          grid:{ display:false },
+          ticks:{ autoSkip:false, maxRotation:0, minRotation:0 }
         },
-        y: {
-          grid: { display: false },
-          beginAtZero: true,
-          min: 0,
-          ticks: { color: '#000' },
-          title: {
-            display: true,
-            text: 'Power (kW)',
-            color: '#000',
-            font: { size: 14, weight: 'bold' }
-          }
-        }
+        y:{ beginAtZero:true, grid:{ display:false }, min:0 }
       }
     }
   };
@@ -419,151 +369,132 @@ async function initializeChart() {
   updateChartData(currentDate);
 }
 
-// Initialize Date Picker
+// ================= Date Picker =================
 const prevBtn = document.getElementById('prevDay');
 const nextBtn = document.getElementById('nextDay');
 const currentDayEl = document.getElementById('currentDay');
 
-if (currentDayEl) {
-  currentDayEl.textContent = formatDateDisplay(currentDate);
+if (currentDayEl) currentDayEl.textContent = formatDateDisplay(currentDate);
+
+function handleDateChange(delta){
+  currentDate.setDate(currentDate.getDate()+delta);
+  if (currentDayEl) currentDayEl.textContent = formatDateDisplay(currentDate);
+  if(chartInitialized && chart) updateChartData(currentDate);
 }
 
-function handleDateChange(delta) {
-  currentDate.setDate(currentDate.getDate() + delta);
-  if (currentDayEl) {
-    currentDayEl.textContent = formatDateDisplay(currentDate);
-  }
-  if (chartInitialized && chart) {
-    // อัปเดต chart วันใหม่
-    updateChartData(currentDate);
-  }
-}
+prevBtn?.addEventListener('pointerdown', e => { e.preventDefault(); handleDateChange(-1); });
+nextBtn?.addEventListener('pointerdown', e => { e.preventDefault(); handleDateChange(1); });
 
-// ใช้ pointerdown แทน click/mousedown/touchstart
-prevBtn?.addEventListener('pointerdown', (e) => {
-  e.preventDefault();
-  handleDateChange(-1);
-});
-nextBtn?.addEventListener('pointerdown', (e) => {
-  e.preventDefault();
-  handleDateChange(1);
-});
-
-// โหลด Chart ทันที
+// โหลด chart ทันที
 initializeChart();
 
-// ================= FullCalendar (Cache Monthly API) ================
-let calendar = null;
-let eventCache = {}; // key: "YYYY-MM" => events array
 
-async function fetchEvents(year, month) {
-  const key = `${year}-${String(month).padStart(2, "0")}`;
+  // ================= FullCalendar =================
+  let calendar = null;
+  let eventCache = {};
 
-  if (eventCache[key]) return eventCache[key]; // ใช้แคช
+  async function fetchEvents(year, month) {
+    const key = `${year}-${String(month).padStart(2, "0")}`;
 
-  try {
-    const url = `https://momaybackendhospital-production.up.railway.app/calendar?year=${year}&month=${month}`;
-    const res = await fetch(url);
-    const data = await res.json();
+    if (eventCache[key]) return eventCache[key];
 
-eventCache[key] = data.map(e => ({
-  ...e,
-  textColor: '#000'        // ตัวอักษรสีดำเท่านั้น
-}));
+    try {
+      const url = `https://momaybackendhospital-production.up.railway.app/calendar?year=${year}&month=${month}`;
+      const res = await fetch(url);
+      const data = await res.json();
 
+      eventCache[key] = data.map(e => ({
+        ...e,
+        textColor: '#000'
+      }));
 
-    return eventCache[key];
-  } catch (err) {
-    console.error("Error loading events:", err);
-    eventCache[key] = [];
-    return [];
-  }
-}
-
-async function preloadInitialMonths() {
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth() + 1;
-
-  // เดือนปัจจุบัน
-  await fetchEvents(currentYear, currentMonth);
-
-  // เดือนก่อนหน้า
-  let prevYear = currentYear;
-  let prevMonth = currentMonth - 1;
-  if (prevMonth === 0) { prevMonth = 12; prevYear--; }
-
-  await fetchEvents(prevYear, prevMonth);
-}
-
-async function initializeCalendar() {
-  const calendarEl = document.getElementById("calendar");
-  if (!calendarEl) return;
-
-  await preloadInitialMonths(); // ✅ โหลดล่วงหน้าก่อน render
-
-  calendar = new FullCalendar.Calendar(calendarEl, {
-    initialView: "dayGridMonth",
-    locale: "en",
-    height: 600,
-    headerToolbar: { left: "prev", center: "title", right: "next" },
-
-    events: async function(fetchInfo, successCallback) {
-      const year = fetchInfo.start.getFullYear();
-      const month = fetchInfo.start.getMonth() + 1;
-
-      const events = await fetchEvents(year, month);
-      successCallback(events);
-    },
-
-    dateClick: async function(info) {
-      const pricePerUnit = 4.4;
-      const datePopup = document.getElementById("DatePopup");
-      const popupDateEl = datePopup?.querySelector(".popup-date");
-      const popupBillEl = document.getElementById("popup-bill");
-      const popupUnitEl = document.getElementById("popup-unit");
-
-      datePopup.style.display = "flex";
-      datePopup.classList.add("active");
-      popupDateEl.textContent = info.dateStr;
-
-      try {
-        const res = await fetch(`https://momaybackendhospital-production.up.railway.app/daily-bill?date=${info.dateStr}`);
-        const json = await res.json();
-        const bill = json.electricity_bill ?? 0;
-        const unit = bill / pricePerUnit;
-
-        popupBillEl.textContent = `${bill.toFixed(2)} THB`;
-        popupUnitEl.textContent = `${unit.toFixed(2)} Unit`;
-      } catch (err) {
-        popupBillEl.textContent = "Error";
-        popupUnitEl.textContent = "";
-      }
+      return eventCache[key];
+    } catch (err) {
+      console.error("Error loading events:", err);
+      eventCache[key] = [];
+      return [];
     }
-  });
+  }
 
-  calendar.render();
-}
+  async function preloadInitialMonths() {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth() + 1;
 
-initializeCalendar();
+    await fetchEvents(currentYear, currentMonth);
 
+    let prevYear = currentYear;
+    let prevMonth = currentMonth - 1;
+    if (prevMonth === 0) { prevMonth = 12; prevYear--; }
 
-// Calendar Popup
-const calendarIcon = document.querySelector("#Calendar_icon img");
-const popup = document.getElementById("calendarPopup");
+    await fetchEvents(prevYear, prevMonth);
+  }
 
-if (calendarIcon && popup) {
-  calendarIcon.addEventListener("click", () => {
-    popup.classList.add("active");
-    calendar?.updateSize();
-  });
-  popup.addEventListener("click", e => {
-    if (e.target === popup) popup.classList.remove("active");
-  });
-}
+  async function initializeCalendar() {
+    const calendarEl = document.getElementById("calendar");
+    if (!calendarEl) return;
 
+    await preloadInitialMonths();
 
-  // ================= Weather Sukhothai (Optimized) =================
+    calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: "dayGridMonth",
+      locale: "en",
+      height: 600,
+      headerToolbar: { left: "prev", center: "title", right: "next" },
+
+      events: async function(fetchInfo, successCallback) {
+        const year = fetchInfo.start.getFullYear();
+        const month = fetchInfo.start.getMonth() + 1;
+
+        const events = await fetchEvents(year, month);
+        successCallback(events);
+      },
+
+      dateClick: async function(info) {
+        const pricePerUnit = 4.4;
+        const datePopup = document.getElementById("DatePopup");
+        const popupDateEl = datePopup?.querySelector(".popup-date");
+        const popupBillEl = document.getElementById("popup-bill");
+        const popupUnitEl = document.getElementById("popup-unit");
+
+        datePopup.style.display = "flex";
+        datePopup.classList.add("active");
+        popupDateEl.textContent = info.dateStr;
+
+        try {
+          const res = await fetch(`https://momaybackendhospital-production.up.railway.app/daily-bill?date=${info.dateStr}`);
+          const json = await res.json();
+          const bill = json.electricity_bill ?? 0;
+          const unit = bill / pricePerUnit;
+
+          popupBillEl.textContent = `${bill.toFixed(2)} THB`;
+          popupUnitEl.textContent = `${unit.toFixed(2)} Unit`;
+        } catch (err) {
+          popupBillEl.textContent = "Error";
+          popupUnitEl.textContent = "";
+        }
+      }
+    });
+
+    calendar.render();
+  }
+
+  initializeCalendar();
+
+  const calendarIcon = document.querySelector("#Calendar_icon img");
+  const popup = document.getElementById("calendarPopup");
+
+  if (calendarIcon && popup) {
+    calendarIcon.addEventListener("click", () => {
+      popup.classList.add("active");
+      calendar?.updateSize();
+    });
+    popup.addEventListener("click", e => {
+      if (e.target === popup) popup.classList.remove("active");
+    });
+  }
+
+  // ================= Weather Sukhothai =================
   async function fetchCurrentWeatherSukhothai() {
     try {
       if (isCacheValid('weather', CACHE_DURATION.weather) && cache.weather) {
@@ -616,7 +547,7 @@ if (calendarIcon && popup) {
   }
 
   fetchCurrentWeatherSukhothai();
-  setInterval(fetchCurrentWeatherSukhothai, 1800000);
+  setInterval(fetchCurrentWeatherSukhothai, 300000);
 
   // ================= Kwang Solar Popup =================
   const kwangIcon = document.getElementById("Kwang_icon");
@@ -634,7 +565,6 @@ if (calendarIcon && popup) {
   const prevBtnKwang = document.getElementById('kwangPrevDay');
   const nextBtnKwang = document.getElementById('kwangNextDay');
   const currentDayElKwang = document.getElementById('kwangCurrentDay');
-
 
   let kwangDate = new Date();
 
@@ -712,17 +642,16 @@ if (calendarIcon && popup) {
 
       if (kwangPowerEl) kwangPowerEl.textContent = (json.dayEnergy ?? 0).toFixed(2) + " Unit";
       if (kwangCapacityEl) kwangCapacityEl.textContent = (json.solarCapacity_kW ?? 0).toFixed(2) + " kW";
-if (kwangBillEl) 
-  kwangBillEl.textContent = (json.savingsDay ?? 0)
-    .toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " THB";     
-if (kwangMonthEl) 
-  kwangMonthEl.textContent = (json.savingsMonth ?? 0)
-    .toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " THB";     
-     if (kwangnigtEl) kwangnigtEl.textContent = (json.nightEnergy ?? 0).toFixed(2) + " Unit";
+      if (kwangBillEl) 
+        kwangBillEl.textContent = (json.savingsDay ?? 0)
+          .toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " THB";     
+      if (kwangMonthEl) 
+        kwangMonthEl.textContent = (json.savingsMonth ?? 0)
+          .toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " THB";     
+      if (kwangnigtEl) kwangnigtEl.textContent = (json.nightEnergy ?? 0).toFixed(2) + " Unit";
       if (TOTEl) TOTEl.textContent = (json.totalEnergyKwh ?? 0).toFixed(2) + " Unit";
       if (kwangPeakEl) kwangPeakEl.textContent = (json.peakPowerDay ?? 0).toFixed(2) + " kW";
       if (kwangTOTdayBill) kwangTOTdayBill.textContent = (json.totalCost ?? 0).toFixed(2) + " THB";
-
 
     } catch (err) {
       if (kwangPowerEl) kwangPowerEl.textContent = "- Unit";

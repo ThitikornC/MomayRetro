@@ -2785,7 +2785,15 @@ color: #000000;
 }
 }
 @media screen and (max-width: 450px) {
-  
+  #Total_Bar {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: -120px;
+  margin-bottom: 10px;}
   /* Container ปฏิทิน */
   #calendar {
     width: 100%;      /* เต็มความกว้างหน้าจอ */
