@@ -1073,7 +1073,8 @@ font-size: 14px;
   font-weight: bold;
   margin-top: -5px;
   position: relative;      /* ⬅️ เพิ่มบรรทัดนี้ */
-  left: -10px;            /* ⬅️ เพิ่มบรรทัดนี้ (ปรับค่าตามต้องการ) */
+  left: -10px; 
+  bottom: 3px;           /* ⬅️ เพิ่มบรรทัดนี้ (ปรับค่าตามต้องการ) */
 }
 
 #weather-city {

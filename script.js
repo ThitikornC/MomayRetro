@@ -1,4 +1,68 @@
 
+// ---------------- Global error capture (collect runtime crashes) ----------------
+(function() {
+  function saveErrorRecord(rec) {
+    try {
+      const key = 'momay_error_logs_v1';
+      const existing = JSON.parse(localStorage.getItem(key) || '[]');
+      existing.unshift(rec);
+      localStorage.setItem(key, JSON.stringify(existing.slice(0, 50)));
+    } catch (e) { /* ignore */ }
+  }
+
+  function showErrorOverlay(rec) {
+    try {
+      if (document.readyState === 'loading') return; // DOM not ready
+      let el = document.getElementById('errorOverlay');
+      if (!el) {
+        el = document.createElement('div');
+        el.id = 'errorOverlay';
+        Object.assign(el.style, {
+          position: 'fixed',
+          right: '12px',
+          bottom: '12px',
+          background: 'rgba(200,30,30,0.95)',
+          color: '#fff',
+          padding: '10px 12px',
+          borderRadius: '6px',
+          zIndex: 99999,
+          fontSize: '12px',
+          maxWidth: '320px',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
+          whiteSpace: 'pre-wrap'
+        });
+        document.body.appendChild(el);
+      }
+      el.textContent = `[${new Date(rec.ts).toLocaleTimeString()}] ${rec.message}${rec.file ? '\n' + rec.file + ':' + rec.line : ''}${rec.stack ? '\n' + rec.stack.split('\n').slice(0,3).join('\n') : ''}`;
+      el.style.display = 'block';
+      clearTimeout(el._hideTimer);
+      el._hideTimer = setTimeout(() => { el.style.display = 'none'; }, 15000);
+    } catch (e) {}
+  }
+
+  function capture(record) {
+    const rec = Object.assign({ ts: Date.now(), message: '', stack: null, file: null, line: null }, record || {});
+    saveErrorRecord(rec);
+    // show overlay (non-blocking)
+    try { showErrorOverlay(rec); } catch (e) {}
+    // still print to console
+    console.error('Captured error:', rec);
+  }
+
+  window.addEventListener('error', function (e) {
+    capture({ message: e.message || 'Error', stack: (e.error && e.error.stack) || null, file: e.filename, line: e.lineno });
+  });
+
+  window.addEventListener('unhandledrejection', function (e) {
+    const reason = e.reason || {}; 
+    capture({ message: reason.message || String(reason) || 'UnhandledRejection', stack: reason.stack || null });
+  });
+
+  // small helper to retrieve stored error logs from console if needed
+  window.getMomayErrorLogs = function () { try { return JSON.parse(localStorage.getItem('momay_error_logs_v1') || '[]'); } catch (e) { return []; } };
+
+})();
+
 document.addEventListener('DOMContentLoaded', async function() {
 
   // ================= Date =================
@@ -131,29 +195,37 @@ document.addEventListener('DOMContentLoaded', async function() {
 
   async function updateBarsAndKW() {
     try {
-      if (isCacheValid('power', CACHE_DURATION.power) && cache.powerData) {
-        renderPowerData(cache.powerData);
-        return;
-      }
-
       const today = new Date();
       const yyyy = today.getFullYear();
       const mm = String(today.getMonth() + 1).padStart(2, '0');
       const dd = String(today.getDate()).padStart(2, '0');
       const localDate = `${yyyy}-${mm}-${dd}`;
 
-      const res = await fetch('https://api-kx4r63rdjq-an.a.run.app/daily-energy/px_pm3250?date=' + localDate);
-      const json = await res.json();
-      const data = json.data;
-      const latest = data.length ? data[data.length - 1].power : 0;
+      // If we have a cached value (even if expired), render it immediately to make UI responsive
+      if (cache.powerData !== null && cache.powerData !== undefined) {
+        renderPowerData(cache.powerData);
+      }
 
-      cache.powerData = latest;
-      cache.lastFetch['power'] = Date.now();
-      
-      renderPowerData(latest);
+      // Prevent concurrent network requests
+      if (cache._powerFetching) return;
+      cache._powerFetching = true;
+
+      // Fetch latest in background (stale-while-revalidate)
+      fetch('https://api-kx4r63rdjq-an.a.run.app/daily-energy/px_pm3250?date=' + localDate)
+        .then(res => res.json())
+        .then(json => {
+          const data = json.data || [];
+          const latest = data.length ? data[data.length - 1].power : 0;
+          cache.powerData = latest;
+          cache.lastFetch['power'] = Date.now();
+          renderPowerData(latest);
+        })
+        .catch(err => console.error('Error fetching power data:', err))
+        .finally(() => { cache._powerFetching = false; });
 
     } catch (err) {
-      console.error('Error fetching power data:', err);
+      console.error('Error in updateBarsAndKW:', err);
+      cache._powerFetching = false;
     }
   }
 
@@ -206,7 +278,8 @@ document.addEventListener('DOMContentLoaded', async function() {
 
   initializeTotalDonut()
   updateBarsAndKW();
-  setInterval(updateBarsAndKW, 500);
+  // Reduce frequency to avoid network congestion on refresh; use stale-while-revalidate for immediacy
+  setInterval(updateBarsAndKW, 2000);
 
   // ================= Daily Bill =================
   const dailyBillEl = document.getElementById('DailyBill');
@@ -215,20 +288,25 @@ document.addEventListener('DOMContentLoaded', async function() {
 
   async function fetchDailyBill() {
     try {
-      if (isCacheValid('dailyBill', CACHE_DURATION.dailyBill) && cache.dailyBill) {
+      // Render cached bill immediately if available
+      if (cache.dailyBill !== null && cache.dailyBill !== undefined) {
         renderDailyBill(cache.dailyBill);
-        return;
       }
+
+      if (cache._dailyBillFetching) return;
+      cache._dailyBillFetching = true;
 
       const today = new Date().toISOString().split('T')[0];
       const url = `https://momaybackendhospital-production.up.railway.app/daily-bill?date=${today}`;
-      const res = await fetch(url);
-      const json = await res.json();
-
-      cache.dailyBill = json.electricity_bill ?? 0;
-      cache.lastFetch['dailyBill'] = Date.now();
-      
-      renderDailyBill(cache.dailyBill);
+      fetch(url)
+        .then(res => res.json())
+        .then(json => {
+          cache.dailyBill = json.electricity_bill ?? 0;
+          cache.lastFetch['dailyBill'] = Date.now();
+          renderDailyBill(cache.dailyBill);
+        })
+        .catch(err => console.error('Error fetching daily bill:', err))
+        .finally(() => { cache._dailyBillFetching = false; });
 
     } catch (err) {
       console.error('Error fetching daily bill:', err);
@@ -268,18 +346,56 @@ async function fetchDailyData(date){
   const dateStr = date.toISOString().split('T')[0];
   
   // ใช้ cache ถ้ามี
-  if(dailyDataCache[dateStr]) return dailyDataCache[dateStr];
+  if (dailyDataCache[dateStr]) return dailyDataCache[dateStr];
 
+  const storageKey = `dailyData-${dateStr}`;
+  const STORAGE_TTL = 1000 * 60 * 15; // 15 minutes
+
+  // Try localStorage first for immediate response
+  try {
+    const raw = localStorage.getItem(storageKey);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && parsed.ts && (Date.now() - parsed.ts < STORAGE_TTL)) {
+        dailyDataCache[dateStr] = parsed.data || [];
+        // Refresh in background
+        (async () => {
+          try {
+            const res = await fetch(`https://api-kx4r63rdjq-an.a.run.app/daily-energy/px_pm3250?date=${dateStr}`);
+            const json = await res.json();
+            const data = json.data ?? [];
+            dailyDataCache[dateStr] = data;
+            try { localStorage.setItem(storageKey, JSON.stringify({ ts: Date.now(), data })); } catch (e) { /* ignore */ }
+          } catch (e) { /* background refresh failed */ }
+        })();
+        return dailyDataCache[dateStr];
+      }
+    }
+  } catch (e) {
+    console.warn('dailyData localStorage read failed', e);
+  }
+
+  // Fallback to network (and persist)
   try {
     const res = await fetch(`https://api-kx4r63rdjq-an.a.run.app/daily-energy/px_pm3250?date=${dateStr}`);
     const json = await res.json();
     const data = json.data ?? [];
     dailyDataCache[dateStr] = data; // เก็บ cache
+    try { localStorage.setItem(storageKey, JSON.stringify({ ts: Date.now(), data })); } catch (e) { /* ignore */ }
     return data;
   } catch(err){
     console.error(err);
     return [];
   }
+}
+
+// ฟังก์ชันช่วยสร้าง labels นาทีสำหรับวัน
+function getMinuteLabels() {
+  return Array.from({ length: 1440 }, (_, i) => {
+    const hour = String(Math.floor(i / 60)).padStart(2,'0');
+    const min = String(i % 60).padStart(2,'0');
+    return `${hour}:${min}`;
+  });
 }
 
 // ฟังก์ชัน update chart
@@ -306,11 +422,48 @@ async function updateChartData(date){
   });
   const avgVal = count>0 ? sum/count : null;
 
-  chart.data.datasets[0].data = chartData;
-  chart.data.datasets[1].data = new Array(1440).fill(null).map((_,i)=>i===maxIdx?maxVal:null);
-  chart.data.datasets[2].data = new Array(1440).fill(avgVal);
+  // Downsample for faster rendering if needed
+  const MAX_POINTS = 360; // target max points to render
+  const fullLength = chartData.length;
+  if (fullLength > MAX_POINTS) {
+    const factor = Math.ceil(fullLength / MAX_POINTS);
+    const sampled = [];
+    const sampledMax = new Array(Math.ceil(fullLength / factor)).fill(null);
+    const sampledAvg = new Array(Math.ceil(fullLength / factor)).fill(null);
+    const labels = getMinuteLabels();
+    const sampledLabels = [];
+    for (let i = 0, si = 0; i < fullLength; i += factor, si++) {
+      sampled.push(chartData[i]);
+      sampledMax[si] = (i === maxIdx) ? maxVal : null;
+      sampledAvg[si] = avgVal;
+      sampledLabels.push(labels[i]);
+    }
+    chart.data.labels = sampledLabels;
+    chart.data.datasets[0].data = sampled;
+    chart.data.datasets[1].data = sampledMax;
+    chart.data.datasets[2].data = sampledAvg;
+  } else {
+    chart.data.labels = getMinuteLabels();
+    chart.data.datasets[0].data = chartData;
+    chart.data.datasets[1].data = new Array(fullLength).fill(null).map((_,i)=>i===maxIdx?maxVal:null);
+    chart.data.datasets[2].data = new Array(fullLength).fill(avgVal);
+  }
 
   chart.update('none'); // อัปเดตแบบไม่มี animation
+
+  // Prefetch adjacent days to make quick navigation (<2s) for next/prev
+  try { prefetchAdjacentDays(date, 2); } catch (e) { /* ignore */ }
+}
+
+// Prefetch helper: fetch surrounding days to warm cache
+function prefetchAdjacentDays(date, range = 1) {
+  for (let d = -range; d <= range; d++) {
+    if (d === 0) continue;
+    const dt = new Date(date);
+    dt.setDate(dt.getDate() + d);
+    // fire-and-forget
+    fetchDailyData(dt).catch(() => {});
+  }
 }
 
 // ================= Initialize Chart =================
@@ -379,12 +532,18 @@ if (currentDayEl) currentDayEl.textContent = formatDateDisplay(currentDate);
 function handleDateChange(delta){
   currentDate.setDate(currentDate.getDate()+delta);
   if (currentDayEl) currentDayEl.textContent = formatDateDisplay(currentDate);
-  if(chartInitialized && chart) updateChartData(currentDate);
+  if(chartInitialized && chart) {
+    // Start warming cache for adjacent days immediately
+    prefetchAdjacentDays(currentDate, 2);
+    updateChartData(currentDate);
+  }
 }
 
 prevBtn?.addEventListener('pointerdown', e => { e.preventDefault(); handleDateChange(-1); });
 nextBtn?.addEventListener('pointerdown', e => { e.preventDefault(); handleDateChange(1); });
 
+// Preload today's chart data (non-blocking) to speed first render
+fetchDailyData(currentDate).catch(() => {});
 // โหลด chart ทันที
 initializeChart();
 
