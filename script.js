@@ -488,17 +488,18 @@ let eventCache = {}; // key: "YYYY-MM" => events array
 async function fetchEvents(year, month) {
   const key = `${year}-${String(month).padStart(2, "0")}`;
 
-  if (eventCache[key]) return eventCache[key]; // ใช้ cache ก่อน
+  if (eventCache[key]) return eventCache[key]; // ใช้แคช
 
   try {
     const url = `https://momaybackendhospital-production.up.railway.app/calendar?year=${year}&month=${month}`;
     const res = await fetch(url);
     const data = await res.json();
 
-    eventCache[key] = data.map(e => ({
-      ...e,
-      textColor: '#000' // ตัวอักษรสีดำ
-    }));
+eventCache[key] = data.map(e => ({
+  ...e,
+  textColor: '#000'        // ตัวอักษรสีดำเท่านั้น
+}));
+
 
     return eventCache[key];
   } catch (err) {
@@ -508,33 +509,27 @@ async function fetchEvents(year, month) {
   }
 }
 
-// preload เดือนก่อนหน้า, ปัจจุบัน, ถัดไป
-async function preloadMonths(centerDate = new Date()) {
-  const year = centerDate.getFullYear();
-  const month = centerDate.getMonth() + 1;
+async function preloadInitialMonths() {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1;
+
+  // เดือนปัจจุบัน
+  await fetchEvents(currentYear, currentMonth);
 
   // เดือนก่อนหน้า
-  let prevYear = year;
-  let prevMonth = month - 1;
+  let prevYear = currentYear;
+  let prevMonth = currentMonth - 1;
   if (prevMonth === 0) { prevMonth = 12; prevYear--; }
 
-  // เดือนถัดไป
-  let nextYear = year;
-  let nextMonth = month + 1;
-  if (nextMonth === 13) { nextMonth = 1; nextYear++; }
-
-  await Promise.all([
-    fetchEvents(prevYear, prevMonth),
-    fetchEvents(year, month),
-    fetchEvents(nextYear, nextMonth)
-  ]);
+  await fetchEvents(prevYear, prevMonth);
 }
 
 async function initializeCalendar() {
   const calendarEl = document.getElementById("calendar");
   if (!calendarEl) return;
 
-  await preloadMonths(); // preload เดือนรอบ ๆ
+  await preloadInitialMonths(); // ✅ โหลดล่วงหน้าก่อน render
 
   calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: "dayGridMonth",
@@ -545,10 +540,6 @@ async function initializeCalendar() {
     events: async function(fetchInfo, successCallback) {
       const year = fetchInfo.start.getFullYear();
       const month = fetchInfo.start.getMonth() + 1;
-
-      // preload เดือนก่อนหน้า/ถัดไปเพิ่มอีกเผื่อ user เลื่อนเร็ว
-      const centerDate = fetchInfo.start;
-      preloadMonths(centerDate); // ไม่ต้อง await
 
       const events = await fetchEvents(year, month);
       successCallback(events);
@@ -585,6 +576,7 @@ async function initializeCalendar() {
 
 initializeCalendar();
 
+
 // Calendar Popup
 const calendarIcon = document.querySelector("#Calendar_icon img");
 const popup = document.getElementById("calendarPopup");
@@ -598,7 +590,6 @@ if (calendarIcon && popup) {
     if (e.target === popup) popup.classList.remove("active");
   });
 }
-
 
 
   // ================= Weather Sukhothai (Optimized) =================
@@ -777,111 +768,110 @@ if (kwangMonthEl)
   }
 
   // ================= Daily Diff =================
-  const dailyYesterdayEl = document.getElementById("dailyYesterday");
-  const dailyDayBeforeEl = document.getElementById("dailyDayBefore");
-  const dailyDiffEl = document.getElementById("dailyDiffValue");
-  const dailyPopupEl = document.getElementById('dailyPopup');
-  const overlayEl = document.getElementById('overlay');
+const dailyYesterdayEl = document.getElementById("dailyYesterday");
+const dailyDayBeforeEl = document.getElementById("dailyDayBefore");
+const dailyDiffEl = document.getElementById("dailyDiffValue");
+const dailyPopupEl = document.getElementById('dailyPopup');
+const overlayEl = document.getElementById('overlay');
 
-  async function fetchDailyDiff() {
-    try {
-      const res = await fetch('https://momaybackendhospital-production.up.railway.app/daily-diff');
-      const json = await res.json();
-      return json;
-    } catch (err) {
-      console.error("Error fetching daily diff:", err);
-      return null;
-    }
+// ================= Cache =================
+const dailyDiffCache = {
+  data: null,
+  lastFetch: 0,
+  duration: 30000 // 30 วินาที
+};
+
+async function fetchDailyDiff() {
+  const now = Date.now();
+  if (dailyDiffCache.data && (now - dailyDiffCache.lastFetch < dailyDiffCache.duration)) {
+    return dailyDiffCache.data; // ใช้ cache
   }
 
-  function formatDateDMY(dateStr) {
-    const date = new Date(dateStr);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
+  try {
+    const res = await fetch('https://momaybackendhospital-production.up.railway.app/daily-diff');
+    const json = await res.json();
+    dailyDiffCache.data = json;
+    dailyDiffCache.lastFetch = now;
+    return json;
+  } catch (err) {
+    console.error("Error fetching daily diff:", err);
+    return dailyDiffCache.data || null; // fallback ใช้ cache เก่า
+  }
+}
+
+function formatDateDMY(dateStr) {
+  const date = new Date(dateStr);
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
+}
+
+async function updateDailyDiff() {
+  const data = await fetchDailyDiff();
+  if (!data) return;
+
+  // แสดงวันที่และค่าของ Yesterday
+  if (document.getElementById("yesterdayDate") && dailyYesterdayEl) {
+    document.getElementById("yesterdayDate").innerHTML = `<strong>${formatDateDMY(data.yesterday.date)}</strong>`;
+    dailyYesterdayEl.innerHTML = `${data.yesterday.energy_kwh.toFixed(2)} Unit<br>${data.yesterday.electricity_bill.toFixed(2)} THB.`;
   }
 
-  async function updateDailyDiff() {
-    const data = await fetchDailyDiff();
-    if (!data) return;
-
-    if (document.getElementById("yesterdayDate") && dailyYesterdayEl) {
-      document.getElementById("yesterdayDate").innerHTML = `
-        <strong>${formatDateDMY(data.yesterday.date)}</strong>
-      `;
-      dailyYesterdayEl.innerHTML = `
-        ${data.yesterday.energy_kwh.toFixed(2)} Unit<br>
-        ${data.yesterday.electricity_bill.toFixed(2)} THB.
-      `;
-    }
-
-    if (document.getElementById("dayBeforeDate") && dailyDayBeforeEl) {
-      document.getElementById("dayBeforeDate").innerHTML = `
-        <strong>${formatDateDMY(data.dayBefore.date)}</strong>
-      `;
-      dailyDayBeforeEl.innerHTML = `
-        ${data.dayBefore.energy_kwh.toFixed(2)} Unit<br>
-        ${data.dayBefore.electricity_bill.toFixed(2)} THB.
-      `;
-    }
-
-    if (dailyDiffEl) {
-      const bill = data.diff.electricity_bill;
-
-      const arrowUp = `<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                         <path d="M12 2L5 10h14L12 2z" fill="red"/>
-                       </svg>`;
-      const arrowDown = `<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                           <path d="M12 22l7-8H5l7 8z" fill="green"/>
-                         </svg>`;
-
-      const color = bill < 0 ? 'red' : 'green';
-      const arrow = bill < 0 ? arrowUp : arrowDown;
-
-      dailyDiffEl.innerHTML = `
-        <div style="text-align:center; display:inline-flex; align-items:center; gap:6px;">
-          <span>Daily Bill Change: </span>
-          <span style="color:${color}; font-weight:bold;">
-            ${Math.abs(bill).toFixed(2)}฿
-          </span>
-          <span class="arrow">${arrow}</span>
-        </div>
-      `;
-    }
-
-    if (dailyPopupEl && overlayEl) {
-      dailyPopupEl.style.display = 'block';
-      overlayEl.style.display = 'block';
-    }
+  // แสดงวันที่และค่าของ DayBefore
+  if (document.getElementById("dayBeforeDate") && dailyDayBeforeEl) {
+    document.getElementById("dayBeforeDate").innerHTML = `<strong>${formatDateDMY(data.dayBefore.date)}</strong>`;
+    dailyDayBeforeEl.innerHTML = `${data.dayBefore.energy_kwh.toFixed(2)} Unit<br>${data.dayBefore.electricity_bill.toFixed(2)} THB.`;
   }
 
-  async function showDailyPopup() {
-    if (dailyPopupEl && overlayEl) {
-      overlayEl.style.display = 'block';
-      dailyPopupEl.style.display = 'block';
+  // แสดง Daily Diff พร้อมลูกศร
+  if (dailyDiffEl) {
+    const bill = data.diff.electricity_bill;
+    const arrowUp = `<svg width="24" height="24" viewBox="0 0 24 24"><path d="M12 2L5 10h14L12 2z" fill="red"/></svg>`;
+    const arrowDown = `<svg width="24" height="24" viewBox="0 0 24 24"><path d="M12 22l7-8H5l7 8z" fill="green"/></svg>`;
+    const color = bill < 0 ? 'red' : 'green';
+    const arrow = bill < 0 ? arrowUp : arrowDown;
 
-      dailyPopupEl.classList.add('show-popup');
-      dailyPopupEl.classList.remove('hide-popup');
-
-      if (navigator.vibrate) {
-        navigator.vibrate([200, 100, 200]);
-      }
-
-      await updateDailyDiff();
-    }
+    dailyDiffEl.innerHTML = `
+      <div style="text-align:center; display:inline-flex; align-items:center; gap:6px;">
+        <span>Daily Bill Change: </span>
+        <span style="color:${color}; font-weight:bold;">${Math.abs(bill).toFixed(2)}฿</span>
+        <span class="arrow">${arrow}</span>
+      </div>
+    `;
   }
 
-  function hideDailyPopup() {
-    if (dailyPopupEl && overlayEl) {
-      dailyPopupEl.style.display = 'none';
-      overlayEl.style.display = 'none';
-    }
+  // แสดง popup และ overlay
+  if (dailyPopupEl && overlayEl) {
+    dailyPopupEl.style.display = 'block';
+    overlayEl.style.display = 'block';
   }
+}
 
-  if (overlayEl) overlayEl.addEventListener('click', hideDailyPopup);
+async function showDailyPopup() {
+  if (dailyPopupEl && overlayEl) {
+    overlayEl.style.display = 'block';
+    dailyPopupEl.style.display = 'block';
+    dailyPopupEl.classList.add('show-popup');
+    dailyPopupEl.classList.remove('hide-popup');
 
-  showDailyPopup();
+    if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+
+    await updateDailyDiff();
+  }
+}
+
+function hideDailyPopup() {
+  if (dailyPopupEl && overlayEl) {
+    dailyPopupEl.style.display = 'none';
+    overlayEl.style.display = 'none';
+  }
+}
+
+if (overlayEl) overlayEl.addEventListener('click', hideDailyPopup);
+
+// เรียกโชว์ทันที
+showDailyPopup();
+
 
 // ================= Notification System (Updated) =================
 const API_BASE = 'https://momaybackendhospital-production.up.railway.app';
