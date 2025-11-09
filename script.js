@@ -562,8 +562,8 @@ function initializeChart() {
             maxRotation: 0,
             minRotation: 0,
             color: '#2c1810',
-            font: { size: 14 },
-            // Show hourly labels (00.00 .. 24.00) but avoid overlap by adaptive stepping
+            font: { size: 6 },
+            // Show labels every 3 hours: 00.00, 03.00, 06.00, 09.00, 12.00, 15.00, 18.00, 21.00, 24.00
             callback: function(v) {
               const l = this.getLabelForValue(v);
               if (!l) return '';
@@ -571,6 +571,7 @@ function initializeChart() {
               const hour = parseInt(h, 10);
               const idx = Number(v);
               const labelsLen = (this.chart && this.chart.data && this.chart.data.labels) ? this.chart.data.labels.length : null;
+              
               // Always allow the final label to be 24.00 (deduped per-scale)
               if (labelsLen !== null && idx === labelsLen - 1) {
                 const scaleId = this.id || this.axis || 'x';
@@ -580,15 +581,8 @@ function initializeChart() {
                 return '24.00';
               }
 
-              // Compute adaptive step based on available width to avoid overlapping
-              const chartObj = this.chart;
-              const chartWidth = chartObj && chartObj.chartArea ? chartObj.chartArea.width : 800;
-              const pxPerLabel = 48; // desired pixels per label
-              const maxLabels = Math.max(1, Math.floor(chartWidth / pxPerLabel));
-              // We have 24 hour labels; compute step = show every `step` hours
-              const step = Math.max(1, Math.ceil(24 / maxLabels));
-
-              if (m === '00' && (hour % step) === 0) {
+              // Show every 3 hours: 0, 3, 6, 9, 12, 15, 18, 21
+              if (m === '00' && (hour % 3) === 0) {
                 const labelToShow = `${String(h).padStart(2,'0')}.00`;
                 const scaleId = this.id || this.axis || 'x';
                 const map = (this.chart && this.chart._lastDisplayedLabel) ? this.chart._lastDisplayedLabel : (this.chart._lastDisplayedLabel = {});
@@ -611,7 +605,7 @@ function initializeChart() {
           beginAtZero: true,
           grid: { display: false },
           min: 0,
-          ticks: { color: '#2c1810', font: { size: 14 } },
+          ticks: { color: '#2c1810', font: { size: 6 } },
           title: { display: true, text: 'Power (kW)', color: '#2c1810', font: { size: 14, weight: 'bold' } }
         }
       }
@@ -662,7 +656,16 @@ function initializeChart() {
 
   // โหลดข้อมูลวันปัจจุบันทันทีหลัง chart พร้อม
   // set custom x-axis title (nudge left a bit so it appears centered in container)
-  chart.options.plugins.xAxisTitle = { text: 'Time (HH:MM)', offset: -80, relativeOffsetPercent: 0.2, padding: 36, color: '#000', font: '14px sans-serif', align: 'center' };
+  // ปรับ offset สำหรับหน้าจอต่างๆ
+  const screenWidth = window.innerWidth || 375;
+  let baseOffset = -80; // default
+  if (screenWidth <= 360) {
+    // Samsung S8 และหน้าจอเล็กกว่า: เลื่อนขวา 20% เพิ่มจาก -40
+    baseOffset = 32; // -40 + (360 * 0.2) = 32
+  } else if (screenWidth <= 375) {
+    baseOffset = -40;
+  }
+  chart.options.plugins.xAxisTitle = { text: 'Time (HH:MM)', offset: baseOffset, relativeOffsetPercent: 0.2, padding: 36, color: '#000', font: '14px sans-serif', align: 'center' };
   updateChartData(currentDate);
 }
 
@@ -1170,7 +1173,7 @@ header.style.cssText = `
 `;
 
 
-  header.innerHTML = '<strong style="font-size:16px; color:#0000;">Notification</strong>';
+  header.innerHTML = '<strong style="font-size:16px; color:#000;">Notification</strong>';
   
   notificationItems.appendChild(header);
   
