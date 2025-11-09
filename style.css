@@ -673,34 +673,56 @@ font-size: 14px;
   color: #000000; 
 }
 
-/* ================= Total Dunut ================= */
+/* ================= Total Donut Container ================= */
 #Total_Bar {
   position: relative;
-  width: 250px; /* ขนาดใหม่ */
-  height: 250px;
+  width: 180px;
+  height: 180px;
   display: flex;
   justify-content: center;
   align-items: center;
-    margin-left: -130px; /* ✅ ขยับไปทางซ้าย */
+  margin-left: -130px;
 
+  /* ขอบนอก + gradient */
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 30% 30%, 
+    #fff,
+    #fff 45%, 
+    #fff 55%, 
+    #fff 100%
+  );
+  border: 3px solid #74640a;
+
+  /* เงา inset + glow */
+  box-shadow:
+    inset 0 0 8px rgba(0,0,0,0.15),
+    1px 1px 0 #000,
+    -12px 4px #3b3305,
+    0 0 12px rgba(255, 230, 160, 0.55);
 }
 
+/* Canvas ให้เต็ม container และเป็นวงกลม */
 #Total_Bar canvas {
-  width: 75% !important;
-  height: 75% !important;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 50%;
+  background: transparent;
 }
 
+/* ตัวเลขตรงกลาง */
 #Total_Bar_Text {
   position: absolute;
   top: 50%;
-  left: 30%;
+  left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
-  color: #4a2e05;
+  color: #2c1810;
   text-align: center;
   pointer-events: none;
 }
+
 
   
 

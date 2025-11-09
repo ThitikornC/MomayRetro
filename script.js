@@ -28,86 +28,101 @@ document.addEventListener('DOMContentLoaded', async function() {
   };
 
   const CACHE_DURATION = {
-    power: 1000, // 1 วินาที
-    dailyBill: 30000, // 30 วินาที
-    weather: 1800000 // 30 นาที
+    power: 500, // 1 วินาที
+    dailyBill: 10000, // 30 วินาที
+    weather: 300000 // 30 นาที
   };
 
   function isCacheValid(key, duration) {
     return cache.lastFetch[key] && (Date.now() - cache.lastFetch[key] < duration);
   }
 
-   // ================= Total Donut Chart (CHANGED) =================
-  let totalDonutChart = null
+function initializeTotalDonut() {
+  const totalBarContainer = document.getElementById("Total_Bar");
+  if (!totalBarContainer) return;
 
-  function initializeTotalDonut() {
-    const totalBarContainer = document.getElementById("Total_Bar")
-    if (!totalBarContainer) return
+  // เคลียร์ HTML และสร้าง canvas
+  totalBarContainer.innerHTML = '<canvas id="totalDonutCanvas"></canvas>';
+  const canvas = document.getElementById("totalDonutCanvas");
 
-    // เคลียร์ HTML และสร้าง canvas
-    totalBarContainer.innerHTML = '<canvas id="totalDonutCanvas"></canvas>'
+  // ตั้งขนาด canvas ให้ตรงกับ container
+  canvas.width = totalBarContainer.offsetWidth;
+  canvas.height = totalBarContainer.offsetHeight;
 
-    const ctx = document.getElementById("totalDonutCanvas").getContext("2d")
+  const ctx = canvas.getContext("2d");
 
-    totalDonutChart = new Chart(ctx, {
-      type: "doughnut",
-      data: {
-        labels: ["Current Power", "Remaining Capacity"],
-        datasets: [
-          {
-            data: [0, 100],
-            backgroundColor: ["#FBBF32", "#e0e0e0"],
-            borderColor: ["#FBBF32", "#e0e0e0"],
-            borderWidth: 2,
-            circumference: 360,
-            rotation: 0,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            enabled: true,
-            backgroundColor: "rgba(0,0,0,0.8)",
-            titleColor: "#fff",
-            bodyColor: "#fff",
-            cornerRadius: 8,
-            callbacks: {
-              label: (context) => {
-                const value = context.parsed
-                return Math.round(value) + "%"
-              },
-            },
-          },
-        },
-      },
-      plugins: [
+  totalDonutChart = new Chart(ctx, {
+    type: "doughnut",
+    data: {
+      labels: ["Current Power", "Remaining Capacity"],
+      datasets: [
         {
-          id: "textCenter",
-          beforeDatasetsDraw(chart) {
-            const { width, height, ctx } = chart
-            ctx.restore()
-
-            const fontSize = (height / 200).toFixed(2)
-            ctx.font = `bold ${fontSize * 16}px sans-serif`
-            ctx.textBaseline = "middle"
-            ctx.textAlign = "center"
-            ctx.fillStyle = "#000"
-
-            // ดึงค่าปัจจุบันจาก dataset
-            const totalPercent = chart.data.datasets[0].data[0]
-            const text = `${Math.round(totalPercent)}%`
-            ctx.fillText(text, width / 2, height / 2)
-
-            ctx.save()
-          },
+          data: [0.01, 99.99], // แทน 0 ด้วย 0.01 เพื่อให้ segment แรกปรากฏ
+          backgroundColor: ["#FBBF32", "#f8f6f0"], // สี segment
+          borderColor: ["#FBBF32", "#f8f6f0"],     // ขอบ segment
+          borderWidth: 2,
+          cutout: "70%", // ขนาดวงด้านใน
         },
       ],
-    })
-  }
+    },
+    options: {
+      responsive: false,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          enabled: true,
+          backgroundColor: "rgba(0,0,0,0.8)",
+          titleColor: "#fff",
+          bodyColor: "#fff",
+          cornerRadius: 8,
+          callbacks: {
+            label: (context) => `${Math.round(context.parsed)}%`,
+          },
+        },
+      },
+    },
+    plugins: [
+      {
+        id: "drawInnerCircle",
+        beforeDraw(chart) {
+          const { ctx, width, height } = chart;
+          const centerX = width / 2;
+          const centerY = height / 2;
+          const innerRadius = chart.getDatasetMeta(0).data[0].innerRadius;
+
+          ctx.save();
+          // วาดวงด้านในแบบ radial gradient
+          const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, innerRadius);
+          gradient.addColorStop(0, "#fffef8"); // สีตรงกลาง
+          gradient.addColorStop(1, "#f8f6f0"); // สีขอบ
+          ctx.fillStyle = gradient;
+          ctx.beginPath();
+          ctx.arc(centerX, centerY, innerRadius, 0, 2 * Math.PI);
+          ctx.fill();
+          ctx.restore();
+        },
+      },
+      {
+        id: "textCenter",
+        beforeDatasetsDraw(chart) {
+          const { width, height, ctx } = chart;
+          ctx.save();
+          const fontSize = Math.floor(height / 8);
+          ctx.font = `bold ${fontSize}px sans-serif`;
+          ctx.textBaseline = "middle";
+          ctx.textAlign = "center";
+          ctx.fillStyle = "#2c1810";
+
+          const totalPercent = chart.data.datasets[0].data[0];
+          ctx.fillText(`${Math.round(totalPercent)}%`, width / 2, height / 2);
+          ctx.restore();
+        },
+      },
+    ],
+  });
+}
+
   // ================= Progress bars (Optimized) =================
   const floor1Bar = document.querySelector('#floor1 .progress-bar');
   const totalBar = document.querySelector('#Total_Bar .progress-bar');
@@ -240,155 +255,171 @@ document.addEventListener('DOMContentLoaded', async function() {
   fetchDailyBill();
   setInterval(fetchDailyBill, 30000); // เปลี่ยนเป็น 30 วินาที
 
-  // ================= Chart.js (Load ทันที - ไม่มี Lazy Load) =================
 // ================= Chart.js (Load ทันที - ไม่มี Lazy Load) =================
-  let chartInitialized = false;
-  let chart = null;
-  let currentDate = new Date();
+let chartInitialized = false;
+let chart = null;
+let currentDate = new Date();
 
-  function formatDateDisplay(date){
-    const d=String(date.getDate()).padStart(2,'0');
-    const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-    const m = monthNames[date.getMonth()];     
-    const y=date.getFullYear();
-    return `${d} - ${m} - ${y}`;
+// ฟังก์ชัน format วันที่
+function formatDateDisplay(date){
+  const d = String(date.getDate()).padStart(2,'0');
+  const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const m = monthNames[date.getMonth()];     
+  const y = date.getFullYear();
+  return `${d} - ${m} - ${y}`;
+}
+
+// ฟังก์ชัน fetch ข้อมูล
+async function fetchDailyData(date){
+  const dateStr = date.toISOString().split('T')[0];
+  try {
+    const res = await fetch(`https://api-kx4r63rdjq-an.a.run.app/daily-energy/px_pm3250?date=${dateStr}`);
+    const json = await res.json();
+    return json.data;
+  } catch(err){
+    console.error(err);
+    return [];
   }
+}
 
-  async function fetchDailyData(date){
-    const dateStr = date.toISOString().split('T')[0];
-    try{
-      const res = await fetch(`https://api-kx4r63rdjq-an.a.run.app/daily-energy/px_pm3250?date=${dateStr}`);
-      const json = await res.json();
-      return json.data;
-    }catch(err){console.error(err); return [];}
-  }
+// ฟังก์ชัน update chart
+async function updateChartData(date){
+  if (!chart) return;
 
-  async function updateChartData(date){
-    if (!chart) return;
-    
-    const values = await fetchDailyData(date);
-    const chartData = new Array(1440).fill(null);
-    values.forEach(item=>{
-      const t = new Date(item.timestamp);
-      const idx = t.getUTCHours()*60 + t.getUTCMinutes();
-      chartData[idx] = item.power;
-    });
-    let maxVal=null, maxIdx=null, sum=0, count=0;
-    chartData.forEach((v,i)=>{
-      if(v!==null){ if(maxVal===null||v>maxVal){ maxVal=v; maxIdx=i; } sum+=v; count++; }
-    });
-    const avgVal = count>0?sum/count:null;
+  const values = await fetchDailyData(date);
 
-    const canvas = document.getElementById('EnergyChart');
-    const ctx = canvas.getContext('2d');
-    const gradient = ctx.createLinearGradient(0,0,0,400);
-    gradient.addColorStop(0,'rgba(139,69,19,0.4)');
-    gradient.addColorStop(0.5,'rgba(210,180,140,0.3)');
-    gradient.addColorStop(1,'rgba(245,222,179,0.1)');
+  // สร้าง array 1440 จุด (1 นาทีต่อจุด)
+  const chartData = new Array(1440).fill(null);
+  values.forEach(item => {
+    const t = new Date(item.timestamp);
+    const idx = t.getUTCHours()*60 + t.getUTCMinutes();
+    chartData[idx] = item.power;
+  });
 
-    chart.data.datasets=[
-      {label:'Power', data:chartData, borderColor:'#8B4513', backgroundColor:gradient, fill:true, borderWidth:0.5, tension:0.3, pointRadius:0.1},
-      {label:'Max', data:new Array(1440).fill(null).map((_,i)=>i===maxIdx?maxVal:null), borderColor:'#ff9999', pointRadius:5, pointBackgroundColor:'#ff9999', fill:false, showLine:false},
-      {label:'Average', data:new Array(1440).fill(avgVal), borderColor:'#000', borderDash:[5,5], fill:false, pointRadius:0,  borderWidth: 1}
-    ];
-    chart.update();
-  }
+  // คำนวณ Max / Avg
+  let maxVal = null, maxIdx = null, sum = 0, count = 0;
+  chartData.forEach((v,i)=>{
+    if(v!==null){
+      if(maxVal===null||v>maxVal){ maxVal=v; maxIdx=i; }
+      sum += v;
+      count++;
+    }
+  });
+  const avgVal = count>0 ? sum/count : null;
 
-  async function initializeChart() {
-    if (chartInitialized) return;
-    
-    const canvas = document.getElementById('EnergyChart');
-    if (!canvas) return;
+  // update chart dataset
+  chart.data.datasets[0].data = chartData;
+  chart.data.datasets[1].data = new Array(1440).fill(null).map((_,i)=>i===maxIdx?maxVal:null);
+  chart.data.datasets[2].data = new Array(1440).fill(avgVal);
 
-    const ctx = canvas.getContext('2d');
-    const labels = Array.from({ length: 1440 }, (_, i) => {
-      const hour = String(Math.floor(i / 60)).padStart(2,'0');
-      const min = String(i % 60).padStart(2,'0');
-      return `${hour}:${min}`;
-    });
+  chart.update('none'); // อัปเดตแบบไม่มี animation
+}
 
-    const gradient = ctx.createLinearGradient(0,0,0,400);
-    gradient.addColorStop(0,'rgba(139,69,19,0.4)');
-    gradient.addColorStop(0.5,'rgba(210,180,140,0.3)');
-    gradient.addColorStop(1,'rgba(245,222,179,0.1)');
+// ฟังก์ชัน initialize chart
+async function initializeChart() {
+  if (chartInitialized) return;
 
-    const data = { labels, datasets:[{label:'Power', data:new Array(1440).fill(null), borderColor:'#8B4513', backgroundColor: gradient, fill:true, borderWidth:0.5, tension:0.3, pointRadius:0}] };
-    
-    const config = {
-      type: 'line',
-      data,
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        animation: false,
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            enabled: true,
-            backgroundColor: 'rgba(0,0,0,0.8)',
-            titleColor: '#fff',
-            bodyColor: '#fff',
-            cornerRadius: 8,
-            displayColors: false,
-            callbacks: {
-              title: function(items){ return items[0].label; },
-              label: function(item){
-                const datasetLabel = item.dataset.label;
-                const value = item.raw;
-                if(datasetLabel==='Max') return `Max: ${value.toFixed(2)} kW`;
-                else if(datasetLabel==='Average') return `Average: ${value.toFixed(2)} kW`;
-                else if(datasetLabel==='Power') return value!==null ? `Power: ${value.toFixed(2)} kW` : '-';
-              }
-            }
-          }
-        },
-        scales: {
-          x: {
-            type: 'category',
-            grid: { display: false },
-            ticks: {
-              autoSkip: false,
-              color: '#000',
-              maxRotation: 0,
-              minRotation: 0,
-              callback: function(v){
-                const l = this.getLabelForValue(v);
-                if(!l) return '';
-                const [h,m] = l.split(':');
-                return m==='00' && parseInt(h)%3===0 ? l : '';
-              }
-            },
-            title: {
-              display: true,
-              text: 'Time (HH:MM)',
-              color: '#000',
-              font: { size: 14, weight: 'bold' },
-            }
-          },
-          y: {
-            grid: { display: false },
-            beginAtZero: true,
-            min: 0,
-            ticks: { color: '#000' },
-            title: {
-              display: true,
-              text: 'Power (kW)',
-              color: '#000',
-              font: { size: 14, weight: 'bold' }
+  const canvas = document.getElementById('EnergyChart');
+  if (!canvas) return;
+
+  const ctx = canvas.getContext('2d');
+  const labels = Array.from({ length: 1440 }, (_, i) => {
+    const hour = String(Math.floor(i / 60)).padStart(2,'0');
+    const min = String(i % 60).padStart(2,'0');
+    return `${hour}:${min}`;
+  });
+
+  // สร้าง gradient
+  const gradient = ctx.createLinearGradient(0,0,0,400);
+  gradient.addColorStop(0,'rgba(139,69,19,0.4)');
+  gradient.addColorStop(0.5,'rgba(210,180,140,0.3)');
+  gradient.addColorStop(1,'rgba(245,222,179,0.1)');
+
+  // สร้าง chart ด้วย 1440 จุด (แสดงทันที)
+  const data = { 
+    labels, 
+    datasets:[
+      {label:'Power', data:new Array(1440).fill(null), borderColor:'#8B4513', backgroundColor: gradient, fill:true, borderWidth:0.5, tension:0.3, pointRadius:0},
+      {label:'Max', data:new Array(1440).fill(null), borderColor:'#ff9999', pointRadius:5, pointBackgroundColor:'#ff9999', fill:false, showLine:false},
+      {label:'Average', data:new Array(1440).fill(null), borderColor:'#000', borderDash:[5,5], fill:false, pointRadius:0, borderWidth:1}
+    ]
+  };
+
+  const config = {
+    type: 'line',
+    data,
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          enabled: true,
+          backgroundColor: 'rgba(0,0,0,0.8)',
+          titleColor: '#fff',
+          bodyColor: '#fff',
+          cornerRadius: 8,
+          displayColors: false,
+          callbacks: {
+            title: function(items){ return items[0].label; },
+            label: function(item){
+              const datasetLabel = item.dataset.label;
+              const value = item.raw;
+              if(datasetLabel==='Max') return `Max: ${value?.toFixed(2)} kW`;
+              else if(datasetLabel==='Average') return `Average: ${value?.toFixed(2)} kW`;
+              else if(datasetLabel==='Power') return value!==null ? `Power: ${value.toFixed(2)} kW` : '-';
             }
           }
         }
+      },
+      scales: {
+        x: {
+          type: 'category',
+          grid: { display: false },
+          ticks: {
+            autoSkip: false,
+            color: '#000',
+            maxRotation: 0,
+            minRotation: 0,
+            callback: function(v){
+              const l = this.getLabelForValue(v);
+              if(!l) return '';
+              const [h,m] = l.split(':');
+              return m==='00' && parseInt(h)%3===0 ? l : '';
+            }
+          },
+          title: {
+            display: true,
+            text: 'Time (HH:MM)',
+            color: '#000',
+            font: { size: 14, weight: 'bold' },
+          }
+        },
+        y: {
+          grid: { display: false },
+          beginAtZero: true,
+          min: 0,
+          ticks: { color: '#000' },
+          title: {
+            display: true,
+            text: 'Power (kW)',
+            color: '#000',
+            font: { size: 14, weight: 'bold' }
+          }
+        }
       }
-    };
-    
-    chart = new Chart(ctx, config);
-    chartInitialized = true;
+    }
+  };
 
-    // โหลดข้อมูลวันปัจจุบันทันทีหลัง chart พร้อม
-    await updateChartData(currentDate);
-  }
+  chart = new Chart(ctx, config);
+  chartInitialized = true;
 
-  // Initialize Date Picker และ Chart ทันที
+  // โหลดข้อมูลวันปัจจุบันทันทีหลัง chart พร้อม
+  updateChartData(currentDate);
+}
+
+// Initialize Date Picker
 const prevBtn = document.getElementById('prevDay');
 const nextBtn = document.getElementById('nextDay');
 const currentDayEl = document.getElementById('currentDay');
@@ -398,12 +429,12 @@ if (currentDayEl) {
 }
 
 function handleDateChange(delta) {
-  console.log('🔥 Date change:', delta);
   currentDate.setDate(currentDate.getDate() + delta);
   if (currentDayEl) {
     currentDayEl.textContent = formatDateDisplay(currentDate);
   }
   if (chartInitialized && chart) {
+    // อัปเดต chart วันใหม่
     updateChartData(currentDate);
   }
 }
@@ -413,7 +444,6 @@ prevBtn?.addEventListener('pointerdown', (e) => {
   e.preventDefault();
   handleDateChange(-1);
 });
-
 nextBtn?.addEventListener('pointerdown', (e) => {
   e.preventDefault();
   handleDateChange(1);
