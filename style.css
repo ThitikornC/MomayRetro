@@ -2823,11 +2823,13 @@ color: #000000;
   }
 
   /* ตัวเลขวัน */
-  .fc-daygrid-day-number {
-    font-size: 0.5rem !important;
-    margin-right: -100 !important;
-    margin-bottom: 2px !important;
-  }
+.fc-daygrid-day-number {
+  font-size: 0.5rem !important;
+  margin-right: 0 !important;
+  margin-bottom: 2px !important;
+  text-align: right;
+  padding-right: 2px; /* ปรับระยะเลขวัน */
+}
 
   /* Event */
   .fc-event {
