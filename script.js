@@ -11,132 +11,256 @@ document.addEventListener('DOMContentLoaded', async function() {
   }
   updateDate();
 
-  // ================= Constants =================
-  const V = 400;
-  const root3 = Math.sqrt(3);
-  const floor1_maxA = 400;
-  const floor1_maxKW = root3 * V * floor1_maxA / 1000;
-  const total_maxA = 400;
-  const total_maxKW = root3 * V * total_maxA / 1000;
+    // ================= Constants =================
+  const V = 400
+  const root3 = Math.sqrt(3)
+  const floor1_maxA = 400
+  const floor1_maxKW = (root3 * V * floor1_maxA) / 1000
+  const total_maxA = 400
+  const total_maxKW = (root3 * V * total_maxA) / 1000
 
   // ================= Cache Management =================
   const cache = {
     powerData: null,
     dailyBill: null,
     weather: null,
-    lastFetch: {}
-  };
+    lastFetch: {},
+  }
 
   const CACHE_DURATION = {
     power: 1000, // 1 วินาที
     dailyBill: 30000, // 30 วินาที
-    weather: 1800000 // 30 นาที
-  };
-
-  function isCacheValid(key, duration) {
-    return cache.lastFetch[key] && (Date.now() - cache.lastFetch[key] < duration);
+    weather: 1800000, // 30 นาที
   }
 
-  // ================= Total Marker =================
-  const totalBarContainer = document.getElementById('Total_Bar'); 
-  let marker = document.createElement('div');
+  function isCacheValid(key, duration) {
+    return cache.lastFetch[key] && Date.now() - cache.lastFetch[key] < duration
+  }
 
-  function updateMarker(totalPercent) {
-    const markerPosition = 182 * (totalPercent / 100);
-    marker.style.top = `${182 - markerPosition}px`; 
+  // ================= Total Donut Chart (CHANGED) =================
+  let totalDonutChart = null
+
+  function initializeTotalDonut() {
+    const totalBarContainer = document.getElementById("Total_Bar")
+    if (!totalBarContainer) return
+
+    totalBarContainer.style.position = "relative"
+    totalBarContainer.style.width = "100%"
+    totalBarContainer.style.height = "300px"
+
+    totalBarContainer.innerHTML = '<canvas id="totalDonutCanvas" width="300" height="300"></canvas>'
+
+    const canvas = document.getElementById("totalDonutCanvas")
+    if (!canvas) {
+      console.error("[v0] Canvas element not found")
+      return
+    }
+
+    if (typeof window.Chart === "undefined") {
+      console.error("[v0] Chart.js library not loaded")
+      return
+    }
+
+    const ctx = canvas.getContext("2d")
+    if (!ctx) {
+      console.error("[v0] Could not get canvas context")
+      return
+    }
+
+   totalDonutChart = new window.Chart(ctx, {
+  type: "doughnut",
+  data: {
+    labels: ["Current Power", "Remaining Capacity"],
+    datasets: [
+      {
+        data: [0, 100],
+        backgroundColor: ["#FBBF32", "#e0e0e0"], // สีหลักและสีเหลือ
+        borderColor: ["#FBBF32", "#e0e0e0"],
+        borderWidth: 2,
+        circumference: 360,
+        rotation: 0,
+      },
+    ],
+  },
+  options: {
+    responsive: false,
+    maintainAspectRatio: false,
+    cutout: "70%", // ให้ตรงกลางเว้นช่องสำหรับตัวเลข
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        enabled: true,
+        backgroundColor: "rgba(0,0,0,0.8)",
+        titleColor: "#fff",
+        bodyColor: "#fff",
+        cornerRadius: 8,
+        callbacks: {
+          label: (context) => {
+            const value = context.parsed;
+            return Math.round(value) + "%";
+          },
+        },
+      },
+    },
+  },
+  plugins: [
+    {
+      // Plugin เพิ่มสไตล์แบบ meter
+    id: "meterStyle",
+beforeDraw(chart) {
+  const { width, height, ctx } = chart;
+  ctx.save();
+
+  const centerX = width / 2;
+  const centerY = height / 2;
+  const radius = Math.min(width, height) / 2;
+
+  // Gradient แบบ .meter
+  const gradient = ctx.createLinearGradient(0, 0, 0, height);
+  gradient.addColorStop(0, "#f8f6f0");
+  gradient.addColorStop(0.45, "#fffef8");
+  gradient.addColorStop(0.55, "#fff8e8");
+  gradient.addColorStop(1, "#f5f0e5");
+
+  // วาดวงกลมพื้นหลัง ปรับ radius ให้เหลือ space สำหรับ border
+  const borderWidth = 6;
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, radius - borderWidth / 2, 0, 2 * Math.PI);
+  ctx.fillStyle = gradient;
+  ctx.fill();
+
+  // วาดขอบวงกลม
+  ctx.lineWidth = borderWidth;
+  ctx.strokeStyle = "#74640a";
+  ctx.stroke();
+
+  // เงาเบา ๆ
+  ctx.shadowColor = "rgba(0,0,0,0.15)";
+  ctx.shadowBlur = 4;
+
+  ctx.restore();
+},
+
+    },
+    {
+      // ตัวเลขตรงกลาง
+      id: "textCenter",
+      beforeDatasetsDraw(chart) {
+        const { width, height, ctx } = chart;
+        ctx.save();
+
+        const fontSize = (height / 200).toFixed(2);
+        ctx.font = `bold ${fontSize * 16}px sans-serif`;
+        ctx.textBaseline = "middle";
+        ctx.textAlign = "center";
+        ctx.fillStyle = "#4a2e05"; // สีตัวเลข
+
+        const totalPercent = chart.data.datasets[0].data[0];
+        const text = `${Math.round(totalPercent)}%`;
+        ctx.fillText(text, width / 2, height / 2);
+
+        ctx.restore();
+      },
+    },
+  ],
+});
+
+    console.log("[v0] Donut chart initialized successfully")
   }
 
   // ================= Progress bars (Optimized) =================
-  const floor1Bar = document.querySelector('#floor1 .progress-bar');
-  const totalBar = document.querySelector('#Total_Bar .progress-bar');
-  const glow = document.querySelector('.glow');
-  const realtimeKWEl = document.querySelector('.Realtime_kW');
-  const mainContainer = document.querySelector('.Main_Container');
-  const glowEl = document.querySelector('.glow');
-  const totalBarText = document.getElementById('Total_Bar_Text');
-  const floor1Text = document.getElementById('floor1_Text');
+  const floor1Bar = document.querySelector("#floor1 .progress-bar")
+  const glow = document.querySelector(".glow")
+  const realtimeKWEl = document.querySelector(".Realtime_kW")
+  const mainContainer = document.querySelector(".Main_Container")
+  const glowEl = document.querySelector(".glow")
+  const totalBarText = document.getElementById("Total_Bar_Text")
+  const floor1Text = document.getElementById("floor1_Text")
 
   async function updateBarsAndKW() {
     try {
       // ใช้ cache ถ้ายังไม่หมดอายุ
-      if (isCacheValid('power', CACHE_DURATION.power) && cache.powerData) {
-        renderPowerData(cache.powerData);
-        return;
+      if (isCacheValid("power", CACHE_DURATION.power) && cache.powerData) {
+        renderPowerData(cache.powerData)
+        return
       }
 
-      const today = new Date();
-      const yyyy = today.getFullYear();
-      const mm = String(today.getMonth() + 1).padStart(2, '0');
-      const dd = String(today.getDate()).padStart(2, '0');
-      const localDate = `${yyyy}-${mm}-${dd}`;
+      const today = new Date()
+      const yyyy = today.getFullYear()
+      const mm = String(today.getMonth() + 1).padStart(2, "0")
+      const dd = String(today.getDate()).padStart(2, "0")
+      const localDate = `${yyyy}-${mm}-${dd}`
 
-      const res = await fetch('https://api-kx4r63rdjq-an.a.run.app/daily-energy/px_pm3250?date=' + localDate);
-      const json = await res.json();
-      const data = json.data;
-      const latest = data.length ? data[data.length - 1].power : 0;
+      const res = await fetch("https://api-kx4r63rdjq-an.a.run.app/daily-energy/px_pm3250?date=" + localDate)
+      const json = await res.json()
+      const data = json.data
+      const latest = data.length ? data[data.length - 1].power : 0
 
-      cache.powerData = latest;
-      cache.lastFetch['power'] = Date.now();
-      
-      renderPowerData(latest);
+      cache.powerData = latest
+      cache.lastFetch["power"] = Date.now()
 
+      renderPowerData(latest)
     } catch (err) {
-      console.error('Error fetching power data:', err);
+      console.error("Error fetching power data:", err)
     }
   }
 
   function renderPowerData(latest) {
     // Floor 1 Bar
-    const floor1Percent = Math.min((latest / floor1_maxKW) * 100, 100);
-    if(floor1Bar){
-      floor1Bar.style.width = `${floor1Percent}%`;
-      floor1Bar.style.backgroundColor = floor1Percent <= 50 ? '#FBBF32' : '#b82500';
+    const floor1Percent = Math.min((latest / floor1_maxKW) * 100, 100)
+    if (floor1Bar) {
+      floor1Bar.style.width = `${floor1Percent}%`
+      floor1Bar.style.backgroundColor = floor1Percent <= 50 ? "#FBBF32" : "#b82500"
     }
-    if(floor1Text){
-      floor1Text.textContent = `${Math.round(floor1Percent)}%`;
+    if (floor1Text) {
+      floor1Text.textContent = `${Math.round(floor1Percent)}%`
     }
 
-    // Total Bar
-    const totalPercent = Math.min((latest / total_maxKW) * 100, 100);
-    if(totalBar){
-      totalBar.style.height = `${totalPercent / 100 * 200}px`; 
-      totalBar.style.backgroundColor = totalPercent <= 50 ? '#FBBF32' : '#b82500';
+    const totalPercent = Math.min((latest / total_maxKW) * 100, 100)
+
+    if (totalDonutChart) {
+      // อัปเดตข้อมูล donut chart
+      totalDonutChart.data.datasets[0].data = [totalPercent, 100 - totalPercent]
+
+      // เปลี่ยนสีตามเปอร์เซ็นต์
+      const barColor = totalPercent <= 50 ? "#FBBF32" : "#b82500"
+      totalDonutChart.data.datasets[0].backgroundColor = [barColor, "#e0e0e0"]
+      totalDonutChart.data.datasets[0].borderColor = [barColor, "#e0e0e0"]
+
+      totalDonutChart.update("none") // อัปเดตแบบไม่มี animation
     }
-    if(totalBarText){
-      totalBarText.textContent = `${Math.round(totalPercent)}%`;
-    }
-    if(mainContainer && glowEl){
-      if(totalPercent <= 50){
-        mainContainer.style.boxShadow = "0 0 5px 2px #FBBF32, inset 0 0 20px 2px #F9B30F";
-        glowEl.style.boxShadow = "0 0 6px 5px #FBBF32";
+
+    if (mainContainer && glowEl) {
+      if (totalPercent <= 50) {
+        mainContainer.style.boxShadow = "0 0 5px 2px #FBBF32, inset 0 0 20px 2px #F9B30F"
+        glowEl.style.boxShadow = "0 0 6px 5px #FBBF32"
       } else {
-        mainContainer.style.boxShadow = "0 0 10px 2px #b82500, inset 0 0 40px 2px #e63939";
-        glowEl.style.boxShadow = "0 0 50px 20px rgba(230, 57, 57, 0.4)";
+        mainContainer.style.boxShadow = "0 0 10px 2px #b82500, inset 0 0 40px 2px #e63939"
+        glowEl.style.boxShadow = "0 0 50px 20px rgba(230, 57, 57, 0.4)"
       }
     }
 
-    updateMarker(totalPercent);
-
     // Glow
-    if(glow){
-      const intensity = totalPercent / 100;
-      const glowAlpha = 0.3 + intensity * 0.7;
-      const glowSize = 100 + intensity * 50;
-      glow.style.transition = 'all 0.5s ease';
-      glow.style.background = `radial-gradient(circle, rgba(255,200,50,${glowAlpha}) 0%, rgba(255,200,50,0) 70%)`;
-      glow.style.width = `${glowSize}%`;
-      glow.style.height = `${glowSize}%`;
+    if (glow) {
+      const intensity = totalPercent / 100
+      const glowAlpha = 0.3 + intensity * 0.7
+      const glowSize = 100 + intensity * 50
+      glow.style.transition = "all 0.5s ease"
+      glow.style.background = `radial-gradient(circle, rgba(255,200,50,${glowAlpha}) 0%, rgba(255,200,50,0) 70%)`
+      glow.style.width = `${glowSize}%`
+      glow.style.height = `${glowSize}%`
     }
 
     // Realtime kW
-    if(realtimeKWEl){
-      realtimeKWEl.textContent = latest.toFixed(2) + ' kW';
+    if (realtimeKWEl) {
+      realtimeKWEl.textContent = latest.toFixed(2) + " kW"
     }
   }
 
-  updateBarsAndKW();
-  setInterval(updateBarsAndKW, 1000);
+  initializeTotalDonut()
 
+  updateBarsAndKW()
+  setInterval(updateBarsAndKW, 1000)
   // ================= Daily Bill (Optimized) =================
   const dailyBillEl = document.getElementById('DailyBill');
   const unitEl = document.querySelector('.unit');
