@@ -11,234 +11,154 @@ document.addEventListener('DOMContentLoaded', async function() {
   }
   updateDate();
 
-    // ================= Constants =================
-  const V = 400
-  const root3 = Math.sqrt(3)
-  const floor1_maxA = 400
-  const floor1_maxKW = (root3 * V * floor1_maxA) / 1000
-  const total_maxA = 400
-  const total_maxKW = (root3 * V * total_maxA) / 1000
+  // ================= Constants =================
+  const V = 400;
+  const root3 = Math.sqrt(3);
+  const floor1_maxA = 400;
+  const floor1_maxKW = root3 * V * floor1_maxA / 1000;
+  const total_maxA = 400;
+  const total_maxKW = root3 * V * total_maxA / 1000;
 
   // ================= Cache Management =================
   const cache = {
     powerData: null,
     dailyBill: null,
     weather: null,
-    lastFetch: {},
-  }
+    lastFetch: {}
+  };
 
   const CACHE_DURATION = {
     power: 1000, // 1 วินาที
     dailyBill: 30000, // 30 วินาที
-    weather: 1800000, // 30 นาที
-  }
+    weather: 1800000 // 30 นาที
+  };
 
   function isCacheValid(key, duration) {
-    return cache.lastFetch[key] && Date.now() - cache.lastFetch[key] < duration
+    return cache.lastFetch[key] && (Date.now() - cache.lastFetch[key] < duration);
   }
 
-  // ================= Total Donut Chart (CHANGED) =================
+   // ================= Total Donut Chart (CHANGED) =================
   let totalDonutChart = null
 
   function initializeTotalDonut() {
     const totalBarContainer = document.getElementById("Total_Bar")
     if (!totalBarContainer) return
 
-    totalBarContainer.style.position = "relative"
-    totalBarContainer.style.width = "100%"
-    totalBarContainer.style.height = "300px"
+    // เคลียร์ HTML และสร้าง canvas
+    totalBarContainer.innerHTML = '<canvas id="totalDonutCanvas"></canvas>'
 
-    totalBarContainer.innerHTML = '<canvas id="totalDonutCanvas" width="300" height="300"></canvas>'
+    const ctx = document.getElementById("totalDonutCanvas").getContext("2d")
 
-    const canvas = document.getElementById("totalDonutCanvas")
-    if (!canvas) {
-      console.error("[v0] Canvas element not found")
-      return
-    }
-
-    if (typeof window.Chart === "undefined") {
-      console.error("[v0] Chart.js library not loaded")
-      return
-    }
-
-    const ctx = canvas.getContext("2d")
-    if (!ctx) {
-      console.error("[v0] Could not get canvas context")
-      return
-    }
-
-   totalDonutChart = new window.Chart(ctx, {
-  type: "doughnut",
-  data: {
-    labels: ["Current Power", "Remaining Capacity"],
-    datasets: [
-      {
-        data: [0, 100],
-        backgroundColor: ["#FBBF32", "#e0e0e0"], // สีหลักและสีเหลือ
-        borderColor: ["#FBBF32", "#e0e0e0"],
-        borderWidth: 2,
-        circumference: 360,
-        rotation: 0,
+    totalDonutChart = new Chart(ctx, {
+      type: "doughnut",
+      data: {
+        labels: ["Current Power", "Remaining Capacity"],
+        datasets: [
+          {
+            data: [0, 100],
+            backgroundColor: ["#FBBF32", "#e0e0e0"],
+            borderColor: ["#FBBF32", "#e0e0e0"],
+            borderWidth: 2,
+            circumference: 360,
+            rotation: 0,
+          },
+        ],
       },
-    ],
-  },
-  options: {
-    responsive: false,
-    maintainAspectRatio: false,
-    cutout: "70%", // ให้ตรงกลางเว้นช่องสำหรับตัวเลข
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        enabled: true,
-        backgroundColor: "rgba(0,0,0,0.8)",
-        titleColor: "#fff",
-        bodyColor: "#fff",
-        cornerRadius: 8,
-        callbacks: {
-          label: (context) => {
-            const value = context.parsed;
-            return Math.round(value) + "%";
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            enabled: true,
+            backgroundColor: "rgba(0,0,0,0.8)",
+            titleColor: "#fff",
+            bodyColor: "#fff",
+            cornerRadius: 8,
+            callbacks: {
+              label: (context) => {
+                const value = context.parsed
+                return Math.round(value) + "%"
+              },
+            },
           },
         },
       },
-    },
-  },
-  plugins: [
-    {
-      // Plugin เพิ่มสไตล์แบบ meter
-    plugins: [
-  {
-    id: "meterStyle",
-    beforeDraw(chart) {
-      const { width, height, ctx } = chart;
-      ctx.save();
+      plugins: [
+        {
+          id: "textCenter",
+          beforeDatasetsDraw(chart) {
+            const { width, height, ctx } = chart
+            ctx.restore()
 
-      const centerX = width / 2;
-      const centerY = height / 2;
+            const fontSize = (height / 200).toFixed(2)
+            ctx.font = `bold ${fontSize * 16}px sans-serif`
+            ctx.textBaseline = "middle"
+            ctx.textAlign = "center"
+            ctx.fillStyle = "#000"
 
-      // กำหนด radius ให้เหลือ space สำหรับ border
-      const radius = Math.min(width, height) / 2 - 6; // 6 คือ borderWidth
+            // ดึงค่าปัจจุบันจาก dataset
+            const totalPercent = chart.data.datasets[0].data[0]
+            const text = `${Math.round(totalPercent)}%`
+            ctx.fillText(text, width / 2, height / 2)
 
-      // Gradient แบบ .meter
-      const gradient = ctx.createLinearGradient(0, 0, 0, height);
-      gradient.addColorStop(0, "#f8f6f0");
-      gradient.addColorStop(0.45, "#fffef8");
-      gradient.addColorStop(0.55, "#fff8e8");
-      gradient.addColorStop(1, "#f5f0e5");
-
-      // วาดวงกลมพื้นหลัง
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-      ctx.fillStyle = gradient;
-      ctx.fill();
-
-      // วาดขอบ
-      ctx.lineWidth = 6;
-      ctx.strokeStyle = "#74640a";
-      ctx.shadowColor = "rgba(0,0,0,0.3)"; // เงา
-      ctx.shadowBlur = 8;
-      ctx.stroke();
-
-      ctx.restore();
-    },
-  },
-  {
-    id: "textCenter",
-    beforeDatasetsDraw(chart) {
-      const { width, height, ctx } = chart;
-      ctx.save();
-
-      const fontSize = (height / 200).toFixed(2);
-      ctx.font = `bold ${fontSize * 16}px sans-serif`;
-      ctx.textBaseline = "middle";
-      ctx.textAlign = "center";
-      ctx.fillStyle = "#000";
-
-      const totalPercent = chart.data.datasets[0].data[0];
-      const text = `${Math.round(totalPercent)}%`;
-      ctx.fillText(text, width / 2, height / 2);
-
-      ctx.restore();
-    },
-  },
-],
-
-    },
-    {
-      // ตัวเลขตรงกลาง
-      id: "textCenter",
-      beforeDatasetsDraw(chart) {
-        const { width, height, ctx } = chart;
-        ctx.save();
-
-        const fontSize = (height / 200).toFixed(2);
-        ctx.font = `bold ${fontSize * 16}px sans-serif`;
-        ctx.textBaseline = "middle";
-        ctx.textAlign = "center";
-        ctx.fillStyle = "#4a2e05"; // สีตัวเลข
-
-        const totalPercent = chart.data.datasets[0].data[0];
-        const text = `${Math.round(totalPercent)}%`;
-        ctx.fillText(text, width / 2, height / 2);
-
-        ctx.restore();
-      },
-    },
-  ],
-});
-
-    console.log("[v0] Donut chart initialized successfully")
+            ctx.save()
+          },
+        },
+      ],
+    })
   }
-
   // ================= Progress bars (Optimized) =================
-  const floor1Bar = document.querySelector("#floor1 .progress-bar")
-  const glow = document.querySelector(".glow")
-  const realtimeKWEl = document.querySelector(".Realtime_kW")
-  const mainContainer = document.querySelector(".Main_Container")
-  const glowEl = document.querySelector(".glow")
-  const totalBarText = document.getElementById("Total_Bar_Text")
-  const floor1Text = document.getElementById("floor1_Text")
+  const floor1Bar = document.querySelector('#floor1 .progress-bar');
+  const totalBar = document.querySelector('#Total_Bar .progress-bar');
+  const glow = document.querySelector('.glow');
+  const realtimeKWEl = document.querySelector('.Realtime_kW');
+  const mainContainer = document.querySelector('.Main_Container');
+  const glowEl = document.querySelector('.glow');
+  const totalBarText = document.getElementById('Total_Bar_Text');
+  const floor1Text = document.getElementById('floor1_Text');
 
   async function updateBarsAndKW() {
     try {
       // ใช้ cache ถ้ายังไม่หมดอายุ
-      if (isCacheValid("power", CACHE_DURATION.power) && cache.powerData) {
-        renderPowerData(cache.powerData)
-        return
+      if (isCacheValid('power', CACHE_DURATION.power) && cache.powerData) {
+        renderPowerData(cache.powerData);
+        return;
       }
 
-      const today = new Date()
-      const yyyy = today.getFullYear()
-      const mm = String(today.getMonth() + 1).padStart(2, "0")
-      const dd = String(today.getDate()).padStart(2, "0")
-      const localDate = `${yyyy}-${mm}-${dd}`
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
+      const localDate = `${yyyy}-${mm}-${dd}`;
 
-      const res = await fetch("https://api-kx4r63rdjq-an.a.run.app/daily-energy/px_pm3250?date=" + localDate)
-      const json = await res.json()
-      const data = json.data
-      const latest = data.length ? data[data.length - 1].power : 0
+      const res = await fetch('https://api-kx4r63rdjq-an.a.run.app/daily-energy/px_pm3250?date=' + localDate);
+      const json = await res.json();
+      const data = json.data;
+      const latest = data.length ? data[data.length - 1].power : 0;
 
-      cache.powerData = latest
-      cache.lastFetch["power"] = Date.now()
+      cache.powerData = latest;
+      cache.lastFetch['power'] = Date.now();
+      
+      renderPowerData(latest);
 
-      renderPowerData(latest)
     } catch (err) {
-      console.error("Error fetching power data:", err)
+      console.error('Error fetching power data:', err);
     }
   }
 
   function renderPowerData(latest) {
     // Floor 1 Bar
-    const floor1Percent = Math.min((latest / floor1_maxKW) * 100, 100)
-    if (floor1Bar) {
-      floor1Bar.style.width = `${floor1Percent}%`
-      floor1Bar.style.backgroundColor = floor1Percent <= 50 ? "#FBBF32" : "#b82500"
+    const floor1Percent = Math.min((latest / floor1_maxKW) * 100, 100);
+    if(floor1Bar){
+      floor1Bar.style.width = `${floor1Percent}%`;
+      floor1Bar.style.backgroundColor = floor1Percent <= 50 ? '#FBBF32' : '#b82500';
     }
-    if (floor1Text) {
-      floor1Text.textContent = `${Math.round(floor1Percent)}%`
+    if(floor1Text){
+      floor1Text.textContent = `${Math.round(floor1Percent)}%`;
     }
 
-    const totalPercent = Math.min((latest / total_maxKW) * 100, 100)
+     const totalPercent = Math.min((latest / total_maxKW) * 100, 100)
 
     if (totalDonutChart) {
       // อัปเดตข้อมูล donut chart
@@ -263,26 +183,25 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 
     // Glow
-    if (glow) {
-      const intensity = totalPercent / 100
-      const glowAlpha = 0.3 + intensity * 0.7
-      const glowSize = 100 + intensity * 50
-      glow.style.transition = "all 0.5s ease"
-      glow.style.background = `radial-gradient(circle, rgba(255,200,50,${glowAlpha}) 0%, rgba(255,200,50,0) 70%)`
-      glow.style.width = `${glowSize}%`
-      glow.style.height = `${glowSize}%`
+    if(glow){
+      const intensity = totalPercent / 100;
+      const glowAlpha = 0.3 + intensity * 0.7;
+      const glowSize = 100 + intensity * 50;
+      glow.style.transition = 'all 0.5s ease';
+      glow.style.background = `radial-gradient(circle, rgba(255,200,50,${glowAlpha}) 0%, rgba(255,200,50,0) 70%)`;
+      glow.style.width = `${glowSize}%`;
+      glow.style.height = `${glowSize}%`;
     }
 
     // Realtime kW
-    if (realtimeKWEl) {
-      realtimeKWEl.textContent = latest.toFixed(2) + " kW"
+    if(realtimeKWEl){
+      realtimeKWEl.textContent = latest.toFixed(2) + ' kW';
     }
   }
-
   initializeTotalDonut()
+  updateBarsAndKW();
+  setInterval(updateBarsAndKW, 1000);
 
-  updateBarsAndKW()
-  setInterval(updateBarsAndKW, 1000)
   // ================= Daily Bill (Optimized) =================
   const dailyBillEl = document.getElementById('DailyBill');
   const unitEl = document.querySelector('.unit');
@@ -569,18 +488,17 @@ let eventCache = {}; // key: "YYYY-MM" => events array
 async function fetchEvents(year, month) {
   const key = `${year}-${String(month).padStart(2, "0")}`;
 
-  if (eventCache[key]) return eventCache[key]; // ใช้แคช
+  if (eventCache[key]) return eventCache[key]; // ใช้ cache ก่อน
 
   try {
     const url = `https://momaybackendhospital-production.up.railway.app/calendar?year=${year}&month=${month}`;
     const res = await fetch(url);
     const data = await res.json();
 
-eventCache[key] = data.map(e => ({
-  ...e,
-  textColor: '#000'        // ตัวอักษรสีดำเท่านั้น
-}));
-
+    eventCache[key] = data.map(e => ({
+      ...e,
+      textColor: '#000' // ตัวอักษรสีดำ
+    }));
 
     return eventCache[key];
   } catch (err) {
@@ -590,27 +508,33 @@ eventCache[key] = data.map(e => ({
   }
 }
 
-async function preloadInitialMonths() {
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth() + 1;
-
-  // เดือนปัจจุบัน
-  await fetchEvents(currentYear, currentMonth);
+// preload เดือนก่อนหน้า, ปัจจุบัน, ถัดไป
+async function preloadMonths(centerDate = new Date()) {
+  const year = centerDate.getFullYear();
+  const month = centerDate.getMonth() + 1;
 
   // เดือนก่อนหน้า
-  let prevYear = currentYear;
-  let prevMonth = currentMonth - 1;
+  let prevYear = year;
+  let prevMonth = month - 1;
   if (prevMonth === 0) { prevMonth = 12; prevYear--; }
 
-  await fetchEvents(prevYear, prevMonth);
+  // เดือนถัดไป
+  let nextYear = year;
+  let nextMonth = month + 1;
+  if (nextMonth === 13) { nextMonth = 1; nextYear++; }
+
+  await Promise.all([
+    fetchEvents(prevYear, prevMonth),
+    fetchEvents(year, month),
+    fetchEvents(nextYear, nextMonth)
+  ]);
 }
 
 async function initializeCalendar() {
   const calendarEl = document.getElementById("calendar");
   if (!calendarEl) return;
 
-  await preloadInitialMonths(); // ✅ โหลดล่วงหน้าก่อน render
+  await preloadMonths(); // preload เดือนรอบ ๆ
 
   calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: "dayGridMonth",
@@ -621,6 +545,10 @@ async function initializeCalendar() {
     events: async function(fetchInfo, successCallback) {
       const year = fetchInfo.start.getFullYear();
       const month = fetchInfo.start.getMonth() + 1;
+
+      // preload เดือนก่อนหน้า/ถัดไปเพิ่มอีกเผื่อ user เลื่อนเร็ว
+      const centerDate = fetchInfo.start;
+      preloadMonths(centerDate); // ไม่ต้อง await
 
       const events = await fetchEvents(year, month);
       successCallback(events);
@@ -657,7 +585,6 @@ async function initializeCalendar() {
 
 initializeCalendar();
 
-
 // Calendar Popup
 const calendarIcon = document.querySelector("#Calendar_icon img");
 const popup = document.getElementById("calendarPopup");
@@ -671,6 +598,7 @@ if (calendarIcon && popup) {
     if (e.target === popup) popup.classList.remove("active");
   });
 }
+
 
 
   // ================= Weather Sukhothai (Optimized) =================

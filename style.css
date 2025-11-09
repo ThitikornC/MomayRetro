@@ -440,9 +440,9 @@ body::after {
 }
 .Meter {
   position: absolute;
-  right: 15px;
-  top: 60px;
-  width: 90px;
+  right: 18px;
+  top: 100px;
+  width: 80px;
   height: auto;
   padding: 10px;
 
@@ -502,7 +502,7 @@ font-size: 14px;
   display: flex;
   flex-direction: row;
   gap: 2px;         /* ระยะห่างระหว่างไอคอน */
-  margin-left: 180px; /* ลดค่าจาก 60px → 20px เพื่อดันซ้าย */
+  margin-left: 185px; /* ลดค่าจาก 60px → 20px เพื่อดันซ้าย */
   margin-bottom: 10px; 
 }
 
@@ -703,8 +703,8 @@ font-size: 14px;
 /* ================= Total Dunut ================= */
 #Total_Bar {
   position: relative;
-  width: 50px; /* ขนาดใหม่ */
-  height: 50px;
+  width: 250px; /* ขนาดใหม่ */
+  height: 250px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -713,14 +713,14 @@ font-size: 14px;
 }
 
 #Total_Bar canvas {
-  width: 60% !important;
+  width: 75% !important;
   height: 75% !important;
 }
 
 #Total_Bar_Text {
   position: absolute;
   top: 50%;
-  left: 50%;
+  left: 30%;
   transform: translate(-50%, -50%);
   font-size: 20px;
   font-weight: 700;
