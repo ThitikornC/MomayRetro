@@ -138,10 +138,10 @@ document.addEventListener('DOMContentLoaded', async function() {
             bodyColor: "#fff",
             cornerRadius: 8,
             callbacks: {
-              label: (context) => `${Math.round(context.parsed)}%`,
-            },
-          },
-        },
+              label: (context) => `${Math.round(context.parsed)}%`
+            }
+          }
+        }
       },
       plugins: [
         {
@@ -480,6 +480,40 @@ function prefetchAdjacentDays(date, range = 1) {
 }
 
 // ================= Initialize Chart =================
+// Small plugin to draw an adjustable X-axis title (allows shifting left/right)
+const xAxisTitlePlugin = {
+  id: 'xAxisTitlePlugin',
+  afterDraw(chart, args, options) {
+    try {
+      const cfg = chart.options && chart.options.plugins && chart.options.plugins.xAxisTitle;
+      if (!cfg || !cfg.text) return;
+      const ctx = chart.ctx;
+      const chartArea = chart.chartArea;
+      // center, then apply pixel offset and optional relative offset (percent of width)
+      const rel = (typeof cfg.relativeOffsetPercent === 'number') ? cfg.relativeOffsetPercent : 0;
+      const x = chartArea.left + chartArea.width / 2 + (cfg.offset || 0) + Math.round(chartArea.width * rel);
+      const y = chartArea.bottom + (cfg.padding || 24);
+      ctx.save();
+      ctx.fillStyle = cfg.color || '#000';
+      ctx.font = (cfg.font || '12px sans-serif');
+      ctx.textAlign = cfg.align || 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(cfg.text, x, y);
+      ctx.restore();
+    } catch (e) {
+      // ignore drawing errors
+    }
+  }
+};
+Chart.register(xAxisTitlePlugin);
+// Small plugin to reset the last-displayed-label map before each update
+const dedupeTickPlugin = {
+  id: 'dedupeTickPlugin',
+  beforeUpdate(chart) {
+    chart._lastDisplayedLabel = {};
+  }
+};
+Chart.register(dedupeTickPlugin);
 function initializeChart() {
   if (chartInitialized) return;
 
@@ -515,23 +549,120 @@ function initializeChart() {
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      // add layout padding so custom x-axis title has room
+      layout: { padding: { bottom: 44 } },
       animation: false,
       plugins: { legend: { display: false } },
       scales: {
         x:{ 
           type:'category', 
           grid:{ display:false },
-          ticks:{ autoSkip:false, maxRotation:0, minRotation:0 }
+          ticks: {
+            autoSkip: false,
+            maxRotation: 0,
+            minRotation: 0,
+            color: '#2c1810',
+            font: { size: 14 },
+            // Show hourly labels (00.00 .. 24.00) but avoid overlap by adaptive stepping
+            callback: function(v) {
+              const l = this.getLabelForValue(v);
+              if (!l) return '';
+              const [h, m] = l.split(':');
+              const hour = parseInt(h, 10);
+              const idx = Number(v);
+              const labelsLen = (this.chart && this.chart.data && this.chart.data.labels) ? this.chart.data.labels.length : null;
+              // Always allow the final label to be 24.00 (deduped per-scale)
+              if (labelsLen !== null && idx === labelsLen - 1) {
+                const scaleId = this.id || this.axis || 'x';
+                const map = (this.chart && this.chart._lastDisplayedLabel) ? this.chart._lastDisplayedLabel : (this.chart._lastDisplayedLabel = {});
+                if (map[scaleId] === '24.00') return '';
+                map[scaleId] = '24.00';
+                return '24.00';
+              }
+
+              // Compute adaptive step based on available width to avoid overlapping
+              const chartObj = this.chart;
+              const chartWidth = chartObj && chartObj.chartArea ? chartObj.chartArea.width : 800;
+              const pxPerLabel = 48; // desired pixels per label
+              const maxLabels = Math.max(1, Math.floor(chartWidth / pxPerLabel));
+              // We have 24 hour labels; compute step = show every `step` hours
+              const step = Math.max(1, Math.ceil(24 / maxLabels));
+
+              if (m === '00' && (hour % step) === 0) {
+                const labelToShow = `${String(h).padStart(2,'0')}.00`;
+                const scaleId = this.id || this.axis || 'x';
+                const map = (this.chart && this.chart._lastDisplayedLabel) ? this.chart._lastDisplayedLabel : (this.chart._lastDisplayedLabel = {});
+                if (map[scaleId] === labelToShow) return '';
+                map[scaleId] = labelToShow;
+                return labelToShow;
+              }
+              return '';
+            }
+          },
+          title: {
+            // Disabled because we draw a custom x-axis title via xAxisTitlePlugin
+            display: false,
+            text: 'Time (HH:MM)',
+            color: '#2c1810',
+            font: { size: 12, weight: 'bold' }
+          }
         },
-        y:{ beginAtZero:true, grid:{ display:false }, min:0 }
+        y: {
+          beginAtZero: true,
+          grid: { display: false },
+          min: 0,
+          ticks: { color: '#2c1810', font: { size: 14 } },
+          title: { display: true, text: 'Power (kW)', color: '#2c1810', font: { size: 14, weight: 'bold' } }
+        }
       }
     }
+    ,
+    // configure our custom x-axis title drawing
+    plugins: []
   };
 
   chart = new Chart(ctx, config);
   chartInitialized = true;
 
+  // Responsive axis font sizing helper
+  function getResponsiveSizes() {
+    if (typeof window === 'undefined') return { x: 14, y: 14, titleFont: '14px sans-serif' };
+    if (window.innerWidth <= 600) return { x: 11, y: 11, titleFont: '12px sans-serif' };
+    return { x: 14, y: 14, titleFont: '14px sans-serif' };
+  }
+
+  function applyResponsiveAxisFontSizes(targetChart) {
+    if (!targetChart || !targetChart.options || !targetChart.options.scales) return;
+    const sizes = getResponsiveSizes();
+    try {
+      if (targetChart.options.scales.x && targetChart.options.scales.x.ticks) {
+        targetChart.options.scales.x.ticks.font = Object.assign({}, targetChart.options.scales.x.ticks.font || {}, { size: sizes.x });
+      }
+      if (targetChart.options.scales.y && targetChart.options.scales.y.ticks) {
+        targetChart.options.scales.y.ticks.font = Object.assign({}, targetChart.options.scales.y.ticks.font || {}, { size: sizes.y });
+      }
+      // also adjust plugin-drawn title font if present
+      if (targetChart.options.plugins && targetChart.options.plugins.xAxisTitle) {
+        targetChart.options.plugins.xAxisTitle.font = sizes.titleFont;
+      }
+      targetChart.update('none');
+    } catch (e) { /* ignore */ }
+  }
+
+  // apply initially and on resize (debounced)
+  applyResponsiveAxisFontSizes(chart);
+  let __axisResizeTimer = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(__axisResizeTimer);
+    __axisResizeTimer = setTimeout(() => {
+      applyResponsiveAxisFontSizes(chart);
+      try { applyResponsiveAxisFontSizes(window.reportChart); } catch (e) {}
+    }, 150);
+  });
+
   // โหลดข้อมูลวันปัจจุบันทันทีหลัง chart พร้อม
+  // set custom x-axis title (nudge left a bit so it appears centered in container)
+  chart.options.plugins.xAxisTitle = { text: 'Time (HH:MM)', offset: -80, relativeOffsetPercent: 0.2, padding: 36, color: '#000', font: '14px sans-serif', align: 'center' };
   updateChartData(currentDate);
 }
 
@@ -1559,15 +1690,43 @@ document.getElementById("kwangMonthReport").textContent =
                     color: '#000',
                     maxRotation: 0,
                     minRotation: 0,
+                    // Show hourly labels (00.00 .. 24.00) but avoid overlap by adaptive stepping
                     callback: function(v) {
                       const l = this.getLabelForValue(v);
                       if (!l) return '';
                       const [h, m] = l.split(':');
-                      return m === '00' && parseInt(h) % 3 === 0 ? l : '';
+                      const hour = parseInt(h, 10);
+                      const idx = Number(v);
+                      const labelsLen = (this.chart && this.chart.data && this.chart.data.labels) ? this.chart.data.labels.length : null;
+                      // Always allow the final label to be 24.00 (deduped per-scale)
+                      if (labelsLen !== null && idx === labelsLen - 1) {
+                        const scaleId = this.id || this.axis || 'x';
+                        const map = (this.chart && this.chart._lastDisplayedLabel) ? this.chart._lastDisplayedLabel : (this.chart._lastDisplayedLabel = {});
+                        if (map[scaleId] === '24.00') return '';
+                        map[scaleId] = '24.00';
+                        return '24.00';
+                      }
+
+                      const chartObj = this.chart;
+                      const chartWidth = chartObj && chartObj.chartArea ? chartObj.chartArea.width : 800;
+                      const pxPerLabel = 48;
+                      const maxLabels = Math.max(1, Math.floor(chartWidth / pxPerLabel));
+                      const step = Math.max(1, Math.ceil(24 / maxLabels));
+
+                      if (m === '00' && (hour % step) === 0) {
+                        const labelToShow = `${String(h).padStart(2,'0')}.00`;
+                        const scaleId = this.id || this.axis || 'x';
+                        const map = (this.chart && this.chart._lastDisplayedLabel) ? this.chart._lastDisplayedLabel : (this.chart._lastDisplayedLabel = {});
+                        if (map[scaleId] === labelToShow) return '';
+                        map[scaleId] = labelToShow;
+                        return labelToShow;
+                      }
+                      return '';
                     }
                   },
                   title: {
-                    display: true,
+                    // Disabled to avoid duplicate title; plugin draws it instead
+                    display: false,
                     text: 'Time (HH:MM)',
                     color: '#000',
                     font: { size: 12, weight: 'bold' }
@@ -1577,7 +1736,7 @@ document.getElementById("kwangMonthReport").textContent =
                   grid: { display: false },
                   beginAtZero: true,
                   min: 0,
-                  ticks: { color: '#000' },
+                  ticks: { color: '#000', font: { size: 9 } },
                   title: {
                     display: true,
                     text: 'Power (kW)',
@@ -1588,6 +1747,18 @@ document.getElementById("kwangMonthReport").textContent =
               }
             }
           });
+          // apply responsive axis font sizes for report chart as well
+          try { if (window.reportChart) applyResponsiveAxisFontSizes(window.reportChart); } catch (e) {}
+          // nudge report chart x-axis title slightly left to center within container
+          if (window.reportChart && window.reportChart.options) {
+            window.reportChart.options.plugins = window.reportChart.options.plugins || {};
+            // give report chart extra bottom padding so title doesn't collide with axis
+            window.reportChart.options.layout = window.reportChart.options.layout || {};
+            window.reportChart.options.layout.padding = window.reportChart.options.layout.padding || {};
+            window.reportChart.options.layout.padding.bottom = Math.max(36, window.reportChart.options.layout.padding.bottom || 0);
+            window.reportChart.options.plugins.xAxisTitle = { text: 'Time (HH:MM)', offset: 20, relativeOffsetPercent: 0.2, padding: 36, color: '#000', font: '12px sans-serif', align: 'center' };
+            window.reportChart.update('none');
+          }
         }
 
         wrapper.style.opacity = 1;

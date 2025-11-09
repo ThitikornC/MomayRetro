@@ -3024,3 +3024,15 @@ color: #000000;
   transform: translateZ(0);
   transition: all 0.3s ease;
 }
+
+/* Responsive: shrink Realtime container horizontally by 10% on small screens */
+@media (max-width: 600px) {
+  .Realtime_Container {
+    width: 90%; /* reduce width to 90% of viewport/container */
+    max-width: 365px; /* keep original ceiling */
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+}
