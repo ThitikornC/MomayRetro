@@ -433,10 +433,23 @@ async function updateChartData(date){
     const labels = getMinuteLabels();
     const sampledLabels = [];
     for (let i = 0, si = 0; i < fullLength; i += factor, si++) {
-      sampled.push(chartData[i]);
-      sampledMax[si] = (i === maxIdx) ? maxVal : null;
+      const windowStart = i;
+      const windowEnd = Math.min(i + factor - 1, fullLength - 1);
+      // compute local max within the window so the sampled line passes through peaks
+      let localMax = null;
+      for (let j = windowStart; j <= windowEnd; j++) {
+        const v = chartData[j];
+        if (v !== null && (localMax === null || v > localMax)) localMax = v;
+      }
+      sampled.push(localMax);
+      // if the global max index falls within this sampled window, mark it here
+      if (maxIdx !== null && maxIdx >= windowStart && maxIdx <= windowEnd) {
+        sampledMax[si] = maxVal;
+      } else {
+        sampledMax[si] = null;
+      }
       sampledAvg[si] = avgVal;
-      sampledLabels.push(labels[i]);
+      sampledLabels.push(labels[windowStart]);
     }
     chart.data.labels = sampledLabels;
     chart.data.datasets[0].data = sampled;
