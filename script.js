@@ -241,6 +241,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   setInterval(fetchDailyBill, 30000); // เปลี่ยนเป็น 30 วินาที
 
   // ================= Chart.js (Load ทันที - ไม่มี Lazy Load) =================
+// ================= Chart.js (Load ทันที - ไม่มี Lazy Load) =================
   let chartInitialized = false;
   let chart = null;
   let currentDate = new Date();
@@ -361,7 +362,7 @@ document.addEventListener('DOMContentLoaded', async function() {
               display: true,
               text: 'Time (HH:MM)',
               color: '#000',
-              font: { size: 1, weight: 'bold' },
+              font: { size: 14, weight: 'bold' },
             }
           },
           y: {
@@ -388,98 +389,38 @@ document.addEventListener('DOMContentLoaded', async function() {
   }
 
   // Initialize Date Picker และ Chart ทันที
-  const prevBtn = document.getElementById('prevDay');
-  const nextBtn = document.getElementById('nextDay');
-  const currentDayEl = document.getElementById('currentDay');
+const prevBtn = document.getElementById('prevDay');
+const nextBtn = document.getElementById('nextDay');
+const currentDayEl = document.getElementById('currentDay');
 
+if (currentDayEl) {
+  currentDayEl.textContent = formatDateDisplay(currentDate);
+}
+
+function handleDateChange(delta) {
+  console.log('🔥 Date change:', delta);
+  currentDate.setDate(currentDate.getDate() + delta);
   if (currentDayEl) {
     currentDayEl.textContent = formatDateDisplay(currentDate);
   }
-
-  function handleDateChange(delta) {
-    console.log('🔥 Date change:', delta);
-    currentDate.setDate(currentDate.getDate() + delta);
-    if (currentDayEl) {
-      currentDayEl.textContent = formatDateDisplay(currentDate);
-    }
-    if (chartInitialized && chart) {
-      updateChartData(currentDate);
-    }
+  if (chartInitialized && chart) {
+    updateChartData(currentDate);
   }
+}
 
-  // ใช้หลายวิธีในการจับ event
-  if (prevBtn) {
-    console.log('✅ Prev button found', prevBtn);
-    
-    // Method 1: onclick property
-    prevBtn.onclick = function(e) {
-      e.preventDefault();
-      console.log('🎯 Prev ONCLICK');
-      handleDateChange(-1);
-    };
-    
-    // Method 2: addEventListener click
-    prevBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      console.log('🎯 Prev CLICK');
-      handleDateChange(-1);
-    }, true); // useCapture = true
-    
-    // Method 3: mousedown
-    prevBtn.addEventListener('mousedown', (e) => {
-      e.preventDefault();
-      console.log('🎯 Prev MOUSEDOWN');
-      handleDateChange(-1);
-    });
-    
-    // Method 4: touchstart for mobile
-    prevBtn.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      console.log('🎯 Prev TOUCH');
-      handleDateChange(-1);
-    });
-  } else {
-    console.error('❌ prevDay button NOT found!');
-  }
-  
-  if (nextBtn) {
-    console.log('✅ Next button found', nextBtn);
-    
-    // Method 1: onclick property
-    nextBtn.onclick = function(e) {
-      e.preventDefault();
-      console.log('🎯 Next ONCLICK');
-      handleDateChange(1);
-    };
-    
-    // Method 2: addEventListener click
-    nextBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      console.log('🎯 Next CLICK');
-      handleDateChange(1);
-    }, true); // useCapture = true
-    
-    // Method 3: mousedown
-    nextBtn.addEventListener('mousedown', (e) => {
-      e.preventDefault();
-      console.log('🎯 Next MOUSEDOWN');
-      handleDateChange(1);
-    });
-    
-    // Method 4: touchstart for mobile
-    nextBtn.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      console.log('🎯 Next TOUCH');
-      handleDateChange(1);
-    });
-  } else {
-    console.error('❌ nextDay button NOT found!');
-  }
+// ใช้ pointerdown แทน click/mousedown/touchstart
+prevBtn?.addEventListener('pointerdown', (e) => {
+  e.preventDefault();
+  handleDateChange(-1);
+});
 
-  // โหลด Chart ทันที
-  initializeChart();
+nextBtn?.addEventListener('pointerdown', (e) => {
+  e.preventDefault();
+  handleDateChange(1);
+});
+
+// โหลด Chart ทันที
+initializeChart();
 
 // ================= FullCalendar (Cache Monthly API) ================
 let calendar = null;
@@ -768,110 +709,111 @@ if (kwangMonthEl)
   }
 
   // ================= Daily Diff =================
-const dailyYesterdayEl = document.getElementById("dailyYesterday");
-const dailyDayBeforeEl = document.getElementById("dailyDayBefore");
-const dailyDiffEl = document.getElementById("dailyDiffValue");
-const dailyPopupEl = document.getElementById('dailyPopup');
-const overlayEl = document.getElementById('overlay');
+  const dailyYesterdayEl = document.getElementById("dailyYesterday");
+  const dailyDayBeforeEl = document.getElementById("dailyDayBefore");
+  const dailyDiffEl = document.getElementById("dailyDiffValue");
+  const dailyPopupEl = document.getElementById('dailyPopup');
+  const overlayEl = document.getElementById('overlay');
 
-// ================= Cache =================
-const dailyDiffCache = {
-  data: null,
-  lastFetch: 0,
-  duration: 30000 // 30 วินาที
-};
-
-async function fetchDailyDiff() {
-  const now = Date.now();
-  if (dailyDiffCache.data && (now - dailyDiffCache.lastFetch < dailyDiffCache.duration)) {
-    return dailyDiffCache.data; // ใช้ cache
+  async function fetchDailyDiff() {
+    try {
+      const res = await fetch('https://momaybackendhospital-production.up.railway.app/daily-diff');
+      const json = await res.json();
+      return json;
+    } catch (err) {
+      console.error("Error fetching daily diff:", err);
+      return null;
+    }
   }
 
-  try {
-    const res = await fetch('https://momaybackendhospital-production.up.railway.app/daily-diff');
-    const json = await res.json();
-    dailyDiffCache.data = json;
-    dailyDiffCache.lastFetch = now;
-    return json;
-  } catch (err) {
-    console.error("Error fetching daily diff:", err);
-    return dailyDiffCache.data || null; // fallback ใช้ cache เก่า
-  }
-}
-
-function formatDateDMY(dateStr) {
-  const date = new Date(dateStr);
-  const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const year = date.getFullYear();
-  return `${day}/${month}/${year}`;
-}
-
-async function updateDailyDiff() {
-  const data = await fetchDailyDiff();
-  if (!data) return;
-
-  // แสดงวันที่และค่าของ Yesterday
-  if (document.getElementById("yesterdayDate") && dailyYesterdayEl) {
-    document.getElementById("yesterdayDate").innerHTML = `<strong>${formatDateDMY(data.yesterday.date)}</strong>`;
-    dailyYesterdayEl.innerHTML = `${data.yesterday.energy_kwh.toFixed(2)} Unit<br>${data.yesterday.electricity_bill.toFixed(2)} THB.`;
+  function formatDateDMY(dateStr) {
+    const date = new Date(dateStr);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
   }
 
-  // แสดงวันที่และค่าของ DayBefore
-  if (document.getElementById("dayBeforeDate") && dailyDayBeforeEl) {
-    document.getElementById("dayBeforeDate").innerHTML = `<strong>${formatDateDMY(data.dayBefore.date)}</strong>`;
-    dailyDayBeforeEl.innerHTML = `${data.dayBefore.energy_kwh.toFixed(2)} Unit<br>${data.dayBefore.electricity_bill.toFixed(2)} THB.`;
+  async function updateDailyDiff() {
+    const data = await fetchDailyDiff();
+    if (!data) return;
+
+    if (document.getElementById("yesterdayDate") && dailyYesterdayEl) {
+      document.getElementById("yesterdayDate").innerHTML = `
+        <strong>${formatDateDMY(data.yesterday.date)}</strong>
+      `;
+      dailyYesterdayEl.innerHTML = `
+        ${data.yesterday.energy_kwh.toFixed(2)} Unit<br>
+        ${data.yesterday.electricity_bill.toFixed(2)} THB.
+      `;
+    }
+
+    if (document.getElementById("dayBeforeDate") && dailyDayBeforeEl) {
+      document.getElementById("dayBeforeDate").innerHTML = `
+        <strong>${formatDateDMY(data.dayBefore.date)}</strong>
+      `;
+      dailyDayBeforeEl.innerHTML = `
+        ${data.dayBefore.energy_kwh.toFixed(2)} Unit<br>
+        ${data.dayBefore.electricity_bill.toFixed(2)} THB.
+      `;
+    }
+
+    if (dailyDiffEl) {
+      const bill = data.diff.electricity_bill;
+
+      const arrowUp = `<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                         <path d="M12 2L5 10h14L12 2z" fill="red"/>
+                       </svg>`;
+      const arrowDown = `<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                           <path d="M12 22l7-8H5l7 8z" fill="green"/>
+                         </svg>`;
+
+      const color = bill < 0 ? 'red' : 'green';
+      const arrow = bill < 0 ? arrowUp : arrowDown;
+
+      dailyDiffEl.innerHTML = `
+        <div style="text-align:center; display:inline-flex; align-items:center; gap:6px;">
+          <span>Daily Bill Change: </span>
+          <span style="color:${color}; font-weight:bold;">
+            ${Math.abs(bill).toFixed(2)}฿
+          </span>
+          <span class="arrow">${arrow}</span>
+        </div>
+      `;
+    }
+
+    if (dailyPopupEl && overlayEl) {
+      dailyPopupEl.style.display = 'block';
+      overlayEl.style.display = 'block';
+    }
   }
 
-  // แสดง Daily Diff พร้อมลูกศร
-  if (dailyDiffEl) {
-    const bill = data.diff.electricity_bill;
-    const arrowUp = `<svg width="24" height="24" viewBox="0 0 24 24"><path d="M12 2L5 10h14L12 2z" fill="red"/></svg>`;
-    const arrowDown = `<svg width="24" height="24" viewBox="0 0 24 24"><path d="M12 22l7-8H5l7 8z" fill="green"/></svg>`;
-    const color = bill < 0 ? 'red' : 'green';
-    const arrow = bill < 0 ? arrowUp : arrowDown;
+  async function showDailyPopup() {
+    if (dailyPopupEl && overlayEl) {
+      overlayEl.style.display = 'block';
+      dailyPopupEl.style.display = 'block';
 
-    dailyDiffEl.innerHTML = `
-      <div style="text-align:center; display:inline-flex; align-items:center; gap:6px;">
-        <span>Daily Bill Change: </span>
-        <span style="color:${color}; font-weight:bold;">${Math.abs(bill).toFixed(2)}฿</span>
-        <span class="arrow">${arrow}</span>
-      </div>
-    `;
+      dailyPopupEl.classList.add('show-popup');
+      dailyPopupEl.classList.remove('hide-popup');
+
+      if (navigator.vibrate) {
+        navigator.vibrate([200, 100, 200]);
+      }
+
+      await updateDailyDiff();
+    }
   }
 
-  // แสดง popup และ overlay
-  if (dailyPopupEl && overlayEl) {
-    dailyPopupEl.style.display = 'block';
-    overlayEl.style.display = 'block';
+  function hideDailyPopup() {
+    if (dailyPopupEl && overlayEl) {
+      dailyPopupEl.style.display = 'none';
+      overlayEl.style.display = 'none';
+    }
   }
-}
 
-async function showDailyPopup() {
-  if (dailyPopupEl && overlayEl) {
-    overlayEl.style.display = 'block';
-    dailyPopupEl.style.display = 'block';
-    dailyPopupEl.classList.add('show-popup');
-    dailyPopupEl.classList.remove('hide-popup');
+  if (overlayEl) overlayEl.addEventListener('click', hideDailyPopup);
 
-    if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
-
-    await updateDailyDiff();
-  }
-}
-
-function hideDailyPopup() {
-  if (dailyPopupEl && overlayEl) {
-    dailyPopupEl.style.display = 'none';
-    overlayEl.style.display = 'none';
-  }
-}
-
-if (overlayEl) overlayEl.addEventListener('click', hideDailyPopup);
-
-// เรียกโชว์ทันที
-showDailyPopup();
-
+  showDailyPopup();
 
 // ================= Notification System (Updated) =================
 const API_BASE = 'https://momaybackendhospital-production.up.railway.app';

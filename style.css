@@ -285,16 +285,17 @@ body::after {
 
 /* ================= Realtime Container ================= */
 .Realtime_Container {
-  width: 375px;   /* ขนาดเดิม */
-  height: 250px;  /* ขนาดเดิม */
-  font-size: 12px;
-  font-weight: 700;  /* หนาขึ้น */
-  text-align: center;
-  box-sizing: border-box;
-  color: #fff;
-  padding-bottom: 100px;
-
-  /* Gradient background แทน PNG */
+  width: 365px;
+  height: 220px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  padding: 10px;
+  position: relative;  /* เพื่อให้ canvas อยู่ภายใน container */
+  z-index: 1;          /* ต่ำสุด เพื่อไม่บังปุ่ม */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   background: linear-gradient(
     180deg,
     #f8f6f0 0%,
@@ -302,34 +303,6 @@ body::after {
     #fff8e8 55%,
     #f5f0e5 100%
   );
-
-  /* ขอบโค้ง + ความหนาและสี */
-  border-radius: 10px;
-  border: 6px solid #74640a;
-
-  /* เงาและ shadow */
-  box-shadow: 
-    1px 1px 0 #000,
-    -8px 6px #3b3305,
-    0 0 20px rgba(255, 230, 160, 0.55);
-
-  /* ข้อความเงา */
-  text-shadow: 
-    0 1px 0 rgba(255, 255, 255, 0.3),
-    0 -1px 0 rgba(0, 0, 0, 0.1);
-
-  /* Layout */
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 0px;
-  padding: 15px;
-
-  /* Animation / Transition */
-  position: relative;
-  transform: translateZ(0);
-  transition: all 0.3s ease;
 }
 
 
@@ -836,8 +809,8 @@ font-size: 14px;
 
 
 .Realtime_Container canvas {
-  width: 300px ;
-  height: 150px ;
+  width: 300px;
+  height: 150px;
   margin-top: 40px;   /* ขยับลงจากด้านบน */
   padding-bottom: 20px; /* เพิ่ม margin ด้านล่าง */
 }
@@ -858,7 +831,7 @@ font-size: 14px;
 /* ตัว "<" และ ">" แยกออกมาให้ขยับเล็กน้อย */
 #PickDate span {
   margin: 0 8px;
-   z-index: 999;
+   z-index: 1001;
 }
 
 .popup-stats > div {
@@ -1044,11 +1017,17 @@ font-size: 14px;
   padding: 4px 10px;      /* ลด padding บน-ล่าง เหลือ 4px, ซ้าย-ขวา 10px */
   cursor: pointer;
   pointer-events: auto;
-  z-index: 999;
+  z-index: 1001;
   position: relative;
 
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
+#PickDate {
+  position: relative;
+  z-index: 999;
+  pointer-events: auto;
+}
+
 
 #currentDay:hover, #prevDay:hover, #nextDay:hover {
   transform: scale(1.05);
@@ -1061,11 +1040,6 @@ font-size: 14px;
 
 
 /* เพิ่ม z-index ให้ container */
-#PickDate {
-  position: relative;
-  z-index: 9999;
-  pointer-events: auto;
-}
 
 
 
@@ -1099,10 +1073,11 @@ font-size: 14px;
     margin-top: 0px;
 }
 #EnergyChart {
-  position: relative;
-  left: -4px;           /* ขยับจากซ้าย */
   width: 90%;
   height: 400px;
+  pointer-events: none; /* ปล่อยให้ click ผ่านไป */
+  position: relative;
+  z-index: 1000; /* ต่ำกว่า #PickDate */
 }
 /* ===== Calendar Popup ===== */
 #calendarPopup {
