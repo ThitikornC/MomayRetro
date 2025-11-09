@@ -1096,7 +1096,7 @@ font-size: 14px;
 }
 #EnergyChart {
   width: 90%;
-  height: 400px;
+  height: 500px;
   pointer-events: none; /* ปล่อยให้ click ผ่านไป */
   position: relative;
   z-index: 1000; /* ต่ำกว่า #PickDate */
