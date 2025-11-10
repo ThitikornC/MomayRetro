@@ -114,13 +114,23 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     const ctx = canvas.getContext("2d");
 
+    // สร้าง gradient แบบ radial สำหรับเอฟเฟกต์เรืองแสง
+    const gradient = ctx.createRadialGradient(
+      canvas.width / 2, canvas.height / 2, 0,
+      canvas.width / 2, canvas.height / 2, canvas.width / 2
+    );
+    gradient.addColorStop(0, "#FFEB99");    // เหลืองอ่อนตรงกลาง (เรืองแสง)
+    gradient.addColorStop(0.5, "#FFD54F");  // เหลืองสดใส
+    gradient.addColorStop(0.8, "#FBBF32");  // ส้มทอง
+    gradient.addColorStop(1, "#FF9800");    // ส้มเข้มขอบนอก
+
     totalDonutChart = new Chart(ctx, {
       type: "doughnut",
       data: {
         labels: ["Current Power", "Remaining Capacity"],
         datasets: [{
           data: [0.01, 99.99],
-          backgroundColor: ["#FBBF32", "#f8f6f0"],
+          backgroundColor: [gradient, "#f8f6f0"],
           borderColor: ["#FBBF32", "#f8f6f0"],
           borderWidth: 2,
           cutout: "70%",
@@ -1135,157 +1145,129 @@ async function loadNotifications() {
 
 function renderNotifications() {
   if (!notificationItems) return;
-  
-  if (notifications.length === 0) {
+
+  // Empty state
+  if (!notifications.length) {
     notificationItems.innerHTML = `
-      <div style="text-align:center; padding:30px; color:#0000;">
+      <div style="text-align:center; padding:30px; color:#000;">
         <p style="font-size:24px; margin-bottom:10px;">🔔</p>
         <p>No Notifications</p>
       </div>
     `;
     return;
   }
-  
+
+  // Helper: format timestamp (local time)
+  const formatTime = iso => {
+    if (!iso) return '-';
+    const d = new Date(iso);
+    const dd = String(d.getDate()).padStart(2,'0');
+    const mmNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const mm = mmNames[d.getMonth()];
+    const yyyy = d.getFullYear();
+    const hh = String(d.getHours()).padStart(2,'0');
+    const mi = String(d.getMinutes()).padStart(2,'0');
+    return `${dd} ${mm} ${yyyy} ${hh}:${mi}`;
+  };
+
+  // Clear
   notificationItems.innerHTML = '';
-  
+
   // Header
   const header = document.createElement('div');
-header.style.cssText = `
-  padding: 15px;
-  border: 6px solid #74640a;         /* ขอบเข้มแบบ Meter */
-  border-radius: 10px;               /* ขอบมน */
-  background: linear-gradient(
-    180deg,
-    #f8f6f0 0%,
-    #fffef8 45%,
-    #fff8e8 55%,
-    #f5f0e5 100%
-  );                                  /* Gradient แทน background-image */
-  box-shadow:
-    inset 0 0 5px rgba(0,0,0,0.15),
-    1px 1px 0 #000,
-    -4px 3px #3b3305,
-    0 0 12px rgba(255, 230, 160, 0.55); /* เงา inset + เงาขอบนอก */
-  text-align: center;
-  font-weight: bold;
-  color: #2c1810;                     /* สีดำแบบ Meter */
-  font-family: 'Roboto', sans-serif;  /* ใช้ Roboto */
-`;
-
-
+  header.style.cssText = `
+    padding: 14px 16px;
+    border: 6px solid #74640a;
+    border-radius: 10px;
+    background: linear-gradient(180deg,#f8f6f0 0%,#fffef8 45%,#fff8e8 55%,#f5f0e5 100%);
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.15),1px 1px 0 #000,-4px 3px #3b3305,0 0 12px rgba(255,230,160,0.55);
+    font-weight:700; text-align:center; font-family:Roboto,sans-serif; color:#000; margin-bottom:6px;
+  `;
   header.innerHTML = '<strong style="font-size:16px; color:#000;">Notification</strong>';
-  
   notificationItems.appendChild(header);
-  
-  // แสดง notifications
-  notifications.forEach(notif => {
-    const div = document.createElement('div');
-    div.className = 'notification-item';
-    div.style.cssText = `
-      padding: 15px;
-      margin-bottom: 1px;
-      border-bottom: 1px solid #f0f0f0;
-      background: ${notif.read ? '#fff' : '#f8f9ff'};
-      transition: background 0.2s;
-      cursor: pointer;
-      border-radius: 5px; 
+
+  // Builder per type
+  const buildDetails = (n) => {
+    switch(n.type) {
+      case 'peak':
+        return n.power !== undefined ? `
+          <div style="background:#fff3cd; padding:8px; border-radius:6px; margin-top:6px; font-size:12px;">
+            <strong style="color:#856404;">Peak Power: ${Number(n.power).toFixed(2)} kW</strong>
+          </div>` : '';
+      case 'daily_diff':
+        if (!n.diff) return '';
+        const isIncrease = n.diff.electricity_bill < 0; // negative means yesterday cheaper?
+        const color = isIncrease ? '#d9534f' : '#5cb85c';
+        const arrow = isIncrease ? '↑' : '↓';
+        return `
+          <div style="background:#f0f0f0; padding:8px; border-radius:6px; margin-top:6px; font-size:11.5px; line-height:1.4;">
+            <div style="margin-bottom:4px;">
+              <span style="color:#666;">Yesterday:</span>
+              <strong>${n.yesterday?.energy_kwh !== undefined ? n.yesterday.energy_kwh.toFixed(2) : '-'} Unit</strong>
+            </div>
+            <div style="margin-bottom:4px;">
+              <span style="color:#666;">Day Before:</span>
+              <strong>${n.dayBefore?.energy_kwh !== undefined ? n.dayBefore.energy_kwh.toFixed(2) : '-'} Unit</strong>
+            </div>
+            <div style="color:${color}; font-weight:700;">${arrow} ${Math.abs(n.diff.electricity_bill).toFixed(2)} THB</div>
+          </div>`;
+      case 'daily_bill':
+        return `
+          <div style="background:#d4edda; padding:10px; border-radius:6px; margin-top:6px; font-size:12px;">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+              <div><span style="color:#666;">Date:</span><br><strong style="color:#155724;">${n.date || '-'}</strong></div>
+              <div><span style="color:#666;">Energy:</span><br><strong style="color:#155724;">${n.energy_kwh !== undefined ? n.energy_kwh.toFixed(2) : '-'} Unit</strong></div>
+            </div>
+            <div style="margin-top:6px; border-top:1px solid #c3e6cb; padding-top:6px;">
+              <span style="color:#666;">Bill:</span> <strong style="color:#155724; font-size:14px;">${n.electricity_bill !== undefined ? n.electricity_bill.toFixed(2) : '-'} THB</strong>
+            </div>
+            ${n.samples ? `<div style='color:#999; font-size:10px; margin-top:4px;'>${n.samples} samples • rate ${n.rate_per_kwh || 4.4} THB/kWh</div>` : ''}
+          </div>`;
+      case 'test':
+        return '';
+      default:
+        return '';
+    }
+  };
+
+  notifications.forEach(n => {
+    const card = document.createElement('div');
+    card.className = 'notification-item';
+    card.style.cssText = `
+      padding:14px 15px; margin:4px 0; background:${n.read ? '#fff' : '#f8f9ff'}; border:1px solid #e6e6e6; border-radius:8px; cursor:pointer; transition:background .15s;`
+    ;
+
+    const ts = formatTime(n.timestamp);
+    const iconMap = { peak:'⚡', daily_diff:'📊', daily_bill:'💰', test:'🧪' };
+    const icon = iconMap[n.type] || '🔔';
+
+    card.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div style="display:flex; align-items:center; gap:6px;">
+          <span style="font-size:16px;">${icon}</span>
+          <strong style="font-size:13px; color:#2c1810;">${n.title || '(No title)'}</strong>
+        </div>
+        ${n.read ? '' : '<span style="width:8px;height:8px;background:#667eea;border-radius:50%;display:inline-block;" title="Unread"></span>'}
+      </div>
+      ${n.body ? `<p style='margin:6px 0 4px 0; font-size:12px; color:#555;'>${n.body}</p>` : ''}
+      ${buildDetails(n)}
+      <div style="margin-top:6px; text-align:right;">
+        <small style="color:#999; font-size:10px;">${ts}</small>
+      </div>
     `;
 
-    // Format timestamp
-    const time = new Date(notif.timestamp);
-    const day = String(time.getUTCDate()).padStart(2, '0');
-    const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-    const month = monthNames[time.getUTCMonth()];
-    const year = time.getUTCFullYear();
-    const hours = String(time.getUTCHours()).padStart(2, '0');
-    const minutes = String(time.getUTCMinutes()).padStart(2, '0');
-    const timeStr = `${day} ${month} ${year} ${hours}:${minutes}`;
-    
-    // สร้าง content ตาม type
-    let detailsHTML = '';
-    
-    if (notif.type === 'peak' && notif.power) {
-      detailsHTML = `
-        <div style="background:#fff3cd; padding:8px; border-radius:5px; margin-top:5px;">
-          <strong style="color:#856404;">Peak Power: ${notif.power.toFixed(2)} kW</strong>
-        </div>
-      `;
-    } else if (notif.type === 'daily_diff' && notif.diff) {
-      const isIncrease = notif.diff.electricity_bill < 0;
-      const color = isIncrease ? '#d9534f' : '#5cb85c';
-      const arrow = isIncrease ? '↑' : '↓';
-      
-      detailsHTML = `
-        <div style="background:#f0f0f0; padding:8px; border-radius:5px; margin-top:5px; font-size:12px;">
-          <div style="margin-bottom:5px;">
-            <span style="color:#666;">Yesterday:</span> 
-            <strong>${notif.yesterday?.energy_kwh.toFixed(2) || '-'} Unit</strong>
-          </div>
-          <div style="margin-bottom:5px;">
-            <span style="color:#666;">Day Before:</span> 
-            <strong>${notif.dayBefore?.energy_kwh.toFixed(2) || '-'} Unit</strong>
-          </div>
-          <div style="color:${color}; font-weight:bold;">
-            ${arrow} ${Math.abs(notif.diff.electricity_bill).toFixed(2)} THB
-          </div>
-        </div>
-      `;
-    } else if (notif.type === 'daily_bill' && notif.energy_kwh !== undefined) {
-      const units = notif.energy_kwh || 0;
-      const bill = notif.electricity_bill || 0;
-      const date = notif.date || '-';
-      
-      detailsHTML = `
-        <div style="background:#d4edda; padding:10px; border-radius:5px; margin-top:5px;">
-          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; font-size:13px;">
-            <div>
-              <div style="color:#666; margin-bottom:3px;">Date:</div>
-              <strong style="color:#155724;">${date}</strong>
-            </div>
-            <div>
-              <div style="color:#666; margin-bottom:3px;">Energy:</div>
-              <strong style="color:#155724;">${units.toFixed(2)} Unit</strong>
-            </div>
-          </div>
-          <div style="margin-top:8px; padding-top:8px; border-top:1px solid #c3e6cb;">
-            <div style="color:#666; font-size:12px;">Total Bill:</div>
-            <strong style="color:#155724; font-size:16px;">${bill.toFixed(2)} THB</strong>
-          </div>
-          ${notif.samples ? `<div style="font-size:11px; color:#999; margin-top:5px;">${notif.samples} samples</div>` : ''}
-        </div>
-      `;
-    }
-    
-    div.innerHTML = `
-      <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:5px;">
-        <div style="display:flex; align-items:center; gap:5px;">
-          <strong style="color:#333; font-size:14px;">${notif.title}</strong>
-        </div>
-        ${!notif.read ? '<span style="width:8px; height:8px; background:#667eea; border-radius:50%; display:block;"></span>' : ''}
-      </div>
-      <p style="color:#666; font-size:13px; margin:5px 0 5px 0;">${notif.body}</p>
-      ${detailsHTML}
-      <div style="margin-top:8px;">
-        <small style="color:#999; font-size:11px;">${timeStr}</small>
-      </div>
-    `;
-    
-    // Click เพื่อ mark as read
-    div.addEventListener('click', async () => {
-      if (!notif.read) {
-        await markAsRead(notif.type, notif._id);
+    card.addEventListener('mouseenter', () => { card.style.background = '#f1f2f6'; });
+    card.addEventListener('mouseleave', () => { card.style.background = n.read ? '#fff' : '#f8f9ff'; });
+    card.addEventListener('click', async () => {
+      if (!n.read && typeof markAsRead === 'function') {
+        await markAsRead(n.type, n._id);
+        n.read = true; // optimistically update UI
+        card.querySelector('span[title="Unread"]')?.remove();
+        card.style.background = '#fff';
       }
     });
-    
-    div.addEventListener('mouseenter', () => {
-      div.style.background = '#f5f5f5';
-    });
-    
-    div.addEventListener('mouseleave', () => {
-      div.style.background = notif.read ? '#fff' : '#f8f9ff';
-    });
-    
-    notificationItems.appendChild(div);
+
+    notificationItems.appendChild(card);
   });
 }
 

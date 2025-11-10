@@ -424,7 +424,7 @@ body::after {
 .Meter {
   position: absolute;
   right: 18px;
-  top: 100px;
+  top: 60px;
   width: 80px;
   height: auto;
   padding: 10px;
@@ -683,6 +683,21 @@ font-size: 14px;
   color: #000000; 
 }
 
+/* ================= Total Donut Label ================= */
+#Total_Bar_Label {
+  position: absolute;
+  top: 40px;
+  left: 32%;
+  transform: translateX(-50%);
+  font-size: 14px;
+  font-weight: 700;
+  color: #2c1810;
+  text-align: center;
+  white-space: nowrap;
+  z-index: 1;
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+}
+
 /* ================= Total Donut Container ================= */
 #Total_Bar {
   position: relative;
@@ -692,6 +707,7 @@ font-size: 14px;
   justify-content: center;
   align-items: center;
   margin-left: -130px;
+  margin-top: 30px;
 
   /* ขอบนอก + gradient */
   border-radius: 50%;
@@ -3047,7 +3063,7 @@ color: #000000;
 @media (max-width: 375px) {
   html, body { overflow-x: hidden; }
   body {
-    margin: 10px auto;
+    margin: 30px auto 10px auto;
     padding: 0;
     align-items: center;
     max-width: 100%;
@@ -3096,12 +3112,13 @@ color: #000000;
    font-size: 16px; 
 }
 #Total_Bar{
-    width: 170px;
-    height: 170px;
+    width: 160px;
+    height: 160px;
     margin-right: 110px;
   }
   .Meter {
      left: 210px;
+     top: 60px;
 
 }
 }
