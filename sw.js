@@ -5,8 +5,8 @@ const API_TTL = 24 * 60 * 60 * 1000; // 24 hours
 const PRECACHE_URLS = [
   '/',
   '/index.html',
-  '/style.css?v=2.33',
-  '/script.js?v=2.33',
+  '/style.css?v=2.34',
+  '/script.js?v=2.34',
   '/manifest.json',
   '/icons/icon-192.png',
   '/icons/icon-512.png'
@@ -60,112 +60,89 @@ self.addEventListener('activate', event => {
 // ---------------- Fetch ----------------
 const API_PATHS = ['/daily-energy', '/solar-size', '/daily-bill', '/calendar'];
 self.addEventListener('fetch', event => {
-  const requestUrl = new URL(event.request.url);
+  try {
+    const requestUrl = new URL(event.request.url);
 
-  if (event.request.method !== 'GET' || !['http:', 'https:'].includes(requestUrl.protocol)) return;
+    if (event.request.method !== 'GET' || !['http:', 'https:'].includes(requestUrl.protocol)) return;
 
-  // Fast navigation handling: respond with preload -> cache -> network
-  if (event.request.mode === 'navigate') {
-    event.respondWith((async () => {
-      // Try navigation preload response first (fetch started by browser)
-      const preloadResp = await event.preloadResponse.catch(() => null);
-      if (preloadResp) return preloadResp;
+    // Fast navigation handling: cache-first with background update
+    if (event.request.mode === 'navigate') {
+      event.respondWith(
+        caches.match('/index.html')
+          .then(cachedResp => {
+            const fetchPromise = fetch(event.request)
+              .then(networkResp => {
+                if (networkResp && networkResp.ok) {
+                  caches.open(CACHE_NAME).then(cache => {
+                    cache.put('/index.html', networkResp.clone()).catch(() => {});
+                  }).catch(() => {});
+                }
+                return networkResp;
+              })
+              .catch(() => cachedResp);
+            
+            return cachedResp || fetchPromise;
+          })
+          .catch(() => fetch(event.request))
+      );
+      return;
+    }
 
-      // Then try cache
-      const cachedIndex = await caches.match('/index.html') || await caches.match('/');
-      if (cachedIndex) {
-        // update cache in background
-        event.waitUntil((async () => {
-          try {
-            const networkResp = await fetch(event.request);
+    // API requests: network-first with simple cache fallback
+    if (API_PATHS.some(path => requestUrl.pathname.includes(path))) {
+      event.respondWith(
+        fetch(event.request)
+          .then(networkResp => {
             if (networkResp && networkResp.ok) {
-              const cache = await caches.open(CACHE_NAME);
-              cache.put('/index.html', networkResp.clone()).catch(() => {});
+              try {
+                const ct = networkResp.headers.get('content-type') || '';
+                if (ct.includes('application/json')) {
+                  caches.open(API_CACHE_NAME).then(cache => {
+                    cache.put(event.request, networkResp.clone()).catch(() => {});
+                  }).catch(() => {});
+                }
+              } catch (e) { /* ignore */ }
             }
-          } catch (e) { /* ignore */ }
-        })());
-        return cachedIndex;
-      }
+            return networkResp;
+          })
+          .catch(() => {
+            return caches.match(event.request)
+              .then(cached => cached || new Response(JSON.stringify({ error: 'offline' }), { 
+                headers: { 'Content-Type': 'application/json' } 
+              }))
+              .catch(() => new Response(JSON.stringify({ error: 'offline' }), { 
+                headers: { 'Content-Type': 'application/json' } 
+              }));
+          })
+      );
+      return;
+    }
 
-      // Fallback to network
-      try {
-        return await fetch(event.request);
-      } catch (err) {
-        return caches.match('/index.html');
-      }
-    })());
-    return;
-  }
-
-  if (API_PATHS.some(path => requestUrl.pathname.includes(path))) {
-    // Network-first สำหรับ API แต่ cache ผลลัพธ์เพื่อ fallback (stale-while-revalidate-ish)
-    event.respondWith((async () => {
-      try {
-          const networkResp = await fetch(event.request.clone());
-          if (networkResp && networkResp.ok) {
-            // Clone and persist JSON responses for offline fallback
-            const ct = networkResp.headers.get('content-type') || '';
-            if (ct.includes('application/json')) {
-              const apiCache = await caches.open(API_CACHE_NAME);
-              await apiCache.put(event.request, networkResp.clone());
-              // store metadata timestamp
-              const meta = new Response(JSON.stringify({ ts: Date.now() }), { headers: { 'Content-Type': 'application/json' } });
-              await apiCache.put(new Request(event.request.url + '::meta'), meta).catch(() => {});
-            }
-          }
-          return networkResp;
-        } catch (e) {
-          // Network failed — try cache (respect TTL)
-          try {
-            const apiCache = await caches.open(API_CACHE_NAME);
-            const cached = await apiCache.match(event.request);
-            if (cached) {
-              const metaResp = await apiCache.match(new Request(event.request.url + '::meta'));
-              const meta = metaResp ? await metaResp.json().catch(() => null) : null;
-              if (meta && meta.ts && (Date.now() - meta.ts <= API_TTL)) {
-                return cached;
+    // Static files: cache-first
+    event.respondWith(
+      caches.match(event.request)
+        .then(cached => {
+          if (cached) return cached;
+          
+          return fetch(event.request)
+            .then(networkResp => {
+              if (networkResp && networkResp.ok) {
+                try {
+                  caches.open(CACHE_NAME).then(cache => {
+                    cache.put(event.request, networkResp.clone()).catch(() => {});
+                  }).catch(() => {});
+                } catch (e) { /* ignore */ }
               }
-            }
-          } catch (e2) { /* ignore cache lookup errors */ }
-          return new Response(JSON.stringify({ error: 'offline' }), { headers: { 'Content-Type': 'application/json' } });
-        }
-    })());
-    return;
+              return networkResp;
+            })
+            .catch(() => new Response('', { status: 504 }));
+        })
+        .catch(() => fetch(event.request).catch(() => new Response('', { status: 504 })))
+    );
+  } catch (err) {
+    // Ultimate fallback if anything goes wrong
+    console.error('SW fetch error:', err);
   }
-
-  // Cache-first สำหรับ static files
-  event.respondWith(
-    caches.match(event.request).then(cached => {
-      if (cached) {
-        // Stale-while-revalidate: respond immediately, then update cache in background
-        event.waitUntil((async () => {
-          try {
-            const networkResp = await fetch(event.request);
-            if (networkResp && networkResp.ok) {
-              const cache = await caches.open(CACHE_NAME);
-              await cache.put(event.request, networkResp.clone());
-            }
-          } catch (e) { /* ignore */ }
-        })());
-        return cached;
-      }
-
-      return fetch(event.request)
-        .then(networkResp => {
-          if (networkResp && networkResp.ok) {
-            caches.open(CACHE_NAME)
-              .then(cache => cache.put(event.request, networkResp.clone()))
-              .catch(err => console.warn('❌ Cache put failed:', err));
-          }
-          return networkResp;
-        })
-        .catch(err => {
-          console.warn('❌ Fetch failed:', err);
-          if (event.request.mode === 'navigate') return caches.match('/index.html');
-          return new Response('', { status: 504, statusText: 'offline' });
-        })
-    })
-  );
 });
 
 // ================= Push Notification =================

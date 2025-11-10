@@ -1662,6 +1662,7 @@ document.getElementById("kwangMonthReport").textContent =
               responsive: true,
               maintainAspectRatio: true,
               animation: false,
+              interaction: { mode: null },
               plugins: {
                 legend: { display: true },
                 tooltip: { enabled: false }
@@ -1675,43 +1676,15 @@ document.getElementById("kwangMonthReport").textContent =
                     color: '#000',
                     maxRotation: 0,
                     minRotation: 0,
-                    // Show hourly labels (00.00 .. 24.00) but avoid overlap by adaptive stepping
                     callback: function(v) {
                       const l = this.getLabelForValue(v);
                       if (!l) return '';
                       const [h, m] = l.split(':');
-                      const hour = parseInt(h, 10);
-                      const idx = Number(v);
-                      const labelsLen = (this.chart && this.chart.data && this.chart.data.labels) ? this.chart.data.labels.length : null;
-                      // Always allow the final label to be 24.00 (deduped per-scale)
-                      if (labelsLen !== null && idx === labelsLen - 1) {
-                        const scaleId = this.id || this.axis || 'x';
-                        const map = (this.chart && this.chart._lastDisplayedLabel) ? this.chart._lastDisplayedLabel : (this.chart._lastDisplayedLabel = {});
-                        if (map[scaleId] === '24.00') return '';
-                        map[scaleId] = '24.00';
-                        return '24.00';
-                      }
-
-                      const chartObj = this.chart;
-                      const chartWidth = chartObj && chartObj.chartArea ? chartObj.chartArea.width : 800;
-                      const pxPerLabel = 48;
-                      const maxLabels = Math.max(1, Math.floor(chartWidth / pxPerLabel));
-                      const step = Math.max(1, Math.ceil(24 / maxLabels));
-
-                      if (m === '00' && (hour % step) === 0) {
-                        const labelToShow = `${String(h).padStart(2,'0')}.00`;
-                        const scaleId = this.id || this.axis || 'x';
-                        const map = (this.chart && this.chart._lastDisplayedLabel) ? this.chart._lastDisplayedLabel : (this.chart._lastDisplayedLabel = {});
-                        if (map[scaleId] === labelToShow) return '';
-                        map[scaleId] = labelToShow;
-                        return labelToShow;
-                      }
-                      return '';
+                      return m === '00' && parseInt(h) % 3 === 0 ? l : '';
                     }
                   },
                   title: {
-                    // Disabled to avoid duplicate title; plugin draws it instead
-                    display: false,
+                    display: true,
                     text: 'Time (HH:MM)',
                     color: '#000',
                     font: { size: 12, weight: 'bold' }
@@ -1721,7 +1694,7 @@ document.getElementById("kwangMonthReport").textContent =
                   grid: { display: false },
                   beginAtZero: true,
                   min: 0,
-                  ticks: { color: '#000', font: { size: 9 } },
+                  ticks: { color: '#000' },
                   title: {
                     display: true,
                     text: 'Power (kW)',
@@ -1732,18 +1705,6 @@ document.getElementById("kwangMonthReport").textContent =
               }
             }
           });
-          // apply responsive axis font sizes for report chart as well
-          try { if (window.reportChart) applyResponsiveAxisFontSizes(window.reportChart); } catch (e) {}
-          // nudge report chart x-axis title slightly left to center within container
-          if (window.reportChart && window.reportChart.options) {
-            window.reportChart.options.plugins = window.reportChart.options.plugins || {};
-            // give report chart extra bottom padding so title doesn't collide with axis
-            window.reportChart.options.layout = window.reportChart.options.layout || {};
-            window.reportChart.options.layout.padding = window.reportChart.options.layout.padding || {};
-            window.reportChart.options.layout.padding.bottom = Math.max(36, window.reportChart.options.layout.padding.bottom || 0);
-            window.reportChart.options.plugins.xAxisTitle = { text: 'Time (HH:MM)', offset: 20, relativeOffsetPercent: 0.2, padding: 36, color: '#000', font: '12px sans-serif', align: 'center' };
-            window.reportChart.update('none');
-          }
         }
 
         wrapper.style.opacity = 1;
@@ -1753,7 +1714,7 @@ document.getElementById("kwangMonthReport").textContent =
         wrapper.style.visibility = 'visible';
 
         setTimeout(() => {
-          html2canvas(wrapper, { scale: 2, useCORS: true }).then(canvas => {
+          html2canvas(wrapper, { scale: 1.5, useCORS: true, logging: false, allowTaint: false, removeContainer: false }).then(canvas => {
             canvas.toBlob(blob => {
               const file = new File([blob], `KwangReport-${apiDate}.png`, { type: 'image/png' });
 
