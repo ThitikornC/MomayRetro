@@ -17,7 +17,7 @@
   <!-- iOS Safari full screen fix -->
   <meta name="apple-mobile-web-app-title" content="Momay">
   <!-- ใส่ CSS versioned แทนตัวเดิม -->
-  <link rel="stylesheet" href="style.css?v=2.35">
+  <link rel="stylesheet" href="style.css?v=2.36">
 </head>
 
 <body>
@@ -231,6 +231,47 @@
   <div id="calendar"></div>
 </div>
 
+<!-- Report Action Modal -->
+<div id="reportActionModal" class="report-modal">
+  <div class="report-modal-content">
+    <div class="modal-header">
+      <h3>Export Report</h3>
+    </div>
+    <div class="modal-body">
+      <p class="modal-description">Choose how you want to export your report</p>
+      <div class="action-buttons">
+        <button id="downloadReportBtn" class="report-action-btn download-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <div class="btn-content">
+            <span class="btn-title">Download</span>
+            <span class="btn-subtitle">Save to device</span>
+          </div>
+        </button>
+        <button id="shareReportBtn" class="report-action-btn share-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="18" cy="5" r="3"></circle>
+            <circle cx="6" cy="12" r="3"></circle>
+            <circle cx="18" cy="19" r="3"></circle>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+          </svg>
+          <div class="btn-content">
+            <span class="btn-title">Share</span>
+            <span class="btn-subtitle">Send to others</span>
+          </div>
+        </button>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button id="cancelReportBtn" class="report-cancel-btn">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <!-- Report Wrapper -->
 <div id="reportWrapper">
 <img src="./images/kwang_logo_report.png" 
@@ -295,7 +336,7 @@ if ('serviceWorker' in navigator) {
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
-<script src="script.js?v=2.35" defer></script>
+<script src="script.js?v=2.36" defer></script>
 
 
 </body>

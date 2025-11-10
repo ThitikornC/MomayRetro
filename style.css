@@ -1918,6 +1918,259 @@ font-size: 14px;
 .notification-item:hover {
   transform: translateX(-2px);
 }
+
+/* Report Action Modal */
+.report-modal {
+  display: none;
+  position: fixed;
+  z-index: 10000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  animation: fadeIn 0.2s ease;
+}
+
+.report-modal-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(
+    180deg,
+    #f8f6f0 0%,
+    #fffef8 45%,
+    #fff8e8 55%,
+    #f5f0e5 100%
+  );
+  border-radius: 10px;
+  border: 6px solid #74640a;
+  box-shadow: 
+    1px 1px 0 #000,
+    -8px 6px #3b3305,
+    0 0 20px rgba(255, 230, 160, 0.55);
+  padding: 20px 25px;
+  max-width: 310px;
+  width: 90%;
+  animation: modalSlideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: hidden;
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.3),
+    0 -1px 0 rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+  padding: 0 0 12px 0;
+  border-bottom: 2px solid rgba(116, 100, 10, 0.2);
+  text-align: center;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #74640a;
+  letter-spacing: -0.02em;
+}
+
+.modal-body {
+  padding: 12px 0 0 0;
+}
+
+.modal-description {
+  margin: 0 0 15px 0;
+  font-size: 13px;
+  color: #555;
+  text-align: center;
+}
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.report-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  background: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.report-action-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, transparent 0%, rgba(255, 255, 255, 0.1) 100%);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.report-action-btn:hover::before {
+  opacity: 1;
+}
+
+.report-action-btn:hover {
+  transform: translateY(-2px);
+}
+
+.report-action-btn:active {
+  transform: translateY(0);
+}
+
+.report-action-btn svg {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  transition: transform 0.2s ease;
+}
+
+.download-btn {
+  border-color: #8B4513;
+  background: linear-gradient(135deg, #8B4513 0%, #74640a 100%);
+  color: white;
+}
+
+.download-btn:hover {
+  border-color: #74640a;
+  box-shadow: 0 8px 20px rgba(139, 69, 19, 0.4);
+}
+
+.download-btn svg {
+  stroke: white;
+}
+
+.download-btn:hover svg {
+  transform: translateY(2px);
+}
+
+.share-btn {
+  border-color: #d4a574;
+  background: linear-gradient(135deg, #d4a574 0%, #b8935f 100%);
+  color: white;
+}
+
+.share-btn:hover {
+  border-color: #b8935f;
+  box-shadow: 0 8px 20px rgba(212, 165, 116, 0.4);
+}
+
+.share-btn svg {
+  stroke: white;
+}
+
+.share-btn:hover svg {
+  transform: scale(1.1);
+}
+
+.btn-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex: 1;
+  text-align: left;
+}
+
+.btn-title {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.3;
+  display: block;
+}
+
+.btn-subtitle {
+  font-size: 12px;
+  opacity: 0.85;
+  font-weight: 400;
+  line-height: 1.3;
+  display: block;
+  margin-top: 2px;
+}
+
+.modal-footer {
+  padding: 12px 0 0 0;
+  border-top: 2px solid rgba(116, 100, 10, 0.2);
+  margin-top: 12px;
+}
+
+.report-cancel-btn {
+  width: 100%;
+  padding: 10px 16px;
+  background: transparent;
+  color: #8B4513;
+  border: 2px solid rgba(139, 69, 19, 0.3);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.report-cancel-btn:hover {
+  background: rgba(139, 69, 19, 0.05);
+  border-color: rgba(139, 69, 19, 0.3);
+  color: #74640a;
+}
+
+.report-cancel-btn:active {
+  background: rgba(139, 69, 19, 0.1);
+  transform: scale(0.98);
+}
+
+@keyframes fadeIn {
+  from { 
+    opacity: 0;
+  }
+  to { 
+    opacity: 1;
+  }
+}
+
+@keyframes modalSlideIn {
+  from { 
+    transform: translate(-50%, -48%);
+    opacity: 0;
+  }
+  to { 
+    transform: translate(-50%, -50%);
+    opacity: 1;
+  }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .report-modal-content {
+    width: 95%;
+    max-width: none;
+  }
+  
+  .report-action-btn {
+    padding: 12px 14px;
+    gap: 10px;
+  }
+  
+  .btn-title {
+    font-size: 14px;
+  }
+  
+  .btn-subtitle {
+    font-size: 11px;
+  }
+}
+
 #reportWrapper {
     width: 794px;          /* ขนาด A4 กว้าง */
     min-height: 1123px;    /* ขนาด A4 สูง */

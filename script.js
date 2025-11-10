@@ -1527,218 +1527,286 @@ if ('Notification' in window && Notification.permission === 'default') {
   Notification.requestPermission();
 }
   // ================= Report Generation =================
+  let reportDataCache = null; // Cache สำหรับเก็บข้อมูล report
+
+  async function prepareReportData() {
+    const currentDayElKwang = document.getElementById('kwangCurrentDay');
+    if (!currentDayElKwang) return null;
+    
+    const rawDate = currentDayElKwang.textContent.trim(); 
+    const [dayStr, monthStr, yearStr] = rawDate.split(' - ');
+    const monthNames = ["January","February","March","April","May","June",
+                        "July","August","September","October","November","December"];
+    const month = String(monthNames.indexOf(monthStr) + 1).padStart(2,'0');
+    const day = dayStr.padStart(2,'0');
+    const year = yearStr;
+    const apiDate = `${year}-${month}-${day}`;
+
+    const res = await fetch(`https://momaybackendhospital-production.up.railway.app/solar-size?date=${apiDate}`);
+    if (!res.ok) throw new Error("Network response was not ok");
+    const json = await res.json();
+
+    const energyRes = await fetch(`https://api-kx4r63rdjq-an.a.run.app/daily-energy/px_pm3250?date=${apiDate}`);
+    const energyJson = await energyRes.json();
+    const energyData = energyJson.data || [];
+
+    return { rawDate, apiDate, json, energyData };
+  }
+
+  async function renderReport(rawDate, apiDate, json, energyData) {
+    const wrapper = document.getElementById("reportWrapper");
+    if (!wrapper) return null;
+
+    document.getElementById("kwangDateReport").textContent = rawDate;
+    document.getElementById("kwangPowerReport").textContent = (json.dayEnergy ?? 0).toFixed(2) + " Unit";
+    document.getElementById("kwangCapacityReport").textContent = (json.solarCapacity_kW ?? 0).toFixed(2) + " kW";
+    document.getElementById("kwangBillReport").textContent = (json.savingsDay ?? 0).toFixed(2) + " THB";
+    document.getElementById("kwangMonthReport").textContent = 
+      (json.savingsMonth ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " THB";
+
+    const tbody = document.querySelector("#kwangHourlyTable tbody");
+    if (tbody) {
+      tbody.innerHTML = "";
+      if (json.hourly && json.hourly.length > 0) {
+        json.hourly.forEach(hourData => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<td>${hourData.hour}</td><td>${hourData.energy_kwh}</td>`;
+          tbody.appendChild(tr);
+        });
+      } else {
+        tbody.innerHTML = '<tr><td colspan="2">No data</td></tr>';
+      }
+    }
+
+    const reportCanvas = document.getElementById('EnergyChartReport');
+    if (reportCanvas) {
+      const reportCtx = reportCanvas.getContext('2d');
+      
+      if (window.reportChart) {
+        window.reportChart.destroy();
+      }
+
+      const labels = Array.from({ length: 1440 }, (_, i) => {
+        const hour = String(Math.floor(i / 60)).padStart(2,'0');
+        const min = String(i % 60).padStart(2,'0');
+        return `${hour}:${min}`;
+      });
+
+      const chartData = new Array(1440).fill(null);
+      energyData.forEach(item => {
+        const t = new Date(item.timestamp);
+        const idx = t.getUTCHours() * 60 + t.getUTCMinutes();
+        chartData[idx] = item.power;
+      });
+
+      let maxVal = null, maxIdx = null, sum = 0, count = 0;
+      chartData.forEach((v, i) => {
+        if (v !== null) {
+          if (maxVal === null || v > maxVal) {
+            maxVal = v;
+            maxIdx = i;
+          }
+          sum += v;
+          count++;
+        }
+      });
+      const avgVal = count > 0 ? sum / count : null;
+
+      const gradient = reportCtx.createLinearGradient(0, 0, 0, 300);
+      gradient.addColorStop(0, 'rgba(139,69,19,0.4)');
+      gradient.addColorStop(0.5, 'rgba(210,180,140,0.3)');
+      gradient.addColorStop(1, 'rgba(245,222,179,0.1)');
+
+      window.reportChart = new Chart(reportCtx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'Power',
+              data: chartData,
+              borderColor: '#8B4513',
+              backgroundColor: gradient,
+              fill: true,
+              borderWidth: 0.5,
+              tension: 0.3,
+              pointRadius: 0.1
+            },
+            {
+              label: 'Max',
+              data: new Array(1440).fill(null).map((_, i) => i === maxIdx ? maxVal : null),
+              borderColor: '#ff9999',
+              pointRadius: 5,
+              pointBackgroundColor: '#ff9999',
+              fill: false,
+              showLine: false
+            },
+            {
+              label: 'Average',
+              data: new Array(1440).fill(avgVal),
+              borderColor: '#000',
+              borderDash: [5, 5],
+              fill: false,
+              pointRadius: 0,
+              borderWidth: 1
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          animation: false,
+          interaction: { mode: null },
+          plugins: {
+            legend: { display: true },
+            tooltip: { enabled: false }
+          },
+          scales: {
+            x: {
+              type: 'category',
+              grid: { display: false },
+              ticks: {
+                autoSkip: false,
+                color: '#000',
+                maxRotation: 0,
+                minRotation: 0,
+                callback: function(v) {
+                  const l = this.getLabelForValue(v);
+                  if (!l) return '';
+                  const [h, m] = l.split(':');
+                  return m === '00' && parseInt(h) % 3 === 0 ? l : '';
+                }
+              },
+              title: {
+                display: true,
+                text: 'Time (HH:MM)',
+                color: '#000',
+                font: { size: 12, weight: 'bold' }
+              }
+            },
+            y: {
+              grid: { display: false },
+              beginAtZero: true,
+              min: 0,
+              ticks: { color: '#000' },
+              title: {
+                display: true,
+                text: 'Power (kW)',
+                color: '#000',
+                font: { size: 12, weight: 'bold' }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    wrapper.style.opacity = 1;
+    wrapper.style.position = 'absolute';
+    wrapper.style.left = '-9999px';
+    wrapper.style.top = '0';
+    wrapper.style.visibility = 'visible';
+
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        html2canvas(wrapper, { scale: 1.5, useCORS: true, logging: false, allowTaint: false, removeContainer: false }).then(canvas => {
+          wrapper.style.opacity = 0;
+          wrapper.style.left = '-9999px';
+          resolve({ canvas, apiDate, rawDate });
+        });
+      }, 500);
+    });
+  }
+
   const generateReportBtn = document.getElementById("generateReport");
-  if (generateReportBtn) {
+  const reportModal = document.getElementById("reportActionModal");
+  const downloadReportBtn = document.getElementById("downloadReportBtn");
+  const shareReportBtn = document.getElementById("shareReportBtn");
+  const cancelReportBtn = document.getElementById("cancelReportBtn");
+
+  if (generateReportBtn && reportModal) {
+    // กดปุ่ม Report แล้วแสดง Modal เลือก
     generateReportBtn.addEventListener("click", async () => {
       try {
-        const currentDayElKwang = document.getElementById('kwangCurrentDay');
-        if (!currentDayElKwang) return;
-        
-        const rawDate = currentDayElKwang.textContent.trim(); 
-        const [dayStr, monthStr, yearStr] = rawDate.split(' - ');
-        const monthNames = ["January","February","March","April","May","June",
-                            "July","August","September","October","November","December"];
-        const month = String(monthNames.indexOf(monthStr) + 1).padStart(2,'0');
-        const day = dayStr.padStart(2,'0');
-        const year = yearStr;
-        const apiDate = `${year}-${month}-${day}`;
-
-        const res = await fetch(`https://momaybackendhospital-production.up.railway.app/solar-size?date=${apiDate}`);
-        if (!res.ok) throw new Error("Network response was not ok");
-        const json = await res.json();
-
-        const energyRes = await fetch(`https://api-kx4r63rdjq-an.a.run.app/daily-energy/px_pm3250?date=${apiDate}`);
-        const energyJson = await energyRes.json();
-        const energyData = energyJson.data || [];
-
-        const wrapper = document.getElementById("reportWrapper");
-        if (!wrapper) return;
-
-        document.getElementById("kwangDateReport").textContent = rawDate;
-        document.getElementById("kwangPowerReport").textContent = (json.dayEnergy ?? 0).toFixed(2) + " Unit";
-        document.getElementById("kwangCapacityReport").textContent = (json.solarCapacity_kW ?? 0).toFixed(2) + " kW";
-        document.getElementById("kwangBillReport").textContent = (json.savingsDay ?? 0).toFixed(2) + " THB";
-document.getElementById("kwangMonthReport").textContent = 
-  (json.savingsMonth ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " THB";
-
-        const tbody = document.querySelector("#kwangHourlyTable tbody");
-        if (tbody) {
-          tbody.innerHTML = "";
-          if (json.hourly && json.hourly.length > 0) {
-            json.hourly.forEach(hourData => {
-              const tr = document.createElement("tr");
-              tr.innerHTML = `<td>${hourData.hour}</td><td>${hourData.energy_kwh}</td>`;
-              tbody.appendChild(tr);
-            });
-          } else {
-            tbody.innerHTML = '<tr><td colspan="2">No data</td></tr>';
-          }
-        }
-
-        const reportCanvas = document.getElementById('EnergyChartReport');
-        if (reportCanvas) {
-          const reportCtx = reportCanvas.getContext('2d');
-          
-          if (window.reportChart) {
-            window.reportChart.destroy();
-          }
-
-          const labels = Array.from({ length: 1440 }, (_, i) => {
-            const hour = String(Math.floor(i / 60)).padStart(2,'0');
-            const min = String(i % 60).padStart(2,'0');
-            return `${hour}:${min}`;
-          });
-
-          const chartData = new Array(1440).fill(null);
-          energyData.forEach(item => {
-            const t = new Date(item.timestamp);
-            const idx = t.getUTCHours() * 60 + t.getUTCMinutes();
-            chartData[idx] = item.power;
-          });
-
-          let maxVal = null, maxIdx = null, sum = 0, count = 0;
-          chartData.forEach((v, i) => {
-            if (v !== null) {
-              if (maxVal === null || v > maxVal) {
-                maxVal = v;
-                maxIdx = i;
-              }
-              sum += v;
-              count++;
-            }
-          });
-          const avgVal = count > 0 ? sum / count : null;
-
-          const gradient = reportCtx.createLinearGradient(0, 0, 0, 300);
-          gradient.addColorStop(0, 'rgba(139,69,19,0.4)');
-          gradient.addColorStop(0.5, 'rgba(210,180,140,0.3)');
-          gradient.addColorStop(1, 'rgba(245,222,179,0.1)');
-
-          window.reportChart = new Chart(reportCtx, {
-            type: 'line',
-            data: {
-              labels,
-              datasets: [
-                {
-                  label: 'Power',
-                  data: chartData,
-                  borderColor: '#8B4513',
-                  backgroundColor: gradient,
-                  fill: true,
-                  borderWidth: 0.5,
-                  tension: 0.3,
-                  pointRadius: 0.1
-                },
-                {
-                  label: 'Max',
-                  data: new Array(1440).fill(null).map((_, i) => i === maxIdx ? maxVal : null),
-                  borderColor: '#ff9999',
-                  pointRadius: 5,
-                  pointBackgroundColor: '#ff9999',
-                  fill: false,
-                  showLine: false
-                },
-                {
-                  label: 'Average',
-                  data: new Array(1440).fill(avgVal),
-                  borderColor: '#000',
-                  borderDash: [5, 5],
-                  fill: false,
-                  pointRadius: 0,
-                  borderWidth: 1
-                }
-              ]
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: true,
-              animation: false,
-              interaction: { mode: null },
-              plugins: {
-                legend: { display: true },
-                tooltip: { enabled: false }
-              },
-              scales: {
-                x: {
-                  type: 'category',
-                  grid: { display: false },
-                  ticks: {
-                    autoSkip: false,
-                    color: '#000',
-                    maxRotation: 0,
-                    minRotation: 0,
-                    callback: function(v) {
-                      const l = this.getLabelForValue(v);
-                      if (!l) return '';
-                      const [h, m] = l.split(':');
-                      return m === '00' && parseInt(h) % 3 === 0 ? l : '';
-                    }
-                  },
-                  title: {
-                    display: true,
-                    text: 'Time (HH:MM)',
-                    color: '#000',
-                    font: { size: 12, weight: 'bold' }
-                  }
-                },
-                y: {
-                  grid: { display: false },
-                  beginAtZero: true,
-                  min: 0,
-                  ticks: { color: '#000' },
-                  title: {
-                    display: true,
-                    text: 'Power (kW)',
-                    color: '#000',
-                    font: { size: 12, weight: 'bold' }
-                  }
-                }
-              }
-            }
-          });
-        }
-
-        wrapper.style.opacity = 1;
-        wrapper.style.position = 'absolute';
-        wrapper.style.left = '-9999px';
-        wrapper.style.top = '0';
-        wrapper.style.visibility = 'visible';
-
-        setTimeout(() => {
-          html2canvas(wrapper, { scale: 1.5, useCORS: true, logging: false, allowTaint: false, removeContainer: false }).then(canvas => {
-            canvas.toBlob(blob => {
-              const file = new File([blob], `KwangReport-${apiDate}.png`, { type: 'image/png' });
-
-              if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                navigator.share({
-                  title: 'Kwang Solar Report',
-                  text: `รายงานพลังงานวันที่ ${rawDate}`,
-                  files: [file],
-                }).catch(err => {
-                  console.error('Share failed:', err);
-                  const link = document.createElement("a");
-                  link.href = URL.createObjectURL(blob);
-                  link.download = `KwangReport-${apiDate}.png`;
-                  link.click();
-                  URL.revokeObjectURL(link.href);
-                });
-              } else {
-                const link = document.createElement("a");
-                link.href = URL.createObjectURL(blob);
-                link.download = `KwangReport-${apiDate}.png`;
-                link.click();
-                URL.revokeObjectURL(link.href);
-              }
-
-              wrapper.style.opacity = 0;
-              wrapper.style.left = '-9999px';
-            });
-          });
-        }, 500);
-
+        reportDataCache = await prepareReportData();
+        if (!reportDataCache) return;
+        reportModal.style.display = "block";
       } catch (err) {
-        console.error("Generate report failed:", err);
-        alert("ไม่สามารถสร้างรายงานได้ ลองใหม่อีกครั้ง");
+        console.error("Prepare report failed:", err);
+        alert("ไม่สามารถเตรียมรายงานได้ ลองใหม่อีกครั้ง");
+      }
+    });
+
+    // ปุ่มโหลด
+    if (downloadReportBtn) {
+      downloadReportBtn.addEventListener("click", async () => {
+        if (!reportDataCache) return;
+        reportModal.style.display = "none";
+        
+        try {
+          const { rawDate, apiDate, json, energyData } = reportDataCache;
+          const result = await renderReport(rawDate, apiDate, json, energyData);
+          if (!result) return;
+
+          result.canvas.toBlob(blob => {
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `KwangReport-${result.apiDate}.png`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+          });
+        } catch (err) {
+          console.error("Download report failed:", err);
+          alert("ไม่สามารถโหลดรายงานได้");
+        }
+      });
+    }
+
+    // ปุ่มแชร์
+    if (shareReportBtn) {
+      shareReportBtn.addEventListener("click", async () => {
+        if (!reportDataCache) return;
+        reportModal.style.display = "none";
+
+        try {
+          const { rawDate, apiDate, json, energyData } = reportDataCache;
+          const result = await renderReport(rawDate, apiDate, json, energyData);
+          if (!result) return;
+
+          result.canvas.toBlob(blob => {
+            const file = new File([blob], `KwangReport-${result.apiDate}.png`, { type: 'image/png' });
+
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+              navigator.share({
+                title: 'Kwang Solar Report',
+                text: `รายงานพลังงานวันที่ ${result.rawDate}`,
+                files: [file],
+              }).catch(err => {
+                console.error('Share failed:', err);
+                alert("ไม่สามารถแชร์ได้ กรุณาลองอีกครั้ง");
+              });
+            } else {
+              alert("อุปกรณ์นี้ไม่รองรับการแชร์");
+            }
+          });
+        } catch (err) {
+          console.error("Share report failed:", err);
+          alert("ไม่สามารถแชร์รายงานได้");
+        }
+      });
+    }
+
+    // ปุ่มยกเลิก
+    if (cancelReportBtn) {
+      cancelReportBtn.addEventListener("click", () => {
+        reportModal.style.display = "none";
+      });
+    }
+
+    // คลิกนอก Modal
+    reportModal.addEventListener("click", (e) => {
+      if (e.target === reportModal) {
+        reportModal.style.display = "none";
       }
     });
   }
