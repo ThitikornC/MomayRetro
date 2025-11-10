@@ -11,33 +11,9 @@
   }
 
   function showErrorOverlay(rec) {
-    try {
-      if (document.readyState === 'loading') return; // DOM not ready
-      let el = document.getElementById('errorOverlay');
-      if (!el) {
-        el = document.createElement('div');
-        el.id = 'errorOverlay';
-        Object.assign(el.style, {
-          position: 'fixed',
-          right: '12px',
-          bottom: '12px',
-          background: 'rgba(200,30,30,0.95)',
-          color: '#fff',
-          padding: '10px 12px',
-          borderRadius: '6px',
-          zIndex: 99999,
-          fontSize: '12px',
-          maxWidth: '320px',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
-          whiteSpace: 'pre-wrap'
-        });
-        document.body.appendChild(el);
-      }
-      el.textContent = `[${new Date(rec.ts).toLocaleTimeString()}] ${rec.message}${rec.file ? '\n' + rec.file + ':' + rec.line : ''}${rec.stack ? '\n' + rec.stack.split('\n').slice(0,3).join('\n') : ''}`;
-      el.style.display = 'block';
-      clearTimeout(el._hideTimer);
-      el._hideTimer = setTimeout(() => { el.style.display = 'none'; }, 15000);
-    } catch (e) {}
+    // Disabled - don't show error overlay to users
+    // Errors are still logged to console and localStorage
+    return;
   }
 
   function capture(record) {
@@ -767,27 +743,42 @@ initializeChart();
       },
 
       dateClick: async function(info) {
-        const pricePerUnit = 4.4;
-        const datePopup = document.getElementById("DatePopup");
-        const popupDateEl = datePopup?.querySelector(".popup-date");
-        const popupBillEl = document.getElementById("popup-bill");
-        const popupUnitEl = document.getElementById("popup-unit");
-
-        datePopup.style.display = "flex";
-        datePopup.classList.add("active");
-        popupDateEl.textContent = info.dateStr;
-
         try {
-          const res = await fetch(`https://momaybackendhospital-production.up.railway.app/daily-bill?date=${info.dateStr}`);
-          const json = await res.json();
-          const bill = json.electricity_bill ?? 0;
-          const unit = bill / pricePerUnit;
+          const pricePerUnit = 4.4;
+          const datePopup = document.getElementById("DatePopup");
+          if (!datePopup) {
+            console.warn('DatePopup element not found');
+            return;
+          }
+          
+          const popupDateEl = datePopup.querySelector(".popup-date");
+          const popupBillEl = document.getElementById("popup-bill");
+          const popupUnitEl = document.getElementById("popup-unit");
 
-          popupBillEl.textContent = `${bill.toFixed(2)} THB`;
-          popupUnitEl.textContent = `${unit.toFixed(2)} Unit`;
+          if (!popupDateEl || !popupBillEl || !popupUnitEl) {
+            console.warn('Popup elements not found');
+            return;
+          }
+
+          datePopup.style.display = "flex";
+          datePopup.classList.add("active");
+          popupDateEl.textContent = info.dateStr;
+
+          try {
+            const res = await fetch(`https://momaybackendhospital-production.up.railway.app/daily-bill?date=${info.dateStr}`);
+            const json = await res.json();
+            const bill = json.electricity_bill ?? 0;
+            const unit = bill / pricePerUnit;
+
+            popupBillEl.textContent = `${bill.toFixed(2)} THB`;
+            popupUnitEl.textContent = `${unit.toFixed(2)} Unit`;
+          } catch (err) {
+            console.error('Error fetching daily bill:', err);
+            popupBillEl.textContent = "Error";
+            popupUnitEl.textContent = "";
+          }
         } catch (err) {
-          popupBillEl.textContent = "Error";
-          popupUnitEl.textContent = "";
+          console.error('Error in dateClick handler:', err);
         }
       }
     });

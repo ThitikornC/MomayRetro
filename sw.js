@@ -5,8 +5,8 @@ const API_TTL = 24 * 60 * 60 * 1000; // 24 hours
 const PRECACHE_URLS = [
   '/',
   '/index.html',
-  '/style.css?v=2.34',
-  '/script.js?v=2.34',
+  '/style.css?v=2.35',
+  '/script.js?v=2.35',
   '/manifest.json',
   '/icons/icon-192.png',
   '/icons/icon-512.png'
